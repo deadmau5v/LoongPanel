@@ -20,7 +20,11 @@ func Dir(path string) ([]File, error) {
 		fileStat, _ := file_.Info()
 
 		file := File{Name: file_.Name()}
-		file.Path = path + string(os.PathSeparator) + file_.Name()
+		if path != "/" {
+			file.Path = path + string(os.PathSeparator) + file_.Name()
+		} else {
+			file.Path = path + file_.Name()
+		}
 		file.User = strconv.Itoa(int(fileStat.Sys().(*syscall.Stat_t).Uid))
 		file.Group = strconv.Itoa(int(fileStat.Sys().(*syscall.Stat_t).Gid))
 		file.Size = fileStat.Size()
@@ -28,6 +32,7 @@ func Dir(path string) ([]File, error) {
 		file.Time = fileStat.ModTime().Format("2024-04-1 2:15:05")
 		file.IsDir = fileStat.IsDir()
 		file.IsHidden = file_.Name()[0] == '.'
+		files = append(files, file)
 	}
 
 	return files, err
