@@ -26,14 +26,17 @@ func Dir(path string) ([]File, error) {
 		} else {
 			file.Path = path + file_.Name()
 		}
-		file.User = strconv.Itoa(int(fileStat.Sys().(*syscall.Stat_t).Uid))
-		file.Group = strconv.Itoa(int(fileStat.Sys().(*syscall.Stat_t).Gid))
-		file.Size = fileStat.Size()
-		file.Mod = fileStat.Mode().String()
-		file.Time = fileStat.ModTime().Format("2024-04-1 2:15:05")
-		file.IsDir = fileStat.IsDir()
-		file.IsHidden = file_.Name()[0] == '.'
-		if strings.Contains(".", file.Name[1:]) {
+		// 路径
+
+		file.User = strconv.Itoa(int(fileStat.Sys().(*syscall.Stat_t).Uid))  // 所属组
+		file.Group = strconv.Itoa(int(fileStat.Sys().(*syscall.Stat_t).Gid)) // 所属组
+		file.Size = fileStat.Size()                                          // 大小
+		file.Mod = fileStat.Mode().String()                                  // 权限
+		file.Time = fileStat.ModTime().Format("2024-04-1 2:15:05")           // 时间
+		file.IsDir = fileStat.IsDir()                                        // 是否是目录
+		file.IsHidden = file_.Name()[0] == '.'                               // 是否隐藏
+		// 文件类型
+		if !file.IsDir && strings.Contains(".", file.Name[1:]) {
 			file.Ext = file.Name[strings.LastIndex(file.Name, ".")+1:]
 		} else {
 			file.Ext = ""
