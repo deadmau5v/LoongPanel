@@ -3,6 +3,7 @@ package Files
 import (
 	"os"
 	"strconv"
+	"strings"
 	"syscall"
 )
 
@@ -32,6 +33,11 @@ func Dir(path string) ([]File, error) {
 		file.Time = fileStat.ModTime().Format("2024-04-1 2:15:05")
 		file.IsDir = fileStat.IsDir()
 		file.IsHidden = file_.Name()[0] == '.'
+		if strings.Contains(".", file.Name[1:]) {
+			file.Ext = file.Name[strings.LastIndex(file.Name, ".")+1:]
+		} else {
+			file.Ext = ""
+		}
 		files = append(files, file)
 	}
 

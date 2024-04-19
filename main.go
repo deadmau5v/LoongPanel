@@ -3,11 +3,20 @@ package main
 import (
 	"LoongPanel/Panel/Files"
 	"fmt"
-	"strings"
 )
 
 func main() {
-	s := fmt.Sprint(Files.Dir("/"))
-	s = strings.Replace(s, "}", "}\n", -1)
-	fmt.Println(s)
+	dir, _ := Files.Dir("/root")
+	for _, v := range dir {
+		fmt.Println(
+			"Name:", v.Name,
+			"Size:", v.Size,
+			"Time:", v.Time,
+			"IsDir:", v.IsDir,
+			"Mod:", v.Mod,
+			"Path:", v.Path,
+			"Ext:", v.Ext,
+			"IsHidden:", v.IsHidden,
+		)
+	}
 }
