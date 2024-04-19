@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	dir, _ := Files.Dir("/root")
+	dir, _ := Files.Dir("/")
 	for _, v := range dir {
 		fmt.Println(
 			"Name:", v.Name,
