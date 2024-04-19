@@ -6,17 +6,23 @@ import (
 )
 
 func main() {
-	dir, _ := Files.Dir("/")
-	for _, v := range dir {
+	dir, _ := Files.Dir("C:\\Users\\d5v\\Desktop\\test")
+	for _, file := range dir {
 		fmt.Println(
-			"Name:", v.Name,
-			"Size:", v.Size,
-			"Time:", v.Time,
-			"IsDir:", v.IsDir,
-			"Mod:", v.Mod,
-			"Path:", v.Path,
-			"Ext:", v.Ext,
-			"IsHidden:", v.IsHidden,
+			"Name:", file.Name,
+			"Size:", file.Size,
+			"Time:", file.Time,
+			"IsDir:", file.IsDir,
+			"Mode:", file.Mode,
+			"Path:", file.Path,
+			"Ext:", file.Ext,
+			"IsHidden:", file.IsHidden,
 		)
+
+		err := file.Copy(file.Path + ".txt")
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
 	}
 }

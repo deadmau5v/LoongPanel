@@ -112,7 +112,6 @@ func DiskWriteIO() (map[string]uint64, error) {
 
 // NetworkIO 网络IO监控
 func NetworkIO() ([]NetworkIOStat, error) {
-	//	网络IO监控
 	counters, err := net.IOCounters(true)
 	if err != nil {
 		return nil, err
