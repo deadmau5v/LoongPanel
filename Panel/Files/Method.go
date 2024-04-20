@@ -86,7 +86,7 @@ func (f *File) Copy(dst *File) error {
 
 	if f.IsDir {
 		// 复制目录
-		err := fs.MkdirAll(dst.Path, src.Mode())
+		err := fs.MkdirAll(dst.Path+string(os.PathSeparator), src.Mode())
 		if err != nil {
 			return err
 		}
@@ -94,7 +94,7 @@ func (f *File) Copy(dst *File) error {
 
 		case "linux":
 			{
-				err := exec.Command("cp", "-r", f.Path, dst.Path).Run()
+				err := exec.Command("cp", "-r", f.Path, dst.Path+string(os.PathSeparator)).Run()
 				if err != nil {
 					return err
 				}

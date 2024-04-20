@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	dir, _ := Files.Dir("C:\\Users\\d5v\\Desktop\\test")
+	dir, _ := Files.Dir("/root/LoongPanel/test")
 	for _, file := range dir {
 		fmt.Println(
 			"Name:", file.Name,
@@ -18,12 +18,14 @@ func main() {
 			"Ext:", file.Ext,
 			"IsHidden:", file.IsHidden,
 		)
-		newFile := Files.NewFile()
-		newFile.Path = file.Path + ".copy.txt"
-		err := file.Copy(newFile)
-		if err != nil {
-			fmt.Println(err.Error())
-			return
+		if !file.IsDir {
+			newFile := Files.NewFile()
+			newFile.Path = file.Path + " back"
+			err := file.Copy(newFile)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 		}
 	}
 }
