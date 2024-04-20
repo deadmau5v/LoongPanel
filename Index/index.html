@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #aside {
+            background-image: url("./static/images/aside.png");
+        /*  固定背景图片  */
+            background-attachment: fixed;
+        }
+
+        #title_text {
+            color: #ff0000;
+        /*  居中  */
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div id="box" class="flex h-screen bg-[#fde8e8]">
+    <aside id="aside" class="w-60 p-5">
+        <!--    Logo图片 导入SVG   -->
+        <div class="mb-5">
+            <img src="./static/images/logo.png" alt="logo">
+        </div>
+        <!--    Logo标题    -->
+        <div class="mb-10">
+            <h1 id="title_text" class="text-3xl font-bold">LoongPanel</h1>
+        </div>
+        <nav class="space-y-2">
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 px-4 py-2 w-full bg-white text-[#ff6464]">
+                首页
+            </button>
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 px-4 py-2 w-full bg-white text-[#ff6464]">
+                状态
+            </button>
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 px-4 py-2 w-full bg-white text-[#ff6464]">
+                用户
+            </button>
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 px-4 py-2 w-full bg-white text-[#ff6464]">
+                设置
+            </button>
+            <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-primary/90 h-10 px-4 py-2 w-full bg-white text-[#ff6464]">
+                文档
+            </button>
+        </nav>
+    </aside>
+    <main class="flex-grow p-5">
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-2">CPU占用</h2>
+                <div class="w-24 h-24">
+                    <div style="width: 100%; height: 100%;"></div>
+                </div>
+                <span class="text-lg font-semibold">60%</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-2">内存占用</h2>
+                <div class="w-24 h-24">
+                    <div style="width: 100%; height: 100%;"></div>
+                </div>
+                <span class="text-lg font-semibold">40%</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-2">负荷</h2>
+                <div class="w-24 h-24">
+                    <div style="width: 100%; height: 100%;"></div>
+                </div>
+                <span class="text-lg font-semibold">40%</span>
+            </div>
+        </div>
+        <div class="bg-white p-5">
+            <h2 class="text-xl font-semibold mb-4">磁盘</h2>
+            <div class="space-y-2">
+                <div class="flex items-center">
+                    <span class="flex-grow text-sm font-medium">/</span>
+                    <div
+                            aria-valuemax="100"
+                            aria-valuemin="0"
+                            role="progressbar"
+                            data-state="indeterminate"
+                            data-max="100"
+                            class="relative h-2 overflow-hidden rounded-full bg-primary/20 w-[60%]"
+                    >
+                        <div
+                                data-state="indeterminate"
+                                data-max="100"
+                                class="h-full w-full flex-1 bg-primary transition-all"
+                                style="transform: translateX(-50%);"
+                        ></div>
+                    </div>
+                    <span class="ml-2 text-sm font-medium">2024G/2077G</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="flex-grow text-sm font-medium">/mnt/c</span>
+                    <div
+                            aria-valuemax="100"
+                            aria-valuemin="0"
+                            role="progressbar"
+                            data-state="indeterminate"
+                            data-max="100"
+                            class="relative h-2 overflow-hidden rounded-full bg-primary/20 w-[60%]"
+                    >
+                        <div
+                                data-state="indeterminate"
+                                data-max="100"
+                                class="h-full w-full flex-1 bg-primary transition-all"
+                                style="transform: translateX(-50%);"
+                        ></div>
+                    </div>
+                    <span class="ml-2 text-sm font-medium">2024G/4096G</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>
