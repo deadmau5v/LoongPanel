@@ -35,7 +35,7 @@ func Dir(path string) ([]File, error) {
 		file.IsDir = fileStat.IsDir()          // 是否是目录
 		file.IsHidden = file_.Name()[0] == '.' // 是否隐藏
 		// 文件类型
-		if !file.IsDir && strings.Contains(".", file.Name[1:]) {
+		if !file.IsDir && strings.Contains(file.Name[1:], ".") {
 			runeName := []rune(file.Name)
 			file.Ext = string(runeName[strings.LastIndex(file.Name, ".")+1:])
 		} else {
