@@ -18,8 +18,9 @@ func main() {
 			"Ext:", file.Ext,
 			"IsHidden:", file.IsHidden,
 		)
-
-		err := file.Copy(file.Path + ".txt")
+		newFile := Files.NewFile()
+		newFile.Path = file.Path + ".copy.txt"
+		err := file.Copy(newFile)
 		if err != nil {
 			fmt.Println(err.Error())
 			return

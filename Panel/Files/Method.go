@@ -1,46 +1,45 @@
 package Files
 
 import (
+	"LoongPanel/Panel/System"
 	"errors"
-	"io"
+	"github.com/spf13/afero"
 	"os"
+	"os/exec"
+	"time"
 )
 
 // Delete 删除当前文件
 func (f *File) Delete() error {
-	err := os.Remove(f.Path)
-	if err != nil {
-		return err
+	fs := afero.NewOsFs()
+	if f.IsDir {
+		err := fs.RemoveAll(f.Path)
+		if err != nil {
+			return err
+		}
+	} else {
+		err := fs.Remove(f.Path)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-// New 创建一个新文件 or 路径
-func (f *File) New() error {
+// Create 创建一个新文件 or 路径
+func (f *File) Create() error {
+	fs := afero.NewOsFs()
 	// 创建文件
 	if f.IsDir {
-		err := os.MkdirAll(f.Path, f.Mode)
+		err := fs.MkdirAll(f.Path, f.Mode)
 		if err != nil {
 			return err
 		}
-		return nil
 	} else {
-		file, err := os.Create(f.Path)
+		_, err := fs.Create(f.Path)
 		if err != nil {
 			return err
 		}
-		defer func(file *os.File) {
-			err := file.Close()
-			if err != nil {
-				return
-			}
-		}(file)
-	}
-	// 设置权限
-
-	err := os.Chmod(f.Path, f.Mode)
-	if err != nil {
-		return err
 	}
 	return nil
 }
@@ -61,50 +60,73 @@ func (f *File) setName(name string) error {
 	return nil
 }
 
+// NewFile 返回默认对象
+func NewFile() *File {
+	return &File{
+		Name:  "NewFile",
+		Size:  0,
+		Time:  time.Now(),
+		IsDir: false,
+		Mode:  os.ModePerm,
+		Path:  "/NewFile",
+		Ext:   "",
+	}
+}
+
 // Copy 复制文件
-func (f *File) Copy(path string) error {
+func (f *File) Copy(dst *File) error {
+	if f.Path == dst.Path {
+		return errors.New("源文件与目标文件路径相同")
+	}
+	fs := afero.NewOsFs()
+	src, err := fs.Stat(f.Path)
+	if err != nil {
+		return err
+	}
+
 	if f.IsDir {
-		// Todo: 复制文件夹
+		// 复制目录
+		err := fs.MkdirAll(dst.Path, src.Mode())
+		if err != nil {
+			return err
+		}
+		switch System.Data.OSName {
+
+		case "linux":
+			{
+				err := exec.Command("cp", "-r", f.Path, dst.Path).Run()
+				if err != nil {
+					return err
+				}
+			}
+		case "windows":
+			{
+				err := exec.Command("xcopy", f.Path, dst.Path, "/s", "/e").Run()
+				if err != nil {
+					return err
+				}
+			}
+
+		}
 	} else {
-		// 读取文件
-		file, err := os.Open(f.Path)
-		if err != nil {
-			return err
-		}
-		defer func(file *os.File) {
-			err := file.Close()
-			if err != nil {
-				return
-			}
-		}(file)
-
-		// 创建文件
-		newFileObj := File{
-			Name:  f.Name,
-			Path:  path,
-			Mode:  f.Mode,
-			IsDir: f.IsDir,
-		}
-		err = newFileObj.New()
-		if err != nil {
-			return err
-		}
-		newFile, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer func(newFile *os.File) {
-			err := newFile.Close()
-			if err != nil {
-				return
-			}
-		}(newFile)
-
 		// 复制文件
-		_, err = io.Copy(newFile, file)
-		if err != nil {
-			return err
+		switch System.Data.OSName {
+		case "windows":
+			{
+				err := exec.Command("copy", f.Path, dst.Path).Run()
+				if err != nil {
+					return err
+				}
+			}
+		case "linux":
+			{
+				err := exec.Command("cp", "-f", f.Path, dst.Path).Run()
+				if err != nil {
+					return err
+				}
+			}
 		}
+
 	}
 	return nil
 }
