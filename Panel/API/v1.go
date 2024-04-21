@@ -40,3 +40,21 @@ func MemoryPercent(ctx *gin.Context) {
 	data["max"] = System.Data.RAM
 	ctx.JSON(http.StatusOK, data)
 }
+
+func SystemInfo(ctx *gin.Context) {
+	data := map[string]interface{}{
+		"system_arch":          "",
+		"system_public_ip":     "",
+		"system_cpu_name":      "",
+		"system_linux_version": "",
+		"system_run_time":      "",
+	}
+
+	data["system_arch"] = System.Data.OSArch
+	data["system_public_ip"] = System.PublicIP
+	data["system_cpu_name"] = System.Data.CPUName
+	data["system_linux_version"] = System.Data.LinuxVersion
+	data["system_run_time"] = System.GetRunTime()
+
+	ctx.JSON(http.StatusOK, data)
+}

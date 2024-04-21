@@ -177,6 +177,13 @@ func GetOSData() (*OSData, error) {
 	Data.OSArch = runtime.GOARCH
 	Data.OSName = runtime.GOOS
 	Data.HostName, err = os.Hostname()
+
+	//Linux 内核版本
+	if Data.OSName == "linux" {
+		Data.LinuxVersion = runtime.GOOS + " " + runtime.GOARCH
+	} else if Data.OSName == "windows" {
+		Data.LinuxVersion = "windows无法获取"
+	}
 	// 网络相关
 	Data.HostIP, err = getLocalIP()
 	Data.RAM, err = getRAM()
@@ -185,4 +192,17 @@ func GetOSData() (*OSData, error) {
 	Data.Disks, err = getDisk()
 
 	return Data, err
+}
+
+// GetRunTime 获取系统运行时间
+func GetRunTime() string {
+	if Data.OSName == "windows" {
+		return "Windows无法获取"
+	}
+	out, err := exec.Command("uptime").Output()
+	if err != nil {
+		fmt.Println("GetRunTime() Error: ", err.Error())
+		return ""
+	}
+	return string(out)
 }

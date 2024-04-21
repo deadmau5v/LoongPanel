@@ -17,6 +17,8 @@ type OSData struct {
 	CPUName   string  `json:"CPUName"`   // CPU 名称
 	CPUMHz    float64 `json:"CPUMHz"`    // CPU 频率
 
+	LinuxVersion string `json:"LinuxVersion"` // Linux 版本
+
 	Disks []*Disk `json:"Disks"` // 盘符
 }
 
