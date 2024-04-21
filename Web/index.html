@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="./static/lib/echarts.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
-
+    <link rel="stylesheet" href="./static/lib/font-awesome-4.7.0/css/font-awesome.min.css">
     <style>
         #aside {
             top: 0;
@@ -64,6 +64,8 @@
         #activated {
             margin-top: 0;
             background: white;
+        /*  描边加宽  */
+            border: 4px solid #ff0000;
         }
 
         #activated:active {
@@ -162,6 +164,12 @@
             background: #ff6f6f;
             border-radius: 10px;
             height: 100%;
+            transition: all 0.5s;
+        }
+
+        .fill:hover {
+            background: #eb3b3b;
+
         }
 
 
@@ -228,21 +236,21 @@
         </div>
         <nav class="space-y-6" id="buttons">
             <a href="/">
-                <button id="activated" class="aside_button">
+                <button id="activated" class="aside_button fa fa-home">
                     首页
                 </button>
             </a>
-            <button class="aside_button">
+            <button class="aside_button fa fa-microchip">
                 状态
             </button>
-            <button class="aside_button">
+            <button class="aside_button fa fa-user">
                 用户
             </button>
-            <button class="aside_button">
+            <button class="aside_button fa fa-gear">
                 设置
             </button>
-            <button class="aside_button">
-                文档
+            <button class="aside_button fa fa-archive">
+                应用
             </button>
         </nav>
 
@@ -358,8 +366,8 @@
                             li.appendChild(span2)
                             li.appendChild(progress)
                             li.appendChild(span3)
-
                             ul.appendChild(li)
+                            // Todo 把 use 和 max 分开到两个span
 
                         }
                     })
@@ -450,7 +458,7 @@
             MemoryCharts1.setOption(MemoryCharts1Option);
             MemoryCharts1Option.animation = false
             getMemoryPercent()
-            setInterval(getMemoryPercent, 2000);
+            setInterval(getMemoryPercent, 10500); // 避免并发
         </script>
 
 

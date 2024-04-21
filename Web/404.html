@@ -8,13 +8,14 @@
     <title>首页</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="./static/lib/echarts.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
 
     <style>
         #aside {
             top: 0;
             left: 0;
             height: 100%;
-            width: 300px;
+            width: 350px;
             position: relative;
             z-index: 2;
             padding: 25px;
@@ -63,6 +64,8 @@
         #activated {
             margin-top: 0;
             background: white;
+        /*  描边加宽  */
+            border: 4px solid #ff0000;
         }
 
         #activated:active {
@@ -70,81 +73,71 @@
             color: white;
         }
 
-        #show {
-            background: white;
-            color: red;
-            /*  位置固定到侧边栏的左边中间  */
-            position: absolute;
-            top: 50%;
-            left: 285px;
-            transform: translateY(-50%);
-            /*  圆形背景  */
-            border-radius: 50%;
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /*  描边  */
-            border: 1px solid #ff0000;
-            font-family: ui-serif;
-            /*  防止选中  */
-            user-select: none;
-        }
 
-        #errorMsg {
-            font-size: 3rem;
-            color: #ff0000;
+        .charts_title {
             text-align: center;
+            font-size: 1.5rem;
+            color: #ff6f6f;
+
+            background: #ffffff;
+            border: 1px solid rgba(255, 0, 0, 0.25);
+            width: 100%;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 20px;
+
         }
+
+        #content {
+            background-color: #FFFFFF;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='%23B0B0B0' stroke-width='1.5' stroke-opacity='0.2'%3E%3Crect x='-40' y='40' width='75' height='75'/%3E%3Crect x='-35' y='45' width='65' height='65'/%3E%3Crect x='-30' y='50' width='55' height='55'/%3E%3Crect x='-25' y='55' width='45' height='45'/%3E%3Crect x='-20' y='60' width='35' height='35'/%3E%3Crect x='-15' y='65' width='25' height='25'/%3E%3Crect x='-10' y='70' width='15' height='15'/%3E%3Crect x='-5' y='75' width='5' height='5'/%3E%3Crect width='35' height='35'/%3E%3Crect x='5' y='5' width='25' height='25'/%3E%3Crect x='10' y='10' width='15' height='15'/%3E%3Crect x='15' y='15' width='5' height='5'/%3E%3Crect x='40' width='75' height='75'/%3E%3Crect x='45' y='5' width='65' height='65'/%3E%3Crect x='50' y='10' width='55' height='55'/%3E%3Crect x='55' y='15' width='45' height='45'/%3E%3Crect x='60' y='20' width='35' height='35'/%3E%3Crect x='65' y='25' width='25' height='25'/%3E%3Crect x='70' y='30' width='15' height='15'/%3E%3Crect x='75' y='35' width='5' height='5'/%3E%3Crect x='40' y='80' width='35' height='35'/%3E%3Crect x='45' y='85' width='25' height='25'/%3E%3Crect x='50' y='90' width='15' height='15'/%3E%3Crect x='55' y='95' width='5' height='5'/%3E%3Crect x='120' y='-40' width='75' height='75'/%3E%3Crect x='125' y='-35' width='65' height='65'/%3E%3Crect x='130' y='-30' width='55' height='55'/%3E%3Crect x='135' y='-25' width='45' height='45'/%3E%3Crect x='140' y='-20' width='35' height='35'/%3E%3Crect x='145' y='-15' width='25' height='25'/%3E%3Crect x='150' y='-10' width='15' height='15'/%3E%3Crect x='155' y='-5' width='5' height='5'/%3E%3Crect x='120' y='40' width='35' height='35'/%3E%3Crect x='125' y='45' width='25' height='25'/%3E%3Crect x='130' y='50' width='15' height='15'/%3E%3Crect x='135' y='55' width='5' height='5'/%3E%3Crect y='120' width='75' height='75'/%3E%3Crect x='5' y='125' width='65' height='65'/%3E%3Crect x='10' y='130' width='55' height='55'/%3E%3Crect x='15' y='135' width='45' height='45'/%3E%3Crect x='20' y='140' width='35' height='35'/%3E%3Crect x='25' y='145' width='25' height='25'/%3E%3Crect x='30' y='150' width='15' height='15'/%3E%3Crect x='35' y='155' width='5' height='5'/%3E%3Crect x='200' y='120' width='75' height='75'/%3E%3Crect x='40' y='200' width='75' height='75'/%3E%3Crect x='80' y='80' width='75' height='75'/%3E%3Crect x='85' y='85' width='65' height='65'/%3E%3Crect x='90' y='90' width='55' height='55'/%3E%3Crect x='95' y='95' width='45' height='45'/%3E%3Crect x='100' y='100' width='35' height='35'/%3E%3Crect x='105' y='105' width='25' height='25'/%3E%3Crect x='110' y='110' width='15' height='15'/%3E%3Crect x='115' y='115' width='5' height='5'/%3E%3Crect x='80' y='160' width='35' height='35'/%3E%3Crect x='85' y='165' width='25' height='25'/%3E%3Crect x='90' y='170' width='15' height='15'/%3E%3Crect x='95' y='175' width='5' height='5'/%3E%3Crect x='120' y='160' width='75' height='75'/%3E%3Crect x='125' y='165' width='65' height='65'/%3E%3Crect x='130' y='170' width='55' height='55'/%3E%3Crect x='135' y='175' width='45' height='45'/%3E%3Crect x='140' y='180' width='35' height='35'/%3E%3Crect x='145' y='185' width='25' height='25'/%3E%3Crect x='150' y='190' width='15' height='15'/%3E%3Crect x='155' y='195' width='5' height='5'/%3E%3Crect x='160' y='40' width='75' height='75'/%3E%3Crect x='165' y='45' width='65' height='65'/%3E%3Crect x='170' y='50' width='55' height='55'/%3E%3Crect x='175' y='55' width='45' height='45'/%3E%3Crect x='180' y='60' width='35' height='35'/%3E%3Crect x='185' y='65' width='25' height='25'/%3E%3Crect x='190' y='70' width='15' height='15'/%3E%3Crect x='195' y='75' width='5' height='5'/%3E%3Crect x='160' y='120' width='35' height='35'/%3E%3Crect x='165' y='125' width='25' height='25'/%3E%3Crect x='170' y='130' width='15' height='15'/%3E%3Crect x='175' y='135' width='5' height='5'/%3E%3Crect x='200' y='200' width='35' height='35'/%3E%3Crect x='200' width='35' height='35'/%3E%3Crect y='200' width='35' height='35'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+
+        #disk_list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%
+        }
+
+
+        #disk_list li {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            margin: 10px;
+            width: 100%
+        }
+
+        /* 第一个Span 10% 第二个 20% */
+        #disk_list li span {
+            width: 10%;
+        }
+
+
+        #disk_list li progress {
+            width: 60%;
+            border-radius: 10px;
+
+            color: red;
+            background: #f3f3f3;
+        }
+
+
     </style>
-    <script>
-        function aside_show() {
-
-            document.getElementById("aside").style.width = "300px";
-            document.getElementById("aside").style.padding = "25px";
-            document.getElementById("aside_background").style.width = "2000px";
-            document.getElementById("show").style.left = "285px";
-            document.getElementById("show").textContent = "<";
-            document.getElementById("show").onclick = aside_close;
-            document.getElementById("logo").style.height = "60%";
-            document.getElementById("logo").style.width = "60%";
-            document.getElementById("logo").style.marginTop = "0px";
-            let buttons = document.getElementsByClassName("aside_button");
-            for (const button of buttons) {
-                button.style.width = "100%";
-                button.style.height = "2.5rem";
-                button.style.marginLeft = "auto";
-            }
-            document.getElementById("title_text").style.display = "block";
-        }
-
-        function aside_close() {
-            document.getElementById("aside").style.width = "60px";
-            document.getElementById("aside").style.padding = "2px";
-            document.getElementById("aside_background").style.width = "60px";
-            document.getElementById("show").style.left = "40px";
-            document.getElementById("show").textContent = ">";
-            document.getElementById("show").onclick = aside_show;
-            document.getElementById("logo").style.height = "80%";
-            document.getElementById("logo").style.width = "80%";
-            document.getElementById("logo").style.marginTop = "10px";
-            let buttons = document.getElementsByClassName("aside_button");
-            for (const button of buttons) {
-                button.style.width = "30px";
-                button.style.height = "3.5rem";
-                button.style.marginLeft = "10px";
-            }
-            document.getElementById("title_text").style.display = "none";
-        }
-    </script>
 </head>
 <body>
 
 
 <div id="box" class="flex h-screen bg-[#fde8e8]">
     <!--  侧边栏  -->
-    <div id="aside" class="w-60">
+    <div id="aside">
         <!--    背景    -->
         <img id="aside_background" src="./static/images/aside.png" alt="bg">
         <!--    Logo图片 导入SVG   -->
@@ -156,9 +149,11 @@
             <h1 id="title_text" class="text-3xl font-bold">LoongPanel</h1>
         </div>
         <nav class="space-y-6" id="buttons">
-            <button id="activated" class="aside_button">
-                首页
-            </button>
+            <a href="/">
+                <button id="activated" class="aside_button">
+                    首页
+                </button>
+            </a>
             <button class="aside_button">
                 状态
             </button>
@@ -169,22 +164,18 @@
                 设置
             </button>
             <button class="aside_button">
-                文档
+                应用
             </button>
         </nav>
-        <button id="show" onclick="aside_close()">
-            <
-        </button>
+
     </div>
 
 
     <!-- 内容 -->
-    <div style="width: 100%; height: 100%">
-    <h1 id="errorMsg">404 Not Found</h1>
+    <div id="content" style="width: 100%; margin: auto; text-align: center; background: rgba(255,111,111,0)">
+        <h1 style="font-size: 100px;color: #ff6f6f"><span style="color: red">404</span> not fund page  <span style="color: black">>_<</span></h1>
     </div>
 
-
-</div>
 
 </body>
 
