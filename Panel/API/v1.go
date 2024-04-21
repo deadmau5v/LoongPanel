@@ -58,3 +58,9 @@ func SystemInfo(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, data)
 }
+
+func Disks(ctx *gin.Context) {
+	data := map[string]interface{}{}
+	data["disks"] = System.Data.Disks
+	ctx.JSON(http.StatusOK, data)
+}

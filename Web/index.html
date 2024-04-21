@@ -87,7 +87,6 @@
             padding: 20px;
             margin: 20px;
 
-            max-width: 500px;
         }
 
         #content {
@@ -114,6 +113,57 @@
             width: 100px;
         }
 
+        #disk_list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%
+        }
+
+
+        #disk_list li {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            margin: 10px;
+            width: 100%
+        }
+
+        /* 第一个Span 10% 第二个 20% */
+        #disk_list li span {
+            width: 10%;
+        }
+
+
+        #disk_list li progress {
+            width: 60%;
+            border-radius: 10px;
+
+            color: red;
+            background: #f3f3f3;
+        }
+
+        .progress {
+            width: 100%;
+            height: 30px;
+            align-items: center;
+            margin: auto;
+            display: flex;
+            background: white;
+            /*  圆角  */
+            border-radius: 10px;
+            /*  描边  */
+            border: 1px solid #ff6f6f;
+        }
+
+        .fill {
+            background: #ff6f6f;
+            border-radius: 10px;
+            height: 100%;
+        }
+
 
     </style>
     <script>
@@ -124,6 +174,9 @@
                     // 处理响应数据
                     let data = response.data;
                     if (data.status === 0) {
+                        if (data.percent < 1) {
+                            data.percent = 1
+                        }
                         CPUCharts1option.series[0].data[0].value = data.percent;
                         CPUCharts1option.series[0].data[1].value = 100 - data.percent;
                         CPUCharts1.setOption(CPUCharts1option);
@@ -221,15 +274,15 @@
                         <td id="system_public_ip">获取中...</td>
                     </tr>
                     <tr>
-                        <td class="td_key" >处理器名</td>
+                        <td class="td_key">处理器名</td>
                         <td id="system_cpu_name">获取中...</td>
                     </tr>
                     <tr>
-                        <td class="td_key" >内核版本</td>
+                        <td class="td_key">内核版本</td>
                         <td id="system_linux_version">获取中...</td>
                     </tr>
                     <tr>
-                        <td class="td_key" >运行时间</td>
+                        <td class="td_key">运行时间</td>
                         <td id="system_run_time">获取中...</td>
                     </tr>
                 </table>
@@ -252,8 +305,71 @@
                         });
                 </script>
             </div>
-
         </div>
+
+        <div style="display: flex;
+                    flex-wrap: nowrap;
+                    justify-content: space-evenly;">
+
+            <div class="charts_title relative drop-shadow-xl overflow-hidden rounded-xl">磁盘
+                <ul id="disk_list">
+                </ul>
+            </div>
+            <script>
+                axios.get('/api/v1/disks')
+                    .then(function (response) {
+                        // 处理响应数据
+                        let data = response.data;
+                        let ul = document.getElementById('disk_list');
+                        for (const disk of data.disks) {
+                            let li = document.createElement("li")
+                            let span1 = document.createElement("span")
+                            let span2 = document.createElement("span")
+                            let progress = document.createElement("div")
+                            span1.innerText = disk.FileSystem
+                            span2.innerText = disk.MountedPath
+                            progress.className = "progress"
+                            let fill = document.createElement("div")
+                            fill.className = "fill"
+                            let used = disk.UsedMemory / disk.MaxMemory * 100
+                            fill.style.width = used + "%"
+
+                            let span3 = document.createElement("span")
+                            let max = disk.MaxMemory / 1024 / 1024 / 1024
+                            let use = disk.UsedMemory / 1024 / 1024 / 1024
+                            max = max.toFixed(2)
+                            use = use.toFixed(2)
+                            if (max > 1024) {
+                                max = (max / 1024).toFixed(2) + "TB"
+                            } else {
+                                max = max + "GB"
+                            }
+                            if (use > 1024) {
+                                use = (use / 1024).toFixed(2) + "TB"
+                            } else {
+                                use = use + "GB"
+                            }
+                            span3.innerText = use + "/" + max
+                            span3.style.width = "30%"
+                            span3.style.textAlign = "left"
+                            span3.style.marginLeft = "20px"
+                            progress.appendChild(fill)
+                            li.appendChild(span1)
+                            li.appendChild(span2)
+                            li.appendChild(progress)
+                            li.appendChild(span3)
+
+                            ul.appendChild(li)
+
+                        }
+                    })
+                    .catch(function (error) {
+                        // 处理错误
+                        console.log(error);
+                    });
+            </script>
+        </div>
+
         <script>
             let CPUCharts1 = echarts.init(document.getElementById('CPUCharts1'));
             let CPUCharts1option;
@@ -272,8 +388,8 @@
                             borderWidth: 5
                         },
                         data: [
-                            {value: 0, name: '占用'},
-                            {value: 100, name: '空闲'}
+                            {value: 1, name: '占用'},
+                            {value: 99, name: '空闲'}
                         ],
                         color: [
                             '#da4343',
@@ -312,8 +428,8 @@
                             borderWidth: 5
                         },
                         data: [
-                            {value: 0, name: '占用'},
-                            {value: 100, name: '空闲'}
+                            {value: 1, name: '占用'},
+                            {value: 99, name: '空闲'}
                         ],
                         color: [
                             '#da4343',

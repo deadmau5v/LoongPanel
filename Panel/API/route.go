@@ -12,4 +12,5 @@ func initRoute(app *gin.Engine) {
 	app.GET("/api/v1/cpu_percent", CPUPercent)
 	app.GET("/api/v1/ram_percent", MemoryPercent)
 	app.GET("/api/v1/system_info", SystemInfo)
+	app.GET("/api/v1/disks", Disks)
 }
