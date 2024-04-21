@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./static/lib/echarts.min.js"></script>
+
+    <style>
+        #aside {
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 300px;
+            position: relative;
+            z-index: 2;
+            padding: 25px;
+        }
+
+        .aside_button {
+            margin-left: auto;
+        }
+
+        #aside_background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #title_text {
+            color: #ff0000;
+            text-align: center;
+            user-select: none;
+        }
+
+        .aside_button {
+            height: 2.5rem;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            background-color: rgb(255 255 255 / 0.8);
+            color: rgb(255 100 100 / 1);
+
+            /*描边*/
+            border: 1px solid #ff0000;;
+            transition: all 0.1s;
+        }
+
+
+        .aside_button:active {
+            background: rgba(255, 0, 0, 0.22);
+            color: white;
+        }
+
+        #activated {
+            margin-top: 0;
+            background: white;
+        }
+
+        #activated:active {
+            background: rgba(255, 0, 0, 0.22);
+            color: white;
+        }
+
+        #show {
+            background: white;
+            color: red;
+            /*  位置固定到侧边栏的左边中间  */
+            position: absolute;
+            top: 50%;
+            left: 285px;
+            transform: translateY(-50%);
+            /*  圆形背景  */
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /*  描边  */
+            border: 1px solid #ff0000;
+            font-family: ui-serif;
+            /*  防止选中  */
+            user-select: none;
+        }
+
+        #errorMsg {
+            font-size: 3rem;
+            color: #ff0000;
+            text-align: center;
+        }
+    </style>
+    <script>
+        function aside_show() {
+
+            document.getElementById("aside").style.width = "300px";
+            document.getElementById("aside").style.padding = "25px";
+            document.getElementById("aside_background").style.width = "2000px";
+            document.getElementById("show").style.left = "285px";
+            document.getElementById("show").textContent = "<";
+            document.getElementById("show").onclick = aside_close;
+            document.getElementById("logo").style.height = "60%";
+            document.getElementById("logo").style.width = "60%";
+            document.getElementById("logo").style.marginTop = "0px";
+            let buttons = document.getElementsByClassName("aside_button");
+            for (const button of buttons) {
+                button.style.width = "100%";
+                button.style.height = "2.5rem";
+                button.style.marginLeft = "auto";
+            }
+            document.getElementById("title_text").style.display = "block";
+        }
+
+        function aside_close() {
+            document.getElementById("aside").style.width = "60px";
+            document.getElementById("aside").style.padding = "2px";
+            document.getElementById("aside_background").style.width = "60px";
+            document.getElementById("show").style.left = "40px";
+            document.getElementById("show").textContent = ">";
+            document.getElementById("show").onclick = aside_show;
+            document.getElementById("logo").style.height = "80%";
+            document.getElementById("logo").style.width = "80%";
+            document.getElementById("logo").style.marginTop = "10px";
+            let buttons = document.getElementsByClassName("aside_button");
+            for (const button of buttons) {
+                button.style.width = "30px";
+                button.style.height = "3.5rem";
+                button.style.marginLeft = "10px";
+            }
+            document.getElementById("title_text").style.display = "none";
+        }
+    </script>
+</head>
+<body>
+
+
+<div id="box" class="flex h-screen bg-[#fde8e8]">
+    <!--  侧边栏  -->
+    <div id="aside" class="w-60">
+        <!--    背景    -->
+        <img id="aside_background" src="./static/images/aside.png" alt="bg">
+        <!--    Logo图片 导入SVG   -->
+        <div class="mb-5">
+            <img src="./static/images/logo.png" id="logo" alt="logo" style="height: 60%;  width: 60%; margin: auto">
+        </div>
+        <!--    Logo标题    -->
+        <div class="mb-10">
+            <h1 id="title_text" class="text-3xl font-bold">LoongPanel</h1>
+        </div>
+        <nav class="space-y-6" id="buttons">
+            <button id="activated" class="aside_button">
+                首页
+            </button>
+            <button class="aside_button">
+                状态
+            </button>
+            <button class="aside_button">
+                用户
+            </button>
+            <button class="aside_button">
+                设置
+            </button>
+            <button class="aside_button">
+                文档
+            </button>
+        </nav>
+        <button id="show" onclick="aside_close()">
+            <
+        </button>
+    </div>
+
+
+    <!-- 内容 -->
+    <div style="width: 100%; height: 100%">
+    <h1 id="errorMsg">404 Not Found</h1>
+    </div>
+
+
+</div>
+
+</body>
+
+</html>

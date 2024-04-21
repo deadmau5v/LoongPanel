@@ -71,13 +71,13 @@ func CPU() (float64, error) {
 	return res[0], nil
 }
 
-func Memory() (float64, error) {
+func Memory() (uint64, error) {
 	res, err := mem.VirtualMemory()
 	if err != nil {
 		fmt.Println("Memory() Error: ", err.Error())
 		return 0, err
 	}
-	return res.UsedPercent, nil
+	return res.Used, nil
 }
 
 // DiskReadIO 磁盘IO监控
