@@ -18,7 +18,29 @@ jobs:
           BUILD_NAME="LoongPanel-$(date +'%Y-%m-%d-%H:%M:%S')"
           echo "BUILD_NAME=$BUILD_NAME" >> $GITHUB_ENV
 
-      - name: Build and Publish
+      - name: Build
         run: |
-          echo "Building and publishing $BUILD_NAME"
+          echo "Building $BUILD_NAME"
           sh build.sh
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.BUILD_NAME }}
+          release_name: Release ${{ env.BUILD_NAME }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./bin/${{ env.BUILD_NAME }}
+          asset_name: ${{ env.BUILD_NAME }}
+          asset_content_type: application/octet-stream
