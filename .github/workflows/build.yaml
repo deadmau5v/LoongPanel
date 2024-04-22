@@ -1,24 +1,24 @@
-on: push
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - master
 
 jobs:
-  job1:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: 构建
+      - name: Generate build name
         run: |
-          pwd
-          chmod +x build.sh
+          BUILD_NAME="LoongPanel-$(date +'%Y-%m-%d-%H:%M:%S')"
+          echo "BUILD_NAME=$BUILD_NAME" >> $GITHUB_ENV
+
+      - name: Build and Publish
+        run: |
+          echo "Building and publishing $BUILD_NAME"
           sh build.sh
-
-      - name: 发布
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./bin/*
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release_name: ${{ github.sha }}
-          tag: ${{ github.sha }}
-          body: ${{ github.sha }}
-
