@@ -41,7 +41,7 @@ axios.get('/api/v1/disks')
             li.appendChild(progress)
             li.appendChild(span3)
             ul.appendChild(li)
-            // Todo 把 use 和 max 分开到两个span
+            // Todo 把 use 和 max 分开到两个span 更好看
 
         }
     })

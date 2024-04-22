@@ -67,9 +67,13 @@ func Disks(ctx *gin.Context) {
 }
 
 func FileDir(ctx *gin.Context) {
+	path := ctx.Query("path")
+	if path == "" {
+		path = "/"
+	}
 	data := map[string]interface{}{}
 	var err error
-	data["files"], err = FileService.Dir("/")
+	data["files"], err = FileService.Dir(path)
 	if err != nil {
 		data["status"] = -1
 		data["msg"] = err.Error()

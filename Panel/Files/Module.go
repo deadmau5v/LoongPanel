@@ -16,4 +16,5 @@ type File struct {
 	IsHidden bool        `json:"isHidden"` // 是否是隐藏文件
 	IsDir    bool        `json:"isDir"`    // 是否是目录
 	Ext      string      `json:"ext"`      // 扩展名
+	IsLink   bool        `json:"isLink"`   // 是否为链接文件
 }

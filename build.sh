@@ -9,7 +9,7 @@ SOURCE_FILE="main.go"
 
 # 设置目标系统和架构
 PLATFORMS="linux"
-ARCHS="loong64"
+ARCHS="loong64 amd64"
 
 # 开始编译
 for GOOS in $PLATFORMS; do
