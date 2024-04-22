@@ -4,7 +4,7 @@
 mkdir -p bin
 
 # 设置程序名称和源文件
-APP_NAME="clash"
+APP_NAME="LoongPanel"
 SOURCE_FILE="main.go"
 
 # 设置目标系统和架构
