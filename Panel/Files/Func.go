@@ -22,6 +22,18 @@ func Dir(path string) ([]File, error) {
 
 	}
 
+	file := File{IsDir: true}
+	file.IsLink = false
+	file.Name = ".."
+	if path != "/" {
+		if path[len(path)-1] == '/' {
+			file.Path = path + "../"
+		} else {
+			file.Path = path + "/../"
+		}
+	}
+	files = append(files, file)
+
 	readDir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
