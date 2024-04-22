@@ -8,6 +8,19 @@ import (
 func Dir(path string) ([]File, error) {
 
 	files := make([]File, 0)
+	if path != "/" {
+		file := File{IsDir: true}
+		file.IsLink = false
+		file.Name = ".."
+
+		if path[len(path)-1] == '/' {
+			file.Path = path + "../"
+		} else {
+			file.Path = path + "/../"
+		}
+		files = append(files, file)
+
+	}
 
 	readDir, err := os.ReadDir(path)
 	if err != nil {
@@ -29,15 +42,16 @@ func Dir(path string) ([]File, error) {
 		fileInfo := fileStat.Sys()
 		file.User, file.Group = getUidGid(fileInfo) // 所属用户 所属组
 
-		file.Size = fileStat.Size()            // 大小
-		file.Mode = fileStat.Mode()            // 权限
-		file.Time = fileStat.ModTime()         // 时间
-		file.IsDir = fileStat.IsDir()          // 是否是目录
-		file.IsHidden = file_.Name()[0] == '.' // 是否隐藏
+		file.Size = fileStat.Size()                                    // 大小
+		file.Mode = fileStat.Mode()                                    // 权限
+		file.Time = fileStat.ModTime()                                 // 时间
+		file.IsDir = fileStat.IsDir()                                  // 是否是目录
+		file.IsHidden = file_.Name()[0] == '.'                         // 是否隐藏
+		file.IsLink = fileStat.Mode()&os.ModeSymlink == os.ModeSymlink // 是否为链接
 		// 文件类型
 		if !file.IsDir && strings.Contains(file.Name[1:], ".") {
 			runeName := []rune(file.Name)
-			file.Ext = string(runeName[strings.LastIndex(file.Name, ".")+1:])
+			file.Ext = string(runeName[RuneIndex(runeName, "."):])
 		} else {
 			file.Ext = ""
 		}

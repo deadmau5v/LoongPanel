@@ -46,9 +46,11 @@ func Files(ctx *gin.Context) {
 		fmt.Println(err.Error())
 		return
 	}
+	path := ctx.Query("path")
 	data := map[string]interface{}{
 		"title":     AppName + " - 文件管理",
 		"pageFiles": true,
+		"path":      path,
 	}
 	err = html.Execute(ctx.Writer, data)
 	if err != nil {

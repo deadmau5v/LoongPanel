@@ -40,6 +40,7 @@
     #main td {
         padding: 10px;
         text-align: center;
+        max-height: 20px;
     }
 
     #thread th {
@@ -58,34 +59,76 @@
         background-color: #fec8c8;
     }
 
+    .fa-folder::before {
+        padding-right: 10px;
+    }
+
 
 </style>
 <script>
-    let data1
-    axios.get("/api/v1/dir").then((response) => {
-        let data = response.data
-        data1 = data
-        console.log(data)
-        let tbody = document.querySelector("#main tbody")
-        for (const idx in data.files) {
-            let file = data.files[idx]
-            console.log(file.name)
-            let tr = document.createElement("tr")
-            let td1 = document.createElement("td")
-            let td2 = document.createElement("td")
-            let td3 = document.createElement("td")
-            let td4 = document.createElement("td")
-            td1.innerText = file.name
-            td2.innerText = file.size
-            td4.innerText = file.path
-            td3.innerText = file.time
+    function dir(path) {
+        axios.get("/api/v1/dir?path=" + path).then((response) => {
+            let data = response.data
+            data.files.sort((a, b) => {
+                // 如果 a 是目录，b 不是目录，那么 a 应该在前面
+                if (a.isDir && !b.isDir) {
+                    return -1;
+                }
+                // 如果 b 是目录，a 不是目录，那么 b 应该在前面
+                if (!a.isDir && b.isDir) {
+                    return 1;
+                }
+                // 如果 a 和 b 都是目录，或者都不是目录，那么按照名称进行字母顺序排序
+                return a.name.localeCompare(b.name);
+            });
+            // Todo 增加 .. 返回上一级
+            let tbody = document.querySelector("#main tbody")
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+            for (const idx in data.files) {
+                let file = data.files[idx]
+                console.log(file.name)
+                let tr = document.createElement("tr")
+                let td1 = document.createElement("td")
+                let td2 = document.createElement("td")
+                let td3 = document.createElement("td")
+                let td4 = document.createElement("td")
+                let button = document.createElement("a")
+                if (file.isDir) {
+                    button.href = "files?path=" + encodeURIComponent(file.path)
+                    button.innerText = file.name
+                    button.className = "fa fa-folder"
 
-            tr.appendChild(td1)
-            tr.appendChild(td2)
-            tr.appendChild(td3)
-            tr.appendChild(td4)
-            tbody.appendChild(tr)
-        }
-    })
+                    td1.appendChild(button)
+                } else {
+                    td1.innerText = file.name
+                }
+                if (!file.isDir && !file.isLink) {
+                    let size = ""
+                    if (file.size > 1073741824) {
+                        size = (file.size / 1024 / 1024 / 1024).toFixed(2) + "GB"
+                    } else if (file.size > 10488832) {
+                        size = (file.size / 1024 / 1024).toFixed(2) + "MB"
+                    } else if (file.size > 1024) {
+                        size = (file.size / 1024).toFixed(2) + "KB"
+                    } else {
+                        size = file.size.toFixed(2) + "B"
+                    }
+                    td2.innerText = size
+                }
+                td4.innerText = file.path
+                td3.innerText = file.time
+
+                tr.appendChild(td1)
+                tr.appendChild(td2)
+                tr.appendChild(td3)
+                tr.appendChild(td4)
+                tbody.appendChild(tr)
+            }
+        })
+    }
+
+    dir({{ .path }})
 </script>
 {{ end }}
