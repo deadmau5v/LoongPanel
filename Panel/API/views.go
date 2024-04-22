@@ -39,3 +39,20 @@ func Home(ctx *gin.Context) {
 		return
 	}
 }
+
+func Files(ctx *gin.Context) {
+	html, err := template.ParseFiles(WORKDIR+"/Web/pages/files.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	data := map[string]interface{}{
+		"title":     AppName + " - 文件管理",
+		"pageFiles": true,
+	}
+	err = html.Execute(ctx.Writer, data)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+}

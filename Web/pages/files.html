@@ -1,0 +1,91 @@
+{{ template "layout" . }}
+
+{{ define "content" }}
+<div id="content" style="width: 100%">
+
+    <table id="main">
+        <thead>
+        <tr id="thread">
+            <th>文件名</th>
+            <th>文件大小</th>
+            <th>修改时间</th>
+            <th>文件操作</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+
+</div>
+<style>
+    #main {
+        width: 100%;
+        height: 100%;
+    }
+
+    /*  thead 固定到页头  */
+    #main thead {
+        position: sticky;
+        top: 0;
+        background-color: #fde8e8;
+    }
+
+    #main th {
+        padding: 10px;
+        text-align: center;
+        max-height: 20px;
+    }
+
+    #main td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    #thread th {
+        background-color: rgba(239, 174, 174, 0.38);
+    }
+
+    #main tr:nth-child(odd) {
+        background-color: #fde8e8;
+    }
+
+    #main tr:nth-child(even) {
+        background-color: #fde8e8;
+    }
+
+    #main tr:hover {
+        background-color: #fec8c8;
+    }
+
+
+</style>
+<script>
+    let data1
+    axios.get("/api/v1/dir").then((response) => {
+        let data = response.data
+        data1 = data
+        console.log(data)
+        let tbody = document.querySelector("#main tbody")
+        for (const idx in data.files) {
+            let file = data.files[idx]
+            console.log(file.name)
+            let tr = document.createElement("tr")
+            let td1 = document.createElement("td")
+            let td2 = document.createElement("td")
+            let td3 = document.createElement("td")
+            let td4 = document.createElement("td")
+            td1.innerText = file.name
+            td2.innerText = file.size
+            td4.innerText = file.path
+            td3.innerText = file.time
+
+            tr.appendChild(td1)
+            tr.appendChild(td2)
+            tr.appendChild(td3)
+            tr.appendChild(td4)
+            tbody.appendChild(tr)
+        }
+    })
+</script>
+{{ end }}

@@ -59,13 +59,16 @@ func getDisk() ([]*Disk, error) {
 		fmt.Println("GetDisk() Error: ", err.Error())
 	}
 	for _, partition := range partitions {
+		// 筛选不必要的空磁盘
 		usage, _ := disk.Usage(partition.Mountpoint)
-		res = append(res, &Disk{
-			FileSystem:  partition.Device,
-			MaxMemory:   float64(usage.Total),
-			UsedMemory:  float64(usage.Used),
-			MountedPath: partition.Mountpoint,
-		})
+		if usage.Total != 0 {
+			res = append(res, &Disk{
+				FileSystem:  partition.Device,
+				MaxMemory:   float64(usage.Total),
+				UsedMemory:  float64(usage.Used),
+				MountedPath: partition.Mountpoint,
+			})
+		}
 	}
 
 	return res, err

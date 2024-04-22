@@ -1,6 +1,7 @@
 package API
 
 import (
+	FileService "LoongPanel/Panel/Files"
 	"LoongPanel/Panel/System"
 	"github.com/gin-gonic/gin"
 	"math"
@@ -62,5 +63,20 @@ func SystemInfo(ctx *gin.Context) {
 func Disks(ctx *gin.Context) {
 	data := map[string]interface{}{}
 	data["disks"] = System.Data.Disks
+	ctx.JSON(http.StatusOK, data)
+}
+
+func FileDir(ctx *gin.Context) {
+	data := map[string]interface{}{}
+	var err error
+	data["files"], err = FileService.Dir("/")
+	if err != nil {
+		data["status"] = -1
+		data["msg"] = err.Error()
+	} else {
+		data["status"] = 0
+		data["msg"] = ""
+	}
+
 	ctx.JSON(http.StatusOK, data)
 }

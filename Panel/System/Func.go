@@ -204,5 +204,6 @@ func GetRunTime() string {
 		fmt.Println("GetRunTime() Error: ", err.Error())
 		return ""
 	}
+	out = []byte(strings.Split(string(out), " up ")[1])
 	return string(out)
 }

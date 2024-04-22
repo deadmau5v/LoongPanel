@@ -42,5 +42,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./bin/LoongPanel-linux-loong64
-          asset_name: ./bin/LoongPanel-linux-loong64
+          asset_name: LoongPanel-linux-loong64
           asset_content_type: application/octet-stream

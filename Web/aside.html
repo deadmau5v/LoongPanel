@@ -13,7 +13,7 @@
         <h1 id="title_text" class="text-3xl font-bold">LoongPanel</h1>
     </div>
 
-    <nav class="space-y-6" id="buttons">
+    <nav id="buttons">
         <a href="/">
             <button {{ if .pageHome }} id="activated" {{ end }} class="aside_button fa fa-home">
                 首页
@@ -31,6 +31,11 @@
         <button {{ if .pageApp }} id="activated" {{ end }} class="aside_button fa fa-archive">
             应用
         </button>
+        <a href="/files" class="option">
+            <button {{ if .pageFiles }} id="activated" {{ end }} class="aside_button fa fa-file">
+                文件
+            </button>
+        </a>
     </nav>
 
 </div>
