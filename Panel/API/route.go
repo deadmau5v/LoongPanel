@@ -6,6 +6,9 @@ func initRoute(app *gin.Engine) {
 	// 静态页面
 	app.GET("/", Home)
 	app.Static("/static", WORKDIR+"/Web/static")
+	app.GET("/favicon.ico", func(context *gin.Context) {
+		context.File(WORKDIR + "/Web/static/images/logo.png")
+	})
 	app.NoRoute(Error404)
 
 	// API

@@ -7,6 +7,7 @@ import (
 
 var App *gin.Engine
 var WORKDIR string
+var AppName = "LoongPanel"
 
 func init() {
 	var err error

@@ -1,17 +1,4 @@
-<!doctype html>
-<html lang="zh_cn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>首页</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="./static/lib/echarts.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
-
-    <style>
-        #aside {
+    #aside {
             top: 0;
             left: 0;
             height: 100%;
@@ -97,6 +84,24 @@
         }
 
 
+        #system_info {
+            max-width: 300px;
+        }
+
+        #system_info_table {
+            color: black;
+            flex: auto;
+            text-align: left;
+            font-size: 16px;
+
+        }
+
+
+        .td_key {
+            font-size: 20px;
+            width: 100px;
+        }
+
         #disk_list {
             list-style: none;
             padding: 0;
@@ -129,54 +134,27 @@
             background: #f3f3f3;
         }
 
+        .progress {
+            width: 100%;
+            height: 30px;
+            align-items: center;
+            margin: auto;
+            display: flex;
+            background: white;
+            /*  圆角  */
+            border-radius: 10px;
+            /*  描边  */
+            border: 1px solid #ff6f6f;
+        }
 
-    </style>
-</head>
-<body>
+        .fill {
+            background: #ff6f6f;
+            border-radius: 10px;
+            height: 100%;
+            transition: all 0.5s;
+        }
 
+        .fill:hover {
+            background: #eb3b3b;
 
-<div id="box" class="flex h-screen bg-[#fde8e8]">
-    <!--  侧边栏  -->
-    <div id="aside">
-        <!--    背景    -->
-        <img id="aside_background" src="./static/images/aside.png" alt="bg">
-        <!--    Logo图片 导入SVG   -->
-        <div class="mb-5">
-            <img src="./static/images/logo.png" id="logo" alt="logo" style="height: 60%;  width: 60%; margin: auto">
-        </div>
-        <!--    Logo标题    -->
-        <div class="mb-10">
-            <h1 id="title_text" class="text-3xl font-bold">LoongPanel</h1>
-        </div>
-        <nav class="space-y-6" id="buttons">
-            <a href="/">
-                <button id="activated" class="aside_button">
-                    首页
-                </button>
-            </a>
-            <button class="aside_button">
-                状态
-            </button>
-            <button class="aside_button">
-                用户
-            </button>
-            <button class="aside_button">
-                设置
-            </button>
-            <button class="aside_button">
-                应用
-            </button>
-        </nav>
-
-    </div>
-
-
-    <!-- 内容 -->
-    <div id="content" style="width: 100%; margin: auto; text-align: center; background: rgba(255,111,111,0)">
-        <h1 style="font-size: 100px;color: #ff6f6f"><span style="color: red">404</span> not fund page  <span style="color: black">>_<</span></h1>
-    </div>
-
-
-</body>
-
-</html>
+        }
