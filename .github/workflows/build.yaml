@@ -5,5 +5,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pwd
-      - run: ./build.sh
+
+      - name: 构建
+        run: |
+          pwd
+          chmod +x build.sh
+          sh build.sh
+
+      - name: 发布
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./bin/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+#          时间戳作为版本号
+          release_name: ${{ timestamp }}
+          release_body: ${{ github.event.head_commit.message }}
+          release_tag: ${{ timestamp }}
