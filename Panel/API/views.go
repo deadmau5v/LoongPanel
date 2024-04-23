@@ -47,6 +47,9 @@ func Files(ctx *gin.Context) {
 		return
 	}
 	path := ctx.Query("path")
+	if path == "" {
+		path = "/"
+	}
 	data := map[string]interface{}{
 		"title":     AppName + " - 文件管理",
 		"pageFiles": true,

@@ -1,38 +1,31 @@
 package Files
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 func Dir(path string) ([]File, error) {
+	path, err := filepath.Abs(path)
+	path = filepath.Clean(path)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+
+	back := NewObj()
+	// 上一级
+	back.Name = ".."
+	back.IsDir = true
+	back.IsLink = false
+	back.Path = filepath.Join(path, "..")
 
 	files := make([]File, 0)
-	if path != "/" {
-		file := File{IsDir: true}
-		file.IsLink = false
-		file.Name = ".."
-
-		if path[len(path)-1] == '/' {
-			file.Path = path + "../"
-		} else {
-			file.Path = path + "/../"
-		}
-		files = append(files, file)
-
+	if path != "/" && path != "" {
+		files = append(files, *back)
 	}
-
-	file := File{IsDir: true}
-	file.IsLink = false
-	file.Name = ".."
-	if path != "/" {
-		if path[len(path)-1] == '/' {
-			file.Path = path + "../"
-		} else {
-			file.Path = path + "/../"
-		}
-	}
-	files = append(files, file)
 
 	readDir, err := os.ReadDir(path)
 	if err != nil {
