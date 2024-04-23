@@ -3,9 +3,11 @@ module LoongPanel
 go 1.20
 
 require (
+	github.com/creack/pty v1.1.21
 	github.com/gin-gonic/gin v1.9.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/afero v1.11.0
+	golang.org/x/term v0.19.0
 	gorm.io/driver/sqlite v1.5.5
 	gorm.io/gorm v1.25.9
 )
