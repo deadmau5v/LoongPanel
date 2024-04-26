@@ -23,7 +23,7 @@ func Error404(ctx *gin.Context) {
 
 }
 
-func Home(ctx *gin.Context) {
+func home(ctx *gin.Context) {
 	html, err := template.ParseFiles(WORKDIR+"/Web/pages/index.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
 	if err != nil {
 		fmt.Println(err.Error())
@@ -40,7 +40,7 @@ func Home(ctx *gin.Context) {
 	}
 }
 
-func Files(ctx *gin.Context) {
+func files(ctx *gin.Context) {
 	html, err := template.ParseFiles(WORKDIR+"/Web/pages/files.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
 	if err != nil {
 		fmt.Println(err.Error())
@@ -54,6 +54,23 @@ func Files(ctx *gin.Context) {
 		"title":     AppName + " - 文件管理",
 		"pageFiles": true,
 		"path":      path,
+	}
+	err = html.Execute(ctx.Writer, data)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+}
+
+func terminal(ctx *gin.Context) {
+	html, err := template.ParseFiles(WORKDIR+"/Web/pages/terminal.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	data := map[string]interface{}{
+		"title":        AppName + " - 首页",
+		"pageTerminal": true,
 	}
 	err = html.Execute(ctx.Writer, data)
 	if err != nil {

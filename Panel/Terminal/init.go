@@ -1,5 +1,10 @@
 package Terminal
 
-func init() {
+import "sync"
 
+func init() {
+	MainScreenManager = &ScreenManager{
+		Screens: make(map[uint32]*Screen),
+		Mu:      sync.RWMutex{},
+	}
 }

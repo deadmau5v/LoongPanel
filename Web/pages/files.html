@@ -94,7 +94,7 @@
 </style>
 <script>
     function dir(path) {
-        axios.get("/api/v1/dir?path=" + path).then((response) => {
+        axios.get("/api/v1/files/dir?path=" + path).then((response) => {
             let data = response.data
             data.files.sort((a, b) => {
                 // 如果 a 是目录，b 不是目录，那么 a 应该在前面

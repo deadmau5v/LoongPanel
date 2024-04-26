@@ -38,7 +38,7 @@
                 </tr>
             </table>
             <script>
-                axios.get('/api/v1/system_info')
+                axios.get('/api/v1/status/system_info')
                     .then(function (response) {
                         // 处理响应数据
                         let data = response.data;
