@@ -4,16 +4,12 @@ import "github.com/gin-gonic/gin"
 
 func initRoute(app *gin.Engine) {
 	// 静态页面
-	app.GET("/", home)
-	app.GET("/files", files)
-	app.GET("/terminal", terminal)
+	app.NoRoute(func(c *gin.Context) {
+		c.File(WORKDIR + "/Panel/Front/LoongPanel/dist/index.html")
+	})
 
 	// 其他
-	app.Static("/static", WORKDIR+"/Panel/Front/static")
-	app.GET("/favicon.ico", func(context *gin.Context) {
-		context.File(WORKDIR + "/Panel/Front/static/images/logo.png")
-	})
-	app.NoRoute(Error404)
+	app.Static("/assets", WORKDIR+"/Panel/Front/LoongPanel/dist/assets")
 
 	// API
 	app.GET("/api/v1/status/cpu_percent", CPUPercent)
