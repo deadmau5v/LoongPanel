@@ -9,9 +9,9 @@ func initRoute(app *gin.Engine) {
 	app.GET("/terminal", terminal)
 
 	// 其他
-	app.Static("/static", WORKDIR+"/Web/static")
+	app.Static("/static", WORKDIR+"/Panel/Front/static")
 	app.GET("/favicon.ico", func(context *gin.Context) {
-		context.File(WORKDIR + "/Web/static/images/logo.png")
+		context.File(WORKDIR + "/Panel/Front/static/images/logo.png")
 	})
 	app.NoRoute(Error404)
 

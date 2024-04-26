@@ -7,7 +7,7 @@ import (
 )
 
 func Error404(ctx *gin.Context) {
-	html, err := template.ParseFiles(WORKDIR+"/Web/pages/404.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
+	html, err := template.ParseFiles(WORKDIR+"/Panel/Front/pages/404.html", WORKDIR+"/Panel/Front/layout.html", WORKDIR+"/Panel/Front/import.html", WORKDIR+"/Panel/Front/aside.html")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -24,7 +24,7 @@ func Error404(ctx *gin.Context) {
 }
 
 func home(ctx *gin.Context) {
-	html, err := template.ParseFiles(WORKDIR+"/Web/pages/index.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
+	html, err := template.ParseFiles(WORKDIR+"/Panel/Front/pages/index.html", WORKDIR+"/Panel/Front/layout.html", WORKDIR+"/Panel/Front/import.html", WORKDIR+"/Panel/Front/aside.html")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -41,7 +41,7 @@ func home(ctx *gin.Context) {
 }
 
 func files(ctx *gin.Context) {
-	html, err := template.ParseFiles(WORKDIR+"/Web/pages/files.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
+	html, err := template.ParseFiles(WORKDIR+"/Panel/Front/pages/files.html", WORKDIR+"/Panel/Front/layout.html", WORKDIR+"/Panel/Front/import.html", WORKDIR+"/Panel/Front/aside.html")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -63,7 +63,7 @@ func files(ctx *gin.Context) {
 }
 
 func terminal(ctx *gin.Context) {
-	html, err := template.ParseFiles(WORKDIR+"/Web/pages/terminal.html", WORKDIR+"/Web/layout.html", WORKDIR+"/Web/import.html", WORKDIR+"/Web/aside.html")
+	html, err := template.ParseFiles(WORKDIR+"/Panel/Front/pages/terminal.html", WORKDIR+"/Panel/Front/layout.html", WORKDIR+"/Panel/Front/import.html", WORKDIR+"/Panel/Front/aside.html")
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -77,4 +77,8 @@ func terminal(ctx *gin.Context) {
 		fmt.Println(err.Error())
 		return
 	}
+}
+
+func appInstall(ctx *gin.Context) {
+
 }

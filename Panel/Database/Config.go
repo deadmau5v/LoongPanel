@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"os"
 )
 
 var UseDB = "sqlite"
@@ -15,14 +16,14 @@ var UseDatabase = "LoongPanel"
 
 func init() {
 	err := errors.New("None")
-
+	_ = os.Mkdir("/resource", os.ModePerm)
 	switch UseDB {
 	case "mysql":
 		// Todo Mysql支持
 	case "redis":
 		// Todo Redis 支持
 	case "sqlite":
-		SQLite, err = gorm.Open(sqlite.Open("LoongPanel.db"))
+		SQLite, err = gorm.Open(sqlite.Open("/resource/LoongPanel.db"))
 	}
 
 	if err != nil {

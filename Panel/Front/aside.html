@@ -1,11 +1,11 @@
 {{ define "aside" }}
 <div id="aside">
     <!--    背景    -->
-    <img id="aside_background" src="./static/images/aside.png" alt="bg">
+    <img id="aside_background" src="static/images/aside.png" alt="bg">
 
     <!--    Logo图片 导入SVG   -->
     <div class="mb-5">
-        <img src="./static/images/logo.png" id="logo" alt="logo" style="height: 60%;  width: 60%; margin: auto">
+        <img src="static/images/logo.png" id="logo" alt="logo" style="height: 60%;  width: 60%; margin: auto">
     </div>
 
     <!--    Logo标题    -->
@@ -14,7 +14,7 @@
     </div>
 
     <nav id="buttons">
-        <a href="/">
+        <a href="/Panel/Front/static">
             <button {{ if .pageHome }} id="activated" {{ end }} class="aside_button fa fa-home">
                 首页
             </button>

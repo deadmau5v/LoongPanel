@@ -1,7 +1,7 @@
 package User
 
 import (
-	"LoongPanel/Database"
+	Database2 "LoongPanel/Panel/Database"
 	"fmt"
 )
 
@@ -12,9 +12,9 @@ type User struct {
 
 func (user *User) Save() {
 	// 保存到数据库
-	switch Database.UseDB {
+	switch Database2.UseDB {
 	case "sqlite":
-		Database.SQLite.Create(&user)
+		Database2.SQLite.Create(&user)
 	case "mysql":
 		// Todo 数据库操作兼容
 	case "redis":
@@ -23,9 +23,9 @@ func (user *User) Save() {
 }
 
 func (user *User) Delete() {
-	switch Database.UseDB {
+	switch Database2.UseDB {
 	case "sqlite":
-		Database.SQLite.Delete(&user)
+		Database2.SQLite.Delete(&user)
 	case "mysql":
 		// Todo 数据库操作兼容
 	case "redis":
@@ -36,7 +36,7 @@ func (user *User) Delete() {
 func Find(where map[string]interface{}) []User {
 	var Users = make([]User, 0)
 
-	switch Database.UseDB {
+	switch Database2.UseDB {
 	case "sqlite":
 		if where != nil {
 			query := ""
@@ -48,9 +48,9 @@ func Find(where map[string]interface{}) []User {
 			args := make([]interface{}, 0)
 			args = append(args, query)
 			args = append(args, keys...)
-			Database.SQLite.Find(&Users, args)
+			Database2.SQLite.Find(&Users, args)
 		} else {
-			Database.SQLite.Find(&Users)
+			Database2.SQLite.Find(&Users)
 		}
 	case "mysql":
 		// Todo 数据库操作兼容
@@ -61,7 +61,7 @@ func Find(where map[string]interface{}) []User {
 }
 
 func init() {
-	err := Database.SQLite.AutoMigrate(&User{})
+	err := Database2.SQLite.AutoMigrate(&User{})
 	if err != nil {
 		fmt.Println("初始化SQLite数据库失败")
 		return
