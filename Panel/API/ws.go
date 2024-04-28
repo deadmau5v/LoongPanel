@@ -3,6 +3,7 @@ package API
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"LoongPanel/Panel/Terminal"
 
@@ -30,14 +31,46 @@ func screenWs(c *gin.Context) {
 			fmt.Println("Ws链接异常关闭")
 		}
 	}(conn)
+
 	id := getIntQuery(c, "id")
 	screen := Terminal.MainScreenManager.GetScreen(id)
+	if screen == nil {
+		c.JSON(200, map[string]interface{}{
+			"status": 500,
+			"msg":    "无法获取screen",
+		})
+	}
+	output := screen.Subscribe()
 
-	for {
-		_, message, err := conn.ReadMessage()
-		if err != nil {
-			break
+	go func() {
+		for {
+			screen.Publish()
+			time.Sleep(100)
 		}
-		screen.InputByte(message)
+	}()
+
+	input := make(chan []byte, 1024)
+	defer close(input)
+
+	go func() {
+		for {
+			_, message, err := conn.ReadMessage()
+			if err != nil {
+				break
+			}
+			input <- message
+		}
+	}()
+	for {
+		select {
+		case o := <-output:
+			err := conn.WriteMessage(1, o)
+			if err != nil {
+				break
+			}
+		case i := <-input:
+			screen.InputByte(i)
+		}
+
 	}
 }

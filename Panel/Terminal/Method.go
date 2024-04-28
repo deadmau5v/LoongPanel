@@ -12,6 +12,41 @@ import (
 	"github.com/creack/pty"
 )
 
+func (s *Screen) Subscribe() chan []byte {
+	c := make(chan []byte, 1024)
+	s.subscribers = append(s.subscribers, c)
+	return c
+}
+
+func (s *Screen) Unsubscribe(c chan []byte) {
+	for i, subscriber := range s.subscribers {
+		if subscriber == c {
+			s.subscribers = append(s.subscribers[:i], s.subscribers[i+1:]...)
+			close(c)
+			break
+		}
+	}
+}
+
+func (s *Screen) Publish() {
+	newOutput := s.Output.Bytes()[s.outputLen:]
+	if string(newOutput) != "" {
+		s.outputLen = len(s.Output.Bytes())
+		for _, subscriber := range s.subscribers {
+			select {
+			case subscriber <- newOutput:
+			default:
+				// 如果订阅者的通道已满就忽略
+			}
+		}
+	}
+}
+
+func (s *Screen) InputByte(b []byte) {
+	_, _ = s.Tmx.Write(b)
+	s.Publish()
+}
+
 func (sm *ScreenManager) Create(name string, id uint32) error {
 
 	flag := false
@@ -74,34 +109,6 @@ func (s *Screen) GetOutput() string {
 
 func (s *Screen) Input(cmd string) {
 	_, _ = s.Tmx.Write([]byte(cmd + "\n"))
-}
-
-func (s *Screen) InputByte(b []byte) {
-	_, _ = s.Tmx.Write(b)
-}
-
-func (s *Screen) GetOutputChannel() chan string {
-	c := make(chan string, 1024)
-	idx := 0
-	go func() {
-		for {
-			c <- s.Output.String()[idx:]
-			idx = len(s.Output.String())
-		}
-	}()
-	return c
-}
-
-func (sm *ScreenManager) Input(id uint32, cmd string) {
-	sm.Mu.Lock()
-
-	screen, ok := sm.Screens[id]
-	if !ok {
-		return
-	}
-
-	_, _ = screen.Tmx.Write([]byte(cmd + "\n"))
-	sm.Mu.Unlock()
 }
 
 func (s *Screen) Close() {
