@@ -22,4 +22,9 @@ func initRoute(app *gin.Engine) {
 	app.GET("/api/v1/screen/close", screenClose)
 	app.GET("/api/v1/screen/output", screenOutput)
 	app.GET("/api/v1/screen/get_screens", getScreens)
+
+	// WebSocket
+	app.GET("/api/ws/screen", func(ctx *gin.Context) {
+		screenWs(ctx)
+	})
 }

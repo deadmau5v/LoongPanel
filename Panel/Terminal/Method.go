@@ -4,11 +4,12 @@ import (
 	"LoongPanel/Panel/System"
 	"bytes"
 	"errors"
-	"github.com/creack/pty"
 	"io"
 	"log"
 	"os/exec"
 	"time"
+
+	"github.com/creack/pty"
 )
 
 func (sm *ScreenManager) Create(name string, id uint32) error {
@@ -73,6 +74,10 @@ func (s *Screen) GetOutput() string {
 
 func (s *Screen) Input(cmd string) {
 	_, _ = s.Tmx.Write([]byte(cmd + "\n"))
+}
+
+func (s *Screen) InputByte(b []byte) {
+	_, _ = s.Tmx.Write(b)
 }
 
 func (s *Screen) GetOutputChannel() chan string {

@@ -4,10 +4,12 @@ import (
 	FileService "LoongPanel/Panel/Files"
 	"LoongPanel/Panel/System"
 	"LoongPanel/Panel/Terminal"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func CPUPercent(ctx *gin.Context) {
@@ -100,6 +102,7 @@ func screenInput(ctx *gin.Context) {
 }
 
 func screenCreate(ctx *gin.Context) {
+	fmt.Println("INFO screenCreate")
 	id := getIntQuery(ctx, "id")
 	name := getQuery(ctx, "name")
 	err := Terminal.MainScreenManager.Create(name, uint32(id))
@@ -108,6 +111,7 @@ func screenCreate(ctx *gin.Context) {
 		data["status"] = -1
 		data["msg"] = err.Error()
 		ctx.JSON(200, data)
+		fmt.Println("创建Screen错误")
 		return
 	}
 	data["status"] = 0

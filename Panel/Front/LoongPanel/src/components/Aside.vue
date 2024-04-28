@@ -1,4 +1,5 @@
 <template>
+
   <el-aside>
     <el-menu>
       <el-image :src="logo"></el-image>
@@ -12,7 +13,9 @@
       <router-link to="/files">
         <el-menu-item index="6">文件</el-menu-item>
       </router-link>
+      <router-link to="/terminal">
       <el-menu-item index="7">终端</el-menu-item>
+      </router-link>
     </el-menu>
   </el-aside>
 </template>
