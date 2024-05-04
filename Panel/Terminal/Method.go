@@ -64,6 +64,9 @@ func (sm *ScreenManager) Create(name string, id uint32) error {
 	var buf bytes.Buffer
 
 	c := getInitShell()
+	if c == nil {
+		return errors.New("无法获取Shell")
+	}
 	tty, err := pty.Start(c)
 	if err != nil {
 		log.Fatal(err)
@@ -73,13 +76,14 @@ func (sm *ScreenManager) Create(name string, id uint32) error {
 		Rows: 16,
 		Cols: 200,
 	})
-
 	screen := &Screen{
-		Name:   name,
-		Id:     id,
-		Time:   time.Now(),
-		Tmx:    tty,
-		Output: &buf,
+		Name:        name,
+		Id:          id,
+		Time:        time.Now(),
+		Tmx:         tty,
+		Output:      &buf,
+		subscribers: make([]chan []byte, 0),
+		outputLen:   0,
 	}
 
 	output := io.MultiWriter(&buf)
@@ -131,8 +135,6 @@ func getInitShell() *exec.Cmd {
 	switch System.Data.OSName {
 	case "linux":
 		return exec.Command("bash")
-	case "windows":
-		return exec.Command("cmd")
 	}
 	return nil
 }

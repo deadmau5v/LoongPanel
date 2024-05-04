@@ -5,21 +5,21 @@ go 1.20
 require (
 	github.com/creack/pty v1.1.21
 	github.com/gin-gonic/gin v1.9.1
+	github.com/gorilla/websocket v1.5.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/afero v1.11.0
 	gorm.io/driver/sqlite v1.5.5
-	gorm.io/gorm v1.25.9
-	github.com/gorilla/websocket v1.5.1
+	gorm.io/gorm v1.25.10
 )
 
 require (
-	github.com/bytedance/sonic v1.11.5 // indirect
+	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
-	github.com/cloudwego/base64x v0.1.3 // indirect
+	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.19.0 // indirect

@@ -6,24 +6,23 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="files" style="width: 100%">
+    <el-table :data="files || []" style="width: 100%">
       <el-table-column prop="name" label="文件名">
-        <template slot-scope="{ row }">
-          <el-button v-if="row.isDir" @click="dir(row.path)" icon="el-icon-folder">{{ row.name }}</el-button>
-          <span v-else>{{ row.name }}</span>
+        <template #default="{ row }">
+          <el-button v-if="row['isDir']" @click="dir(row['path'])" class="fa fa-folder"><el-text style="margin-left: 10px;">{{ row['name'] }}</el-text></el-button>
+          <el-text v-else>{{ row['name'] }}</el-text>
         </template>
       </el-table-column>
-      <el-table-column prop="size" label="文件大小">
-        <template slot-scope="{ row }">
-          <span>{{ formatSize(row.size) }}</span>
+      <el-table-column prop="size" label="大小">
+        <template #default="{ row }">
+          <el-text>{{ formatSize(row['size']) }}</el-text>
         </template>
       </el-table-column>
       <el-table-column prop="time" label="修改时间">
-        <template slot-scope="{ row }">
-          <span>{{ row.name === '..' ? '' : row.time }}</span>
+        <template #default="{ row }">
+          <el-text>{{ row['time'] }}</el-text>
         </template>
       </el-table-column>
-      <el-table-column prop="path" label="文件操作"></el-table-column>
     </el-table>
   </div>
 </template>
@@ -44,20 +43,25 @@ export default {
   data() {
     return {
       path: '',
-      files: [],
+         "files": [],
     };
   },
   methods: {
     async dir(path) {
       const response = await axios.get("/api/v1/files/dir?path=" + path);
       this.files = response.data.files.sort((a, b) => {
-        if (a.isDir && !b.isDir) {
+        if (a["isDir"] && a["name"] === "..") {
           return -1;
-        }
-        if (!a.isDir && b.isDir) {
+        } else if (b["isDir"] && b["name"] === "..") {
           return 1;
         }
-        return a.name.localeCompare(b.name);
+        if (a["isDir"] && !b["isDir"]) {
+          return -1;
+        }
+        if (!a["isDir"] && b["isDir"]) {
+          return 1;
+        }
+        return a["name"].localeCompare(b["name"]);
       });
       this.path = decodeURIComponent(path);
     },
@@ -83,5 +87,4 @@ export default {
 </script>
 
 <style scoped>
-/* 你的CSS样式 */
 </style>
