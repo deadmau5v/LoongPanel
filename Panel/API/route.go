@@ -12,11 +12,11 @@ func initRoute(app *gin.Engine) {
 	app.Static("/assets", WORKDIR+"/Panel/Front/LoongPanel/dist/assets")
 
 	// API
-	app.GET("/api/v1/status/cpu_percent", CPUPercent)
-	app.GET("/api/v1/status/ram_percent", MemoryPercent)
+	app.GET("/api/v1/status/system_status", SystemStatus)
 	app.GET("/api/v1/status/system_info", SystemInfo)
 	app.GET("/api/v1/status/disks", Disks)
 	app.GET("/api/v1/files/dir", FileDir)
+
 	app.GET("/api/v1/screen/input", screenInput)
 	app.GET("/api/v1/screen/create", screenCreate)
 	app.GET("/api/v1/screen/close", screenClose)

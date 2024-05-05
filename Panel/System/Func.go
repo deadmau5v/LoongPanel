@@ -17,6 +17,11 @@ import (
 // LoadAverage 负荷监控
 func LoadAverage() ([3]float32, error) {
 	// 负荷监控
+	if Data.OSName == "windows" {
+		// Windows 平台暂不支持
+		return [3]float32{0, 0, 0}, nil
+	}
+
 	out, err := exec.Command("uptime").Output()
 	out = out[:len(out)-1] // 去除 \n 换行符
 
@@ -44,6 +49,7 @@ func LoadAverage() ([3]float32, error) {
 	return res, nil
 
 }
+
 func LoadAverage1m() (float32, error) {
 	// 平均负荷 最近1分钟
 	res, err := LoadAverage()
@@ -60,24 +66,19 @@ func LoadAverage15m() (float32, error) {
 	return res[2], err
 }
 
-// CPU CPU负荷监控
-func CPU() (float64, error) {
-	// CPU负荷
-	res, err := cpu.Percent(time.Second, false)
-	if err != nil {
-		fmt.Println("CPU() Error: ", err.Error())
-		return 0, nil
-	}
-	return res[0], nil
-}
-
-func Memory() (uint64, error) {
+// MemoryUsage 内存使用率
+func MemoryUsage() (float32, error) {
 	res, err := mem.VirtualMemory()
 	if err != nil {
-		fmt.Println("Memory() Error: ", err.Error())
+		fmt.Println("MemoryUsage() Error: ", err.Error())
 		return 0, err
 	}
-	return res.Used, nil
+	return float32(res.UsedPercent), nil
+}
+
+// GetCpuUsage 获取CPU使用率
+func GetCpuUsage() float32 {
+	return float32(CPUPercent)
 }
 
 // DiskReadIO 磁盘IO监控
@@ -206,4 +207,10 @@ func GetRunTime() string {
 	}
 	out = []byte(strings.Split(string(out), " up ")[1])
 	return string(out)
+}
+
+// GetDiskUsage 获取磁盘使用
+func GetDiskUsage() float32 {
+	usage, _ := disk.Usage("/")
+	return float32(usage.UsedPercent)
 }

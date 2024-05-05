@@ -21,6 +21,9 @@ func Dir(path string) ([]File, error) {
 	back.IsDir = true
 	back.IsLink = false
 	back.Path = filepath.Join(path, "..")
+	back.ShowEdit = false
+	back.ShowSize = false
+	back.ShowTime = false
 
 	files := make([]File, 0)
 	if path != "/" && path != "" {
@@ -53,6 +56,15 @@ func Dir(path string) ([]File, error) {
 		file.IsDir = fileStat.IsDir()                                  // 是否是目录
 		file.IsHidden = file_.Name()[0] == '.'                         // 是否隐藏
 		file.IsLink = fileStat.Mode()&os.ModeSymlink == os.ModeSymlink // 是否为链接
+		file.ShowEdit = true                                           // 显示编辑按钮
+		file.ShowTime = true                                           // 显示时间
+		file.ShowSize = true                                           // 显示大小
+
+		if file.IsDir {
+			file.ShowSize = false // 显示大小
+			file.ShowTime = false // 显示时间
+		}
+
 		// 文件类型
 		if !file.IsDir && strings.Contains(file.Name[1:], ".") {
 			runeName := []rune(file.Name)

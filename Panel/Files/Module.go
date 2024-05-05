@@ -17,4 +17,7 @@ type File struct {
 	IsDir    bool        `json:"isDir"`    // 是否是目录
 	Ext      string      `json:"ext"`      // 扩展名
 	IsLink   bool        `json:"isLink"`   // 是否为链接文件
+	ShowTime bool        `json:"showTime"` // 是否显示时间
+	ShowEdit bool        `json:"showEdit"` // 是否显示编辑按钮
+	ShowSize bool        `json:"showSize"` // 是否显示大小
 }

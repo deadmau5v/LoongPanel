@@ -5,46 +5,11 @@ import (
 	"LoongPanel/Panel/System"
 	"LoongPanel/Panel/Terminal"
 	"fmt"
-	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
-
-func CPUPercent(ctx *gin.Context) {
-	data := map[string]interface{}{}
-	res, err := System.CPU()
-	if err != nil {
-		data["msg"] = "获取CPU使用率失败"
-		data["status"] = -1
-		data["percent"] = 0
-		ctx.JSON(http.StatusInternalServerError, data)
-		return
-	}
-	res = math.Round(res*100) / 100
-	data["msg"] = ""
-	data["status"] = 0
-	data["percent"] = res
-	ctx.JSON(http.StatusOK, data)
-}
-
-func MemoryPercent(ctx *gin.Context) {
-	data := map[string]interface{}{}
-	res, err := System.Memory()
-	if err != nil {
-		data["msg"] = "获取内存使用率失败"
-		data["status"] = -1
-		data["percent"] = 0
-		ctx.JSON(http.StatusInternalServerError, data)
-		return
-	}
-	data["msg"] = ""
-	data["status"] = 0
-	data["percent"] = res
-	data["max"] = System.Data.RAM
-	ctx.JSON(http.StatusOK, data)
-}
 
 func SystemInfo(ctx *gin.Context) {
 	data := map[string]interface{}{
@@ -68,6 +33,33 @@ func Disks(ctx *gin.Context) {
 	data := map[string]interface{}{}
 	data["disks"] = System.Data.Disks
 	ctx.JSON(http.StatusOK, data)
+}
+
+func SystemStatus(ctx *gin.Context) {
+	var (
+		DiskUsage   float32
+		AverageLoad float32
+		MemoryUsage float32
+		CpuUsage    float32
+	)
+
+	DiskUsage = System.GetDiskUsage()
+	AverageLoad, err := System.LoadAverage1m()
+	if err != nil {
+		AverageLoad = 0
+	}
+	MemoryUsage, err = System.MemoryUsage()
+	if err != nil {
+		MemoryUsage = 0
+	}
+	CpuUsage = System.GetCpuUsage()
+	res := map[string]interface{}{
+		"disk_usage":   DiskUsage,
+		"average_load": AverageLoad,
+		"memory_usage": MemoryUsage,
+		"cpu_usage":    CpuUsage,
+	}
+	ctx.JSON(http.StatusOK, res)
 }
 
 func FileDir(ctx *gin.Context) {

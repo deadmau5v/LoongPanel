@@ -2,10 +2,12 @@ package System
 
 import (
 	"fmt"
+	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
 	"os/exec"
+	"time"
 )
 
 // getLocalIP 获取本地IP 数组
@@ -72,4 +74,14 @@ func getDisk() ([]*Disk, error) {
 	}
 
 	return res, err
+}
+
+// getCPUPercent 获取CPU使用率
+func getCPUPercent() float64 {
+	percentages, err := cpu.Percent(time.Second, false)
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return 0
+	}
+	return percentages[0]
 }

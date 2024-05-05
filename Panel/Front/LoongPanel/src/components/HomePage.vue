@@ -87,6 +87,7 @@ function drawDiskUsageChart(usedPercentage) {
   chart.setOption(option)
 
 }
+
 function drawAverageLoadChart(usedPercentage) {
   let doc = document.getElementById('averageLoadChart')
   let chart = echarts.init(doc)
@@ -156,6 +157,7 @@ function drawMemoryUsageChart(usedPercentage) {
   };
   chart.setOption(option)
 }
+
 function drawCpuUsageChart(usedPercentage) {
   let doc = document.getElementById('cpuUsageChart')
   let chart = echarts.init(doc)
@@ -196,13 +198,28 @@ function init() {
   averageLoadChart = echarts.init(document.getElementById('averageLoadChart'));
   memoryUsageChart = echarts.init(document.getElementById('memoryUsageChart'));
   cpuUsageChart = echarts.init(document.getElementById('cpuUsageChart'));
+  drawDiskUsageChart(0)
+  drawAverageLoadChart(0)
+  drawMemoryUsageChart(0)
+  drawCpuUsageChart(0)
 }
 
 function getData() {
-  drawDiskUsageChart(0);
-  drawAverageLoadChart(0);
-  drawMemoryUsageChart(0);
-  drawCpuUsageChart(0);
+  // 设置定时器
+  setInterval(() => {
+    axios.get('/api/v1/status/system_status').then(res => {
+      let disk_usage = res.data["disk_usage"]
+      let average_load = res.data["average_load"]
+      let memory_usage=  res.data["memory_usage"]
+      let cpu_usage = res.data["cpu_usage"]
+      // 保留两位小数
+      drawDiskUsageChart(disk_usage.toFixed(2))
+      drawAverageLoadChart(average_load.toFixed(2))
+      drawMemoryUsageChart(memory_usage.toFixed(2))
+      drawCpuUsageChart(cpu_usage.toFixed(2))
+
+    })
+  }, 1000)
 }
 
 onMounted(init);
