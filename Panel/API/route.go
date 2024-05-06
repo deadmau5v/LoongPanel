@@ -1,6 +1,11 @@
 package API
 
-import "github.com/gin-gonic/gin"
+import (
+	"LoongPanel/Panel/API/v1/files"
+	"LoongPanel/Panel/API/v1/home"
+	"LoongPanel/Panel/API/v1/terminal"
+	"github.com/gin-gonic/gin"
+)
 
 func initRoute(app *gin.Engine) {
 	// 静态页面
@@ -11,20 +16,20 @@ func initRoute(app *gin.Engine) {
 	// 其他
 	app.Static("/assets", WORKDIR+"/Panel/Front/LoongPanel/dist/assets")
 
-	// API
-	app.GET("/api/v1/status/system_status", SystemStatus)
-	app.GET("/api/v1/status/system_info", SystemInfo)
-	app.GET("/api/v1/status/disks", Disks)
-	app.GET("/api/v1/files/dir", FileDir)
-
-	app.GET("/api/v1/screen/input", screenInput)
-	app.GET("/api/v1/screen/create", screenCreate)
-	app.GET("/api/v1/screen/close", screenClose)
-	app.GET("/api/v1/screen/output", screenOutput)
-	app.GET("/api/v1/screen/get_screens", getScreens)
-
+	// home 页面
+	app.GET("/api/v1/status/system_status", home.SystemStatus)
+	app.GET("/api/v1/status/system_info", home.SystemInfo)
+	app.GET("/api/v1/status/disks", home.Disks)
+	// files 页面
+	app.GET("/api/v1/files/dir", files.FileDir)
+	// terminal 页面
+	app.GET("/api/v1/screen/input", terminal.ScreenInput)
+	app.GET("/api/v1/screen/create", terminal.ScreenCreate)
+	app.GET("/api/v1/screen/close", terminal.ScreenClose)
+	app.GET("/api/v1/screen/output", terminal.ScreenOutput)
+	app.GET("/api/v1/screen/get_screens", terminal.GetScreens)
 	// WebSocket
 	app.GET("/api/ws/screen", func(ctx *gin.Context) {
-		screenWs(ctx)
+		terminal.ScreenWs(ctx)
 	})
 }

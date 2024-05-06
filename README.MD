@@ -8,6 +8,8 @@
 <p align="center">
     <img src="https://img.shields.io/badge/Go-1.22-blue">
     <img src="https://img.shields.io/badge/Gin-1.9.1-blue">
+    <img src="https://img.shields.io/badge/element-plus-blue">
+    <img src="https://img.shields.io/badge/vue-3-green">
     <img src="https://img.shields.io/badge/arch-Loong64-red">
     <img src="https://img.shields.io/badge/os-linux-red">
 </p>
@@ -21,7 +23,7 @@
 - [ ] 应用安装
 - [ ] 告警通知
 - [ ] 漏洞扫描
-- [ ] 远程终端
+- [x] 远程终端
 - [ ] 进程管理
 - [ ] 垃圾清理
 - [ ] 系统设置

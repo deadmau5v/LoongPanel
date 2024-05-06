@@ -1,4 +1,4 @@
-package API
+package terminal
 
 import (
 	"fmt"
@@ -11,16 +11,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
+var upgrade = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
 
-func screenWs(c *gin.Context) {
+func ScreenWs(c *gin.Context) {
 	w := c.Writer
 	r := c.Request
-	conn, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 		return
