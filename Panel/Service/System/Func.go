@@ -12,6 +12,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
+	"log/slog"
 	"os"
 	"os/exec"
 	"runtime"
@@ -143,13 +144,6 @@ func NetworkIO() ([]NetworkIOStat, error) {
 	return stats, nil
 }
 
-// 重要
-// Todo 持久化记录
-// 		Todo 持久化记录 开关
-// 		Todo 持久化记录 时长
-// 		Todo 持久化记录 位置
-// 		Todo 持久化记录 清理
-
 // MonitorCPUPerCore 监控每个CPU核心的使用率
 func MonitorCPUPerCore() ([]float64, error) {
 	percentages, err := cpu.Percent(time.Second, true)
@@ -209,4 +203,38 @@ func GetRunTime() string {
 func GetDiskUsage() float32 {
 	usage, _ := disk.Usage("/")
 	return float32(usage.UsedPercent)
+}
+
+// Shutdown 关机
+func Shutdown() {
+	if Data.OSName == "windows" {
+		err := exec.Command("shutdown -s -t 0").Run()
+		if err != nil {
+			slog.Error("Shutdown Error: ", err.Error())
+			return
+		}
+		return
+	}
+	err := exec.Command("shutdown -h now").Run()
+	if err != nil {
+		slog.Error("Shutdown Error: ", err.Error())
+		return
+	}
+}
+
+// Reboot 重启
+func Reboot() {
+	if Data.OSName == "windows" {
+		err := exec.Command("shutdown -r -t 0").Run()
+		if err != nil {
+			slog.Error("Shutdown Error: ", err.Error())
+			return
+		}
+		return
+	}
+	err := exec.Command("reboot").Run()
+	if err != nil {
+		slog.Error("Shutdown Error: ", err.Error())
+		return
+	}
 }

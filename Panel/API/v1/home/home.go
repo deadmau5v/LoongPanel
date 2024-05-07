@@ -62,3 +62,13 @@ func SystemStatus(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, res)
 }
+
+func Shutdown(ctx *gin.Context) {
+	System2.Shutdown()
+	// 没必要返回数据 都关机了 返回个屁
+}
+
+func Reboot(ctx *gin.Context) {
+	System2.Reboot()
+	// 没必要返回数据 都重启了 返回个屁
+}

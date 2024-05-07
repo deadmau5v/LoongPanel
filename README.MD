@@ -65,3 +65,11 @@ npm run build
 ---
 <img align="center" src="doc/img/3.png">
 ---
+
+# TODO 开发计划
+
+- [ ] 持久化记录
+  - [ ] 开关
+  - [ ] 时长
+  - [ ] 位置
+  - [ ] 清理

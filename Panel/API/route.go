@@ -23,19 +23,21 @@ func initRoute(app *gin.Engine) {
 
 	// 其他
 	app.Static("/assets", WORKDIR+"/Panel/Front/LoongPanel/dist/assets")
-	//  home -> API
-	// -- home -> status
+	//  home 首页
+	// -- home -> status 状态监控(实时)
 	app.GET("/api/v1/status/system_status", home.SystemStatus)
 	app.GET("/api/v1/status/system_info", home.SystemInfo)
 	app.GET("/api/v1/status/disks", home.Disks)
-	// -- home -> clean
+	// -- home -> clean 清理垃圾
 	app.GET("/api/v1/clean/pkg_auto_clean", clean.PkgAutoClean)
-	// -- home -> power
+	// -- home -> power 电源操作
+	app.GET("/api/v1/power/shutdown", home.Reboot)
+	app.GET("/api/v1/power/reboot", home.Shutdown)
 
-	//  files -> API
+	//  files 文件
 	app.GET("/api/v1/files/dir", files.FileDir)
 
-	//  terminal -> API
+	//  terminal 终端
 	app.GET("/api/v1/screen/input", terminal.ScreenInput)
 	app.GET("/api/v1/screen/create", terminal.ScreenCreate)
 	app.GET("/api/v1/screen/close", terminal.ScreenClose)
