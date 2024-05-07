@@ -24,7 +24,4 @@ import Aside from "./components/Aside.vue";
       width: 100%;
       height: 100%;
   }
-
-
-
 </style>

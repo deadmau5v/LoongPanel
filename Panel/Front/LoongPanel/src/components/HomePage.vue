@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--  性能监视表  -->
     <el-row id="box1">
       <el-col :span="col_w">
         <el-card class="box-card">
@@ -34,6 +35,17 @@
         </el-card>
       </el-col>
     </el-row>
+    <!--  服务器小工具  -->
+    <el-row id="box2">
+      <el-col :span="col_w" style="text-align: center">
+        <span class="fa fa-power-off" ><span style="padding-left: 10px"></span>电源</span>
+        <el-card class="box-card">
+          <el-button type="primary" class="power-button">关闭服务器</el-button>
+          <el-button type="primary" class="power-button">重启服务器</el-button>
+        </el-card>
+      </el-col>
+    </el-row>
+
   </div>
 </template>
 
@@ -210,7 +222,7 @@ function getData() {
     axios.get('/api/v1/status/system_status').then(res => {
       let disk_usage = res.data["disk_usage"]
       let average_load = res.data["average_load"]
-      let memory_usage=  res.data["memory_usage"]
+      let memory_usage = res.data["memory_usage"]
       let cpu_usage = res.data["cpu_usage"]
       // 保留两位小数
       drawDiskUsageChart(disk_usage.toFixed(2))
@@ -237,6 +249,10 @@ onMounted(getData)
   justify-content: center
 }
 
+
+.el-button {
+  margin: 10px 0;
+}
 .charts {
   width: 200px;
   height: 200px;
@@ -247,7 +263,7 @@ onMounted(getData)
   text-align: center;
 }
 
-#box1 {
+#box1, #box2 {
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
@@ -255,7 +271,29 @@ onMounted(getData)
   padding: 20px;
 }
 
+#box2 {
+  width: 15%;
+}
+
 html {
   background-color: #f0f0f0;
+}
+
+.power-button {
+  background-color: rgba(255, 77, 81, 0.6);
+  color: white;
+  border-color: #ff4d51;
+}
+
+.power-button:hover {
+  background-color: rgba(255, 77, 81, 0.8);
+  color: white;
+  border-color: #ff4d51;
+}
+
+.power-button:active {
+  background-color: rgba(255, 77, 81, 1);
+  color: white;
+  border-color: #ff4d51;
 }
 </style>

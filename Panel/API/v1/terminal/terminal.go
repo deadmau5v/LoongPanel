@@ -1,7 +1,13 @@
+/*
+ * 创建人： deadmau5v
+ * 创建时间： 2024-5-7
+ * 文件作用：终端相关API 主要实现在 Service/Terminal 包中
+ */
+
 package terminal
 
 import (
-	"LoongPanel/Panel/Terminal"
+	"LoongPanel/Panel/Service/Terminal"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"

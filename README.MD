@@ -14,16 +14,17 @@
     <img src="https://img.shields.io/badge/os-linux-red">
 </p>
 
+# 后端
 ## 主要功能
 
-- [x] 性能监控
-- [x] 文件管理
+- [x] ~~性能监控~~
+- [x] ~~文件管理~~
 - [ ] 集群管理
 - [ ] 日志管理
 - [ ] 应用安装
 - [ ] 告警通知
 - [ ] 漏洞扫描
-- [x] 远程终端
+- [x] ~~远程终端~~
 - [ ] 进程管理
 - [ ] 垃圾清理
 - [ ] 系统设置
@@ -37,10 +38,30 @@
 - [ ] 运行环境管理
 - [ ] 多用户权限管理
 
-## 安装并运行
-
+## 构建
+> 需要先构建前端获得dist目录
 ```shell
-wget https://github.com/deadmau5v/LoongPanel/releases/tag/latest/LoongPanel-linux-loong64
-chmod +x LoongPanel-linux-loong64
-./LoongPanel-linux-loong64
+cd 项目路径/
+go get
+go mod tidy
+go build
 ```
+
+# 前端
+使用 Vue + Element Plus 开发
+位置在 `项目路径/Panel/Front/LoongPanel`
+
+## 构建
+```shell
+cd 项目路径/Panel/Front/LoongPanel
+npm install
+npm run build
+```
+
+# 效果图
+<img align="center" src="doc/img/1.png">
+---
+<img align="center" src="doc/img/2.png">
+---
+<img align="center" src="doc/img/3.png">
+---

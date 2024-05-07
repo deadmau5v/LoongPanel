@@ -1,3 +1,9 @@
+/*
+ * 创建人： deadmau5v
+ * 创建时间： 2024-5-7
+ * 文件作用：提供系统信息获取
+ */
+
 package System
 
 import (

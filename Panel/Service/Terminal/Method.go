@@ -1,7 +1,13 @@
+/*
+ * 创建人： deadmau5v
+ * 创建时间： 2024-5-7
+ * 文件作用：Terminal模块的方法 操作Screen的输入输出等
+ */
+
 package Terminal
 
 import (
-	"LoongPanel/Panel/System"
+	"LoongPanel/Panel/Service/System"
 	"bytes"
 	"errors"
 	"io"

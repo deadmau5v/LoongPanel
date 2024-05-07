@@ -1,7 +1,13 @@
+/*
+ * 创建人： deadmau5v
+ * 创建时间： 2024-5-7
+ * 文件作用：统一标准化操作Files对象的方法
+ */
+
 package Files
 
 import (
-	"LoongPanel/Panel/System"
+	"LoongPanel/Panel/Service/System"
 	"errors"
 	"fmt"
 	"github.com/spf13/afero"

@@ -1,3 +1,9 @@
+/*
+ * 创建人： deadmau5v
+ * 创建时间： 2024-5-7
+ * 文件作用：数据库配置
+ */
+
 package Database
 
 import (
@@ -23,7 +29,7 @@ func init() {
 	case "redis":
 		// Todo Redis 支持
 	case "sqlite":
-		SQLite, err = gorm.Open(sqlite.Open("/resource/LoongPanel.db"))
+		DB, err = gorm.Open(sqlite.Open("/resource/LoongPanel.db"))
 	}
 
 	if err != nil {

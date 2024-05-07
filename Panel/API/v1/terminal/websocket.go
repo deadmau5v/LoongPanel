@@ -1,11 +1,16 @@
+/*
+ * 创建人： deadmau5v
+ * 创建时间： 2024-5-7
+ * 文件作用：提供 terminal 的流式传输
+ */
+
 package terminal
 
 import (
+	"LoongPanel/Panel/Service/Terminal"
 	"fmt"
 	"net/http"
 	"time"
-
-	"LoongPanel/Panel/Terminal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
