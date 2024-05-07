@@ -9,9 +9,10 @@ package Database
 import (
 	"errors"
 	"fmt"
+	"os"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"os"
 )
 
 var UseDB = "sqlite"

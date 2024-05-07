@@ -61,16 +61,6 @@ func LoadAverage1m() (float32, error) {
 	res, err := LoadAverage()
 	return res[0], err
 }
-func LoadAverage5m() (float32, error) {
-	// 平均负荷 最近5分钟
-	res, err := LoadAverage()
-	return res[1], err
-}
-func LoadAverage15m() (float32, error) {
-	// 平均负荷 最近15分钟
-	res, err := LoadAverage()
-	return res[2], err
-}
 
 // MemoryUsage 内存使用率
 func MemoryUsage() (float32, error) {

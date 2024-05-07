@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// CheckFileName 检查文件名是否合法
 func CheckFileName(path string) bool {
 	words := []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"}
 	for _, word := range words {
@@ -21,6 +22,7 @@ func CheckFileName(path string) bool {
 	return true
 }
 
+// RuneIndex 查找字符在切片中的位置
 func RuneIndex(runes []rune, str string) int {
 	for i, v := range runes {
 		if string(v) == str {
@@ -30,11 +32,12 @@ func RuneIndex(runes []rune, str string) int {
 	return -1
 }
 
-func RuneIndexR(runes []rune, str string) int {
-	for i := len(runes) - 1; i >= 0; i-- {
-		if string(runes[i]) == str {
-			return i
-		}
-	}
-	return -1
-}
+// RuneIndexR 从右向左查找
+//func RuneIndexR(runes []rune, str string) int {
+//	for i := len(runes) - 1; i >= 0; i-- {
+//		if string(runes[i]) == str {
+//			return i
+//		}
+//	}
+//	return -1
+//}
