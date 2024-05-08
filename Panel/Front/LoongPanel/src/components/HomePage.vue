@@ -40,8 +40,8 @@
       <el-col :span="col_w" style="text-align: center">
         <span class="fa fa-power-off" ><span style="padding-left: 10px"></span>电源</span>
         <el-card class="box-card">
-          <el-button type="primary" class="power-button">关闭服务器</el-button>
-          <el-button type="primary" class="power-button">重启服务器</el-button>
+          <el-button type="primary" class="power-button" @click="shutdown()">关闭服务器</el-button>
+          <el-button type="primary" class="power-button" @click="reboot()">重启服务器</el-button>
         </el-card>
       </el-col>
     </el-row>
@@ -63,6 +63,16 @@ let memoryUsageChart = null;
 let cpuUsageChart = null;
 
 let col_w = 1000
+
+function reboot() {
+  axios.get('/api/v1/power/reboot').then(res => {
+  })
+}
+
+function shutdown() {
+  axios.get('/api/v1/power/shutdown').then(res => {
+  })
+}
 
 function drawDiskUsageChart(usedPercentage) {
   let doc = document.getElementById('diskUsageChart')
@@ -209,7 +219,7 @@ function init() {
   diskUsageChart = echarts.init(document.getElementById('diskUsageChart'));
   averageLoadChart = echarts.init(document.getElementById('averageLoadChart'));
   memoryUsageChart = echarts.init(document.getElementById('memoryUsageChart'));
-  cpuUsageChart = echarts.init(document.getElementById('cpuUsageChart'));
+  cpuUsageChart = echarts.init(document.getElementById('cpuUsageChart') );
   drawDiskUsageChart(0)
   drawAverageLoadChart(0)
   drawMemoryUsageChart(0)
