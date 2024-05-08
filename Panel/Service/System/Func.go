@@ -218,7 +218,7 @@ func GetLinuxVersion() string {
 	if SkipWindows() {
 		return "Windows 无法获取"
 	}
-	out, err := exec.Command("uname -sr").Output()
+	out, err := exec.Command("uname", "-sr").Output()
 	if err != nil {
 		fmt.Println("GetLinuxVersion() Error: ", err.Error())
 		return ""
