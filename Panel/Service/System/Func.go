@@ -173,7 +173,7 @@ func GetOSData() (*OSData, error) {
 	if SkipWindows() {
 		Data.LinuxVersion = "Windows 无法获取"
 	} else {
-		Data.LinuxVersion = runtime.GOOS + " " + runtime.GOARCH
+		Data.LinuxVersion = GetLinuxVersion()
 	}
 	// 网络相关
 	Data.HostIP, err = getLocalIP()
