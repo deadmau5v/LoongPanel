@@ -208,9 +208,7 @@ func GetRunTime() string {
 	res = strings.Replace(res, ",", "", -1)
 	res = strings.Replace(res, "\n", "", -1)
 	res = strings.Replace(res, "\t", "", -1)
-	if string(res[len(res)-1]) == "时" {
-		res += "0分"
-	} else {
+	if string(res[len(res)-1]) != "分" {
 		res += "分"
 	}
 	return res
