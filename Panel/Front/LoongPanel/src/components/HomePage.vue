@@ -1,50 +1,44 @@
 <template>
   <div>
     <!--  性能监视表  -->
-    <el-row id="box1">
-      <el-col :span="col_w">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>磁盘使用</span>
-          </div>
-          <div id="diskUsageChart" class="charts"></div>
-        </el-card>
-      </el-col>
-      <el-col :span="col_w">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>平均负荷</span>
-          </div>
-          <div id="averageLoadChart" class="charts"></div>
-        </el-card>
-      </el-col>
-      <el-col :span="col_w">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>内存使用</span>
-          </div>
-          <div id="memoryUsageChart" class="charts"></div>
-        </el-card>
-      </el-col>
-      <el-col :span="col_w">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <span>CPU使用</span>
-          </div>
-          <div id="cpuUsageChart" class="charts"></div>
-        </el-card>
-      </el-col>
-    </el-row>
-    <!--  服务器小工具  -->
-    <el-row id="box2">
-      <el-col :span="col_w" style="text-align: center">
-        <span class="fa fa-power-off" ><span style="padding-left: 10px"></span>电源</span>
-        <el-card class="box-card">
-          <el-button type="primary" class="power-button" @click="shutdown()">关闭服务器</el-button>
-          <el-button type="primary" class="power-button" @click="reboot()">重启服务器</el-button>
-        </el-card>
-      </el-col>
-    </el-row>
+    <el-card id="echarts-cards">
+      <el-card class="box-card echarts-card">
+        <div slot="header" class="clearfix">
+          <span>磁盘使用</span>
+        </div>
+        <div id="diskUsageChart" class="charts"></div>
+      </el-card>
+
+      <el-card class="box-card echarts-card">
+        <div slot="header" class="clearfix">
+          <span>平均负荷</span>
+        </div>
+        <div id="averageLoadChart" class="charts"></div>
+      </el-card>
+
+      <el-card class="box-card echarts-card">
+        <div slot="header" class="clearfix">
+          <span>内存使用</span>
+        </div>
+        <div id="memoryUsageChart" class="charts"></div>
+      </el-card>
+
+      <el-card class="box-card echarts-card">
+        <div slot="header" class="clearfix">
+          <span>CPU使用</span>
+        </div>
+        <div id="cpuUsageChart" class="charts"></div>
+      </el-card>
+    </el-card>
+
+    <!--  开关机重启  -->
+    <span class="fa fa-power-off"><span style="padding-left: 10px"></span>电源</span>
+    <el-card class="box-card">
+      <el-button type="primary" class="power-button" @click="shutdown()">关闭服务器</el-button>
+      <el-button type="primary" class="power-button" @click="reboot()">重启服务器</el-button>
+    </el-card>
+
+    <!--  垃圾清理  -->
 
   </div>
 </template>
@@ -219,7 +213,7 @@ function init() {
   diskUsageChart = echarts.init(document.getElementById('diskUsageChart'));
   averageLoadChart = echarts.init(document.getElementById('averageLoadChart'));
   memoryUsageChart = echarts.init(document.getElementById('memoryUsageChart'));
-  cpuUsageChart = echarts.init(document.getElementById('cpuUsageChart') );
+  cpuUsageChart = echarts.init(document.getElementById('cpuUsageChart'));
   drawDiskUsageChart(0)
   drawAverageLoadChart(0)
   drawMemoryUsageChart(0)
@@ -255,14 +249,15 @@ onMounted(getData)
   border: none;
 }
 
-.el-row {
-  justify-content: center
+.echarts-card {
+  width: 250px;
+  height: 260px;
 }
-
 
 .el-button {
   margin: 10px 0;
 }
+
 .charts {
   width: 200px;
   height: 200px;
@@ -271,18 +266,6 @@ onMounted(getData)
 
 .clearfix {
   text-align: center;
-}
-
-#box1, #box2 {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
-  margin: 20px;
-  padding: 20px;
-}
-
-#box2 {
-  width: 15%;
 }
 
 html {

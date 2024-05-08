@@ -22,5 +22,6 @@ func init() {
 		panic(err)
 	}
 	App = gin.Default()
+	gin.SetMode(gin.DebugMode)
 	initRoute(App)
 }

@@ -91,3 +91,12 @@ func getCPUPercent() float64 {
 	}
 	return percentages[0]
 }
+
+// SkipWindows 跳过Windows
+func SkipWindows() bool {
+	if Data.OSName == "windows" {
+		return true
+	} else {
+		return false
+	}
+}

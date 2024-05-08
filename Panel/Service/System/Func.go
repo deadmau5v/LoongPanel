@@ -170,10 +170,10 @@ func GetOSData() (*OSData, error) {
 	Data.HostName, err = os.Hostname()
 
 	//Linux 内核版本
-	if Data.OSName == "linux" {
+	if SkipWindows() {
+		Data.LinuxVersion = "Windows 无法获取"
+	} else {
 		Data.LinuxVersion = runtime.GOOS + " " + runtime.GOARCH
-	} else if Data.OSName == "windows" {
-		Data.LinuxVersion = "windows无法获取"
 	}
 	// 网络相关
 	Data.HostIP, err = getLocalIP()
@@ -187,15 +187,42 @@ func GetOSData() (*OSData, error) {
 
 // GetRunTime 获取系统运行时间
 func GetRunTime() string {
-	if Data.OSName == "windows" {
-		return "Windows无法获取"
+	if SkipWindows() {
+		return "Windows 无法获取"
 	}
 	out, err := exec.Command("uptime").Output()
 	if err != nil {
 		fmt.Println("GetRunTime() Error: ", err.Error())
 		return ""
 	}
-	out = []byte(strings.Split(string(out), " up ")[1])
+	out = []byte(strings.Split(string(out), "up")[1])
+	res := string(out)
+	res = strings.Split(res, ",")[1]
+	res = strings.Replace(string(out), "hour", "时", -1)
+	res = strings.Replace(string(out), ":", "时", -1)
+	res = strings.Replace(string(out), "min", "分", -1)
+	res = strings.Replace(string(out), "days", "天", -1)
+	res = strings.Replace(string(out), "day", "天", -1)
+	res = strings.Replace(string(out), " ", "", -1)
+	res = strings.Replace(string(out), ",", "", -1)
+	if string(res[len(res)-1]) == "时" {
+		res += "0分"
+	} else {
+		res += "分"
+	}
+	return res
+}
+
+// GetLinuxVersion 获取Linux版本
+func GetLinuxVersion() string {
+	if SkipWindows() {
+		return "Windows 无法获取"
+	}
+	out, err := exec.Command("uname -sr").Output()
+	if err != nil {
+		fmt.Println("GetLinuxVersion() Error: ", err.Error())
+		return ""
+	}
 	return string(out)
 }
 
@@ -207,12 +234,7 @@ func GetDiskUsage() float32 {
 
 // Shutdown 关机
 func Shutdown() {
-	if Data.OSName == "windows" {
-		err := exec.Command("shutdown -s -t 0").Run()
-		if err != nil {
-			slog.Error("Shutdown Error: ", err.Error())
-			return
-		}
+	if SkipWindows() {
 		return
 	}
 	err := exec.Command("shutdown -h now").Run()
@@ -224,12 +246,7 @@ func Shutdown() {
 
 // Reboot 重启
 func Reboot() {
-	if Data.OSName == "windows" {
-		err := exec.Command("shutdown -r -t 0").Run()
-		if err != nil {
-			slog.Error("Shutdown Error: ", err.Error())
-			return
-		}
+	if SkipWindows() {
 		return
 	}
 	err := exec.Command("reboot").Run()
