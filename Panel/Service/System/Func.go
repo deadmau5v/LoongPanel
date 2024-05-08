@@ -195,16 +195,19 @@ func GetRunTime() string {
 		fmt.Println("GetRunTime() Error: ", err.Error())
 		return ""
 	}
-	out = []byte(strings.Split(string(out), "up")[1])
+
 	res := string(out)
-	res = strings.Split(res, ",")[1]
-	res = strings.Replace(string(out), "hour", "时", -1)
-	res = strings.Replace(string(out), ":", "时", -1)
-	res = strings.Replace(string(out), "min", "分", -1)
-	res = strings.Replace(string(out), "days", "天", -1)
-	res = strings.Replace(string(out), "day", "天", -1)
-	res = strings.Replace(string(out), " ", "", -1)
-	res = strings.Replace(string(out), ",", "", -1)
+	res = strings.Split(res, "up")[1]
+	res = strings.Split(res, ",")[0]
+	res = strings.Replace(res, "hour", "时", -1)
+	res = strings.Replace(res, ":", "时", -1)
+	res = strings.Replace(res, "min", "分", -1)
+	res = strings.Replace(res, "days", "天", -1)
+	res = strings.Replace(res, "day", "天", -1)
+	res = strings.Replace(res, " ", "", -1)
+	res = strings.Replace(res, ",", "", -1)
+	res = strings.Replace(res, "\n", "", -1)
+	res = strings.Replace(res, "\t", "", -1)
 	if string(res[len(res)-1]) == "时" {
 		res += "0分"
 	} else {
@@ -223,7 +226,10 @@ func GetLinuxVersion() string {
 		fmt.Println("GetLinuxVersion() Error: ", err.Error())
 		return ""
 	}
-	return string(out)
+	res := string(out)
+	res = strings.Replace(res, "\n", "", -1)
+	res = strings.Replace(res, "\t", "", -1)
+	return res
 }
 
 // GetDiskUsage 获取磁盘使用
