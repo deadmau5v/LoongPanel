@@ -8,8 +8,6 @@
 <p align="center">
     <img src="https://img.shields.io/badge/Go-1.22-blue">
     <img src="https://img.shields.io/badge/Gin-1.9.1-blue">
-    <img src="https://img.shields.io/badge/element-plus-blue">
-    <img src="https://img.shields.io/badge/vue-3-green">
     <img src="https://img.shields.io/badge/arch-Loong64-red">
     <img src="https://img.shields.io/badge/os-linux-red">
 </p>
