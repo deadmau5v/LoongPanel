@@ -22,23 +22,54 @@ func PkgAutoClean(ctx *gin.Context) {
 		})
 		return
 	}
-	clean, err := Clean.AptAutoClean()
-	if err != nil {
-		slog.Error("AptAutoClean", err)
-		return
+	// 检查包管理器
+	switch System.Data.PkgManager {
+	case "apt":
+		msg, err := Clean.AptAutoClean()
+		if err != nil {
+			slog.Error("AptAutoClean() Error: ", err.Error())
+			ctx.JSON(200, gin.H{
+				"msg":    "AptAutoClean() Error: " + err.Error(),
+				"status": 1,
+			})
+			return
+		}
+		msg2, err := Clean.AptAutoRemove()
+		if err != nil {
+			slog.Error("AptAutoRemove() Error: ", err.Error())
+			ctx.JSON(200, gin.H{
+				"msg":    "AptAutoRemove() Error: " + err.Error(),
+				"status": 1,
+			})
+			return
+		}
+		ctx.JSON(200, gin.H{
+			"msg":    msg + msg2,
+			"status": 0,
+		})
+
+	case "yum":
+		msg, err := Clean.YumAutoClean()
+		if err != nil {
+			slog.Error("YumAutoClean() Error: ", err.Error())
+			ctx.JSON(200, gin.H{
+				"msg":    "YumAutoClean() Error: " + err.Error(),
+				"status": 1,
+			})
+			return
+		}
+		msg2, err := Clean.YumAutoRemove()
+		if err != nil {
+			slog.Error("YumAutoRemove() Error: ", err.Error())
+			ctx.JSON(200, gin.H{
+				"msg":    "YumAutoRemove() Error: " + err.Error(),
+				"status": 1,
+			})
+			return
+		}
+		ctx.JSON(200, gin.H{
+			"msg":    msg + msg2,
+			"status": 0,
+		})
 	}
-	slog.Debug("AptAutoClean", string(clean))
-	remove, err := Clean.AptAutoRemove()
-	if err != nil {
-		slog.Error("AptAutoRemove", err)
-		return
-	}
-	slog.Debug("AptAutoRemove", string(remove))
-	autoClean, err := Clean.YumAutoClean()
-	if err != nil {
-		slog.Error("YumAutoClean", err)
-		return
-	}
-	slog.Debug("YumAutoClean", string(autoClean))
-	return
 }

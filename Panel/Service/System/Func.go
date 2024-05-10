@@ -171,7 +171,7 @@ func GetOSData() (*OSData, error) {
 
 	//Linux 内核版本
 	if SkipWindows() {
-		Data.LinuxVersion = "Windows 无法获取"
+		Data.LinuxVersion = "Windows平台"
 	} else {
 		Data.LinuxVersion = GetLinuxVersion()
 	}
@@ -181,6 +181,8 @@ func GetOSData() (*OSData, error) {
 	Data.Swap, err = getSwap()
 	// Disk
 	Data.Disks, err = getDisk()
+	// 包管理器
+	Data.PkgManager = getPkgManager()
 
 	return Data, err
 }
@@ -188,7 +190,7 @@ func GetOSData() (*OSData, error) {
 // GetRunTime 获取系统运行时间
 func GetRunTime() string {
 	if SkipWindows() {
-		return "Windows 无法获取"
+		return "上次关机还是在上次"
 	}
 	out, err := exec.Command("uptime").Output()
 	if err != nil {
@@ -214,7 +216,7 @@ func GetRunTime() string {
 // GetLinuxVersion 获取Linux版本
 func GetLinuxVersion() string {
 	if SkipWindows() {
-		return "Windows 无法获取"
+		return "Windows"
 	}
 	out, err := exec.Command("uname", "-sr").Output()
 	if err != nil {
@@ -255,4 +257,20 @@ func Reboot() {
 		slog.Error("Shutdown Error: ", err.Error())
 		return
 	}
+}
+
+// getPkgManager 获取包管理器
+func getPkgManager() string {
+	if SkipWindows() {
+		return "Windows"
+	}
+	_, err := exec.LookPath("apt")
+	if err == nil {
+		return "apt"
+	}
+	_, err = exec.LookPath("yum")
+	if err == nil {
+		return "yum"
+	}
+	return ""
 }

@@ -26,6 +26,8 @@ type OSData struct {
 	LinuxVersion string `json:"LinuxVersion"` // Linux 版本
 
 	Disks []*Disk `json:"Disks"` // 盘符
+
+	PkgManager string `json:"PkgManager"` // 包管理器
 }
 
 // Disk 磁盘信息

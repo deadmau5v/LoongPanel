@@ -18,11 +18,11 @@ import (
 func initRoute(app *gin.Engine) {
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {
-		c.File(WORKDIR + "/Panel/Front/LoongPanel/dist/index.html")
+		c.File(WORKDIR + "/dist/index.html")
 	})
 
 	// 其他
-	app.Static("/assets", WORKDIR+"/Panel/Front/LoongPanel/dist/assets")
+	app.Static("/assets", WORKDIR+"/dist/assets")
 	//  home 首页
 	// -- home -> status 状态监控(实时)
 	app.GET("/api/v1/status/system_status", home.SystemStatus)

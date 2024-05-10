@@ -48,15 +48,11 @@ go build
 ```
 
 # 前端
-使用 Vue + Element Plus 开发
-位置在 `项目路径/Panel/Front/LoongPanel`
+https://github.com/deadmau5v/loong_panel_react
 
-## 构建
-```shell
-cd 项目路径/Panel/Front/LoongPanel
-npm install
-npm run build
-```
+
+# 运行
+需要将前端编译后 dist 目录放到后端目录下
 
 # 效果图
 <img align="center" src="doc/img/1.png">
