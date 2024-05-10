@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="./Panel/Front/LoongPanel/src/assets/logo.png" alt="Clash" width="200">
+  <img src="./doc/img/logo.png" alt="Logo" width="200">
   <br>LoongPanel<br>
 </h1>
 
