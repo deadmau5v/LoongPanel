@@ -4,7 +4,7 @@
 </h1>
 
 <h4 align="center">一个 LoongArch64 下的运维管理平台</h4>
-    
+
 <p align="center">
     <img src="https://img.shields.io/badge/Go-1.22-blue">
     <img src="https://img.shields.io/badge/Gin-1.9.1-blue">
@@ -13,31 +13,35 @@
 </p>
 
 # 后端
+
 ## 主要功能
 
 - [x] ~~性能监控~~
-- [x] ~~文件管理~~
-- [ ] 集群管理
-- [ ] 日志管理
-- [ ] 应用安装
-- [ ] 告警通知
-- [ ] 漏洞扫描
-- [x] ~~远程终端~~
-- [ ] 进程管理
-- [ ] 垃圾清理
-- [ ] 系统设置
-- [ ] 面板设置
+    - [x] ~~文件管理~~
+    - [ ] 集群管理
+    - [ ] 日志管理
+    - [ ] 应用安装
+    - [ ] 告警通知
+    - [ ] 漏洞扫描
+    - [x] ~~远程终端~~
+    - [ ] 进程管理
+    - [ ] 垃圾清理
+    - [ ] 系统设置
+    - [ ] 面板设置
 
 ## 高级功能
+
 - [ ] SSH 管理
-- [ ] 数据库管理
-- [ ] Docker 管理
-- [ ] 定时任务执行
-- [ ] 运行环境管理
-- [ ] 多用户权限管理
+    - [ ] 数据库管理
+    - [ ] Docker 管理
+    - [ ] 定时任务执行
+    - [ ] 运行环境管理
+    - [ ] 多用户权限管理
 
 ## 构建
+
 > 需要先构建前端获得dist目录
+
 ```shell
 cd 项目路径/
 go get
@@ -46,13 +50,15 @@ go build
 ```
 
 # 前端
+
 https://github.com/deadmau5v/loong_panel_react
 
-
 # 运行
+
 需要将前端编译后 dist 目录放到后端目录下
 
 # 效果图
+
 <img align="center" src="doc/img/1.png">
 ---
 <img align="center" src="doc/img/2.png">
@@ -63,7 +69,7 @@ https://github.com/deadmau5v/loong_panel_react
 # TODO 开发计划
 
 - [ ] 持久化记录
-  - [ ] 开关
-  - [ ] 时长
-  - [ ] 位置
-  - [ ] 清理
+    - [ ] 开关
+    - [ ] 时长
+    - [ ] 位置
+    - [ ] 清理

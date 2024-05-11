@@ -80,8 +80,24 @@ func ScreenClose(ctx *gin.Context) {
 
 func ScreenCreate(ctx *gin.Context) {
 	fmt.Println("INFO screenCreate")
-	id := getIntQuery(ctx, "id")
-	name := getQuery(ctx, "name")
+	idStr := ctx.Query("id")
+	var id int
+	if idStr == "" {
+		id = Terminal.GetNextId() // 时间戳
+	} else {
+		_id, err := strconv.Atoi(idStr)
+		if err != nil {
+			data := map[string]interface{}{
+				"msg":    "无法获取参数: id",
+				"status": -1,
+			}
+			ctx.JSON(200, data)
+			return
+		}
+		id = _id
+	}
+
+	name := strconv.Itoa(id)
 	err := Terminal.MainScreenManager.Create(name, uint32(id))
 	data := map[string]interface{}{}
 	if err != nil {

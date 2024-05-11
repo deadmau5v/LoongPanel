@@ -15,8 +15,9 @@ type OSData struct {
 	HostIP []string `json:"HostIP"` // 本地IP
 	//PublicIP string   `json:"PublicIP"` // 公网IP 影响速度 取消
 
-	RAM  float64 `json:"RAM"`  // 运行内存
-	Swap float64 `json:"Swap"` // 交换空间内存
+	RAM    float64 `json:"RAM"`    // 运行内存
+	Swap   float64 `json:"Swap"`   // 交换空间内存
+	RAMMHz any     `json:"RAMMHz"` // 内存频率
 
 	CPUNumber int     `json:"CPUNumber"` // CPU 数量
 	CPUCores  int     `json:"CPUCores"`  // CPU 核心数
@@ -25,7 +26,8 @@ type OSData struct {
 
 	LinuxVersion string `json:"LinuxVersion"` // Linux 版本
 
-	Disks []*Disk `json:"Disks"` // 盘符
+	Disks     []*Disk `json:"Disks"`     // 盘符
+	DiskTotal float64 `json:"DiskTotal"` // 硬盘总容量
 
 	PkgManager string `json:"PkgManager"` // 包管理器
 }

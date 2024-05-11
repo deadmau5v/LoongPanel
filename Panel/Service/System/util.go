@@ -7,12 +7,14 @@
 package System
 
 import (
-	"fmt"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
+	"log/slog"
 	"os/exec"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -21,12 +23,12 @@ func getLocalIP() ([]string, error) {
 	res := make([]string, 0)
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		fmt.Println("GetOSData() Error: ", err.Error())
+		slog.Error("GetOSData() Error: ", err.Error())
 	}
 	for _, iface := range ifaces {
 		adders := iface.Addrs
 		if err != nil {
-			fmt.Println("GetOSData() Error: ", err.Error())
+			slog.Error("GetOSData() Error: ", err.Error())
 		}
 		for _, addr := range adders {
 			res = append(res, addr.Addr)
@@ -45,7 +47,7 @@ func getPublicIP() (string, error) {
 func getRAM() (float64, error) {
 	memInfo, err := mem.VirtualMemory()
 	if err != nil {
-		fmt.Println("GetRAM() Error: ", err.Error())
+		slog.Error("GetRAM() Error: ", err.Error())
 	}
 	return float64(memInfo.Total), err
 }
@@ -54,7 +56,7 @@ func getRAM() (float64, error) {
 func getSwap() (float64, error) {
 	memInfo, err := mem.SwapMemory()
 	if err != nil {
-		fmt.Println("GetSwap() Error: ", err.Error())
+		slog.Error("GetSwap() Error: ", err.Error())
 	}
 	return float64(memInfo.Total), err
 }
@@ -64,7 +66,7 @@ func getDisk() ([]*Disk, error) {
 	res := make([]*Disk, 0)
 	partitions, err := disk.Partitions(true)
 	if err != nil {
-		fmt.Println("GetDisk() Error: ", err.Error())
+		slog.Error("GetDisk() Error: ", err.Error())
 	}
 	for _, partition := range partitions {
 		// 筛选不必要的空磁盘
@@ -86,7 +88,7 @@ func getDisk() ([]*Disk, error) {
 func getCPUPercent() float64 {
 	percentages, err := cpu.Percent(time.Second, false)
 	if err != nil {
-		fmt.Println("Error: ", err)
+		slog.Error("Error: ", err)
 		return 0
 	}
 	return percentages[0]
@@ -98,5 +100,28 @@ func SkipWindows() bool {
 		return true
 	} else {
 		return false
+	}
+}
+
+// getRAMMHz 获取内存频率
+func getRAMMHz() (int, error) {
+	if SkipWindows() {
+		return 0, nil
+	} else {
+		cmd := "dmidecode -t memory"
+		out, err := exec.Command("bash", "-c", cmd).Output()
+		if err != nil {
+			slog.Error("GetRAMMHz() Error: ", err.Error())
+			return 0, err
+		}
+		res := string(out)
+		res = strings.Split(res, "Speed: ")[1]
+		res = strings.Split(res, " ")[0]
+		resInt, err := strconv.Atoi(res)
+		if err != nil {
+			slog.Error("GetRAMMHz() Error: ", err.Error())
+			return 0, err
+		}
+		return resInt, nil
 	}
 }

@@ -144,3 +144,7 @@ func getInitShell() *exec.Cmd {
 	}
 	return nil
 }
+
+func GetNextId() int {
+	return int(time.Now().Unix())
+}

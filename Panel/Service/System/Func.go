@@ -177,10 +177,16 @@ func GetOSData() (*OSData, error) {
 	}
 	// 网络相关
 	Data.HostIP, err = getLocalIP()
+	// 内存
 	Data.RAM, err = getRAM()
 	Data.Swap, err = getSwap()
+	Data.RAMMHz, err = getRAMMHz()
 	// Disk
 	Data.Disks, err = getDisk()
+	for _, d := range Data.Disks {
+		Data.DiskTotal += d.MaxMemory
+	}
+
 	// 包管理器
 	Data.PkgManager = getPkgManager()
 
@@ -273,4 +279,10 @@ func getPkgManager() string {
 		return "yum"
 	}
 	return ""
+}
+
+// GetRAMUsedAndFree 获取内存剩余
+func GetRAMUsedAndFree() (uint64, uint64) {
+	memory, _ := mem.VirtualMemory()
+	return memory.Free, memory.Used
 }
