@@ -54,7 +54,7 @@ func GetScreens(ctx *gin.Context) {
 func ScreenOutput(ctx *gin.Context) {
 	id := getIntQuery(ctx, "id")
 	idx := getIntQuery(ctx, "idx")
-	screen := Terminal.MainScreenManager.GetScreen(id)
+	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
 	if screen == nil {
 		data := map[string]interface{}{
 			"msg":    "无法查询到ID",
@@ -115,7 +115,7 @@ func ScreenCreate(ctx *gin.Context) {
 func ScreenInput(ctx *gin.Context) {
 	id := getIntQuery(ctx, "id")
 	cmd := getQuery(ctx, "cmd")
-	screen := Terminal.MainScreenManager.GetScreen(id)
+	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
 	screen.Input(cmd)
 	data := map[string]interface{}{
 		"msg":    "ok",
