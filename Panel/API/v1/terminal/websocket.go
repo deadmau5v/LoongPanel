@@ -39,14 +39,13 @@ func ScreenWs(c *gin.Context) {
 		}
 	}(conn)
 
-	id := getIntQuery(c, "id")
-	screen := Terminal.MainScreenManager.GetScreen(id)
-	if screen == nil {
-		slog.Error("无法获取screen", id)
-		c.JSON(200, map[string]interface{}{
-			"status": 500,
-			"msg":    "无法获取screen",
-		})
+	screen := Terminal.DefaultScreen
+	if screen.Connected {
+		// 关闭之前的连接
+		screen.Close()
+		// 新建一个连接
+		_ = Terminal.MainScreenManager.Create(screen.Name, screen.Id)
+		screen = Terminal.MainScreenManager.GetScreen(screen.Id)
 	}
 	output := screen.Subscribe()
 

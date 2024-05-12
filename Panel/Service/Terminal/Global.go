@@ -7,3 +7,4 @@
 package Terminal
 
 var MainScreenManager *ScreenManager
+var DefaultScreen *Screen

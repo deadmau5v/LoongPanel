@@ -104,9 +104,9 @@ func (sm *ScreenManager) Create(name string, id uint32) error {
 	return nil
 }
 
-func (sm *ScreenManager) GetScreen(id int) *Screen {
+func (sm *ScreenManager) GetScreen(id uint32) *Screen {
 	for _, v := range sm.Screens {
-		if v.Id == uint32(id) {
+		if v.Id == id {
 			return v
 		}
 	}

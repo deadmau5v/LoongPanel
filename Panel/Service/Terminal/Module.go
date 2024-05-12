@@ -21,6 +21,7 @@ type Screen struct {
 	Output      *bytes.Buffer
 	subscribers []chan []byte
 	outputLen   int
+	Connected   bool
 }
 
 type ScreenManager struct {
