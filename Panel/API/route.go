@@ -44,8 +44,6 @@ func initRoute(app *gin.Engine) {
 	app.GET("/api/v1/screen/output", terminal.ScreenOutput)
 	app.GET("/api/v1/screen/get_screens", terminal.GetScreens)
 	// -- terminal -> WebSocket
-	app.GET("/api/ws/screen", func(ctx *gin.Context) {
-		terminal.ScreenWs(ctx)
-	})
+	app.GET("/api/ws/screen", terminal.ScreenWs)
 
 }

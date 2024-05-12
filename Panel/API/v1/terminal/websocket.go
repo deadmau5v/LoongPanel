@@ -8,7 +8,7 @@ package terminal
 
 import (
 	"LoongPanel/Panel/Service/Terminal"
-	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -23,23 +23,26 @@ var upgrade = websocket.Upgrader{
 }
 
 func ScreenWs(c *gin.Context) {
+	slog.Info("ScreenWs创建")
 	w := c.Writer
 	r := c.Request
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
+		slog.Error("无法打开websocket连接")
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 		return
 	}
 	defer func(conn *websocket.Conn) {
 		err := conn.Close()
 		if err != nil {
-			fmt.Println("Ws链接异常关闭")
+			slog.Error("Ws链接异常关闭")
 		}
 	}(conn)
 
 	id := getIntQuery(c, "id")
 	screen := Terminal.MainScreenManager.GetScreen(id)
 	if screen == nil {
+		slog.Error("无法获取screen", id)
 		c.JSON(200, map[string]interface{}{
 			"status": 500,
 			"msg":    "无法获取screen",
