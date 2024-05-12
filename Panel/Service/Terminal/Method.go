@@ -35,7 +35,13 @@ func (s *Screen) Unsubscribe(c chan []byte) {
 }
 
 func (s *Screen) Publish() {
-	newOutput := s.Output.Bytes()[s.outputLen:]
+	output := s.Output.Bytes()
+	outputLen := len(output)
+	if s.outputLen >= outputLen {
+		s.outputLen = outputLen
+		return
+	}
+	newOutput := output[s.outputLen:outputLen]
 	if string(newOutput) != "" {
 		s.outputLen = len(s.Output.Bytes())
 		for _, subscriber := range s.subscribers {

@@ -8,7 +8,7 @@ package Terminal
 
 import (
 	"bytes"
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"os"
 	"sync"
 	"time"
@@ -22,7 +22,7 @@ type Screen struct {
 	Output      *bytes.Buffer
 	subscribers []chan []byte
 	outputLen   int
-	WS          *gin.Context
+	WS          *websocket.Conn
 }
 
 type ScreenManager struct {

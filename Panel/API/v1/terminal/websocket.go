@@ -39,12 +39,32 @@ func ScreenWs(c *gin.Context) {
 		}
 	}(conn)
 
-	screen := Terminal.DefaultScreen
+	id := getIntQuery(c, "id")
+	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
 	if screen.WS != nil {
-		screen.WS.Abort()
-		screen.WS = c
+		screen.WS.Close()
+		screen.WS = conn
 	}
+
+	input := make(chan []byte, 1024)
 	output := screen.Subscribe()
+	defer close(input)
+
+	close_ := func() {
+		id_, name_ := screen.Id, screen.Name
+		if screen.WS != nil && screen.WS == conn {
+			conn.Close()
+			screen.Close()
+			conn = nil
+			screen.WS = nil
+		}
+
+		Terminal.MainScreenManager.Close(id)
+		// 重建screen
+
+		_ = Terminal.MainScreenManager.Create(name_, id_)
+		c.Abort()
+	}
 
 	go func() {
 		for {
@@ -53,28 +73,30 @@ func ScreenWs(c *gin.Context) {
 		}
 	}()
 
-	input := make(chan []byte, 1024)
-	defer close(input)
-
 	go func() {
 		for {
-			_, message, err := conn.ReadMessage()
-			if err != nil {
-				break
+			if conn != nil {
+				_, message, err := conn.ReadMessage()
+				if err != nil {
+					close_()
+					return
+				}
+				input <- message
 			}
-			input <- message
 		}
 	}()
 	for {
-		select {
-		case o := <-output:
-			err := conn.WriteMessage(1, o)
-			if err != nil {
-				break
+		if conn != nil {
+			select {
+			case o := <-output:
+				err := conn.WriteMessage(1, o)
+				if err != nil {
+					close_()
+					return
+				}
+			case i := <-input:
+				screen.InputByte(i)
 			}
-		case i := <-input:
-			screen.InputByte(i)
 		}
-
 	}
 }
