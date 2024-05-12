@@ -108,8 +108,7 @@ func getRAMMHz() (int, error) {
 	if SkipWindows() {
 		return 0, nil
 	} else {
-		cmd := "dmidecode -t memory"
-		out, err := exec.Command("bash", "-c", cmd).Output()
+		out, err := exec.Command("dmidecode", "-t", "memory").Output()
 		if err != nil {
 			slog.Error("GetRAMMHz() Error: ", err.Error())
 			return 0, err
