@@ -8,6 +8,7 @@ package Terminal
 
 import (
 	"bytes"
+	"github.com/gin-gonic/gin"
 	"os"
 	"sync"
 	"time"
@@ -21,7 +22,7 @@ type Screen struct {
 	Output      *bytes.Buffer
 	subscribers []chan []byte
 	outputLen   int
-	Connected   bool
+	WS          *gin.Context
 }
 
 type ScreenManager struct {

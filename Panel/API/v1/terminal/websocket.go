@@ -40,12 +40,9 @@ func ScreenWs(c *gin.Context) {
 	}(conn)
 
 	screen := Terminal.DefaultScreen
-	if screen.Connected {
-		// 关闭之前的连接
-		screen.Close()
-		// 新建一个连接
-		_ = Terminal.MainScreenManager.Create(screen.Name, screen.Id)
-		screen = Terminal.MainScreenManager.GetScreen(screen.Id)
+	if screen.WS != nil {
+		screen.WS.Abort()
+		screen.WS = c
 	}
 	output := screen.Subscribe()
 
