@@ -7,8 +7,8 @@
 package terminal
 
 import (
+	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/Terminal"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -79,7 +79,7 @@ func ScreenClose(ctx *gin.Context) {
 }
 
 func ScreenCreate(ctx *gin.Context) {
-	fmt.Println("INFO screenCreate")
+	Log.INFO("screenCreate")
 	idStr := ctx.Query("id")
 	var id int
 	if idStr == "" {
@@ -104,7 +104,7 @@ func ScreenCreate(ctx *gin.Context) {
 		data["status"] = -1
 		data["msg"] = err.Error()
 		ctx.JSON(200, data)
-		fmt.Println("创建Screen错误")
+		Log.ERROR("创建Screen错误")
 		return
 	}
 	data["status"] = 0

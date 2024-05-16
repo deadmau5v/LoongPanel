@@ -7,7 +7,8 @@
 package System
 
 import (
-	"fmt"
+	"LoongPanel/Panel/Service/Log"
+	"os"
 )
 
 func init() {
@@ -15,10 +16,10 @@ func init() {
 	Data, err = GetOSData()
 	temp, err := getPublicIP()
 	if err != nil {
-		fmt.Println("GetPublicIP() Error: ", err.Error())
+		Log.ERROR("GetPublicIP() Error: ", err.Error())
 	}
 	PublicIP = temp
-
+	WORKDIR, err = os.Getwd()
 	// 开启线程 实时监控CPU占用 防止调用时阻塞
 	go func() {
 		for {

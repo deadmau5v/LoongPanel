@@ -84,7 +84,6 @@ func (f *File) GetDir() string {
 	name := []rune(f.Name)
 	dir := []rune(f.Path)
 	dir = dir[:len(dir)-len(name)]
-	fmt.Println(string(dir))
 	return string(dir)
 }
 

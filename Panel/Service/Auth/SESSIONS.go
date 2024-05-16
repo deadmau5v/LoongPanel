@@ -1,10 +1,10 @@
 /*
  * 创建人： deadmau5v
- * 创建时间： 2024-0-0
+ * 创建时间： 2024-5-16
  * 文件作用：
  */
 
-package auth
+package Auth
 
 import "github.com/google/uuid"
 

@@ -7,8 +7,8 @@
 package Database
 
 import (
+	"LoongPanel/Panel/Service/Log"
 	"errors"
-	"fmt"
 	"os"
 
 	"gorm.io/driver/sqlite"
@@ -22,7 +22,7 @@ var Password = ""
 var UseDatabase = "LoongPanel"
 
 func init() {
-	err := errors.New("None")
+	err := errors.New("none")
 	_ = os.Mkdir("/resource", os.ModePerm)
 	switch UseDB {
 	case "sqlite":
@@ -30,10 +30,10 @@ func init() {
 	}
 
 	if err != nil {
-		fmt.Printf("使用的数据库: %v 使用的库: %v 详细: \n", UseDB, UseDatabase)
-		fmt.Println(err.Error())
+		Log.INFO("使用的数据库: %v 使用的库: %v 详细: \n", UseDB, UseDatabase)
+		Log.ERROR(err.Error())
 		return
 	} else {
-		fmt.Println("连接成功")
+		Log.INFO("[数据库模块]连接成功")
 	}
 }

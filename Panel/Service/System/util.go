@@ -7,11 +7,11 @@
 package System
 
 import (
+	"LoongPanel/Panel/Service/Log"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
-	"log/slog"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -23,12 +23,12 @@ func getLocalIP() ([]string, error) {
 	res := make([]string, 0)
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		slog.Error("GetOSData() Error: ", err.Error())
+		Log.ERROR("GetOSData() Error: ", err.Error())
 	}
 	for _, iface := range ifaces {
 		adders := iface.Addrs
 		if err != nil {
-			slog.Error("GetOSData() Error: ", err.Error())
+			Log.ERROR("GetOSData() Error: ", err.Error())
 		}
 		for _, addr := range adders {
 			res = append(res, addr.Addr)
@@ -47,7 +47,7 @@ func getPublicIP() (string, error) {
 func getRAM() (float64, error) {
 	memInfo, err := mem.VirtualMemory()
 	if err != nil {
-		slog.Error("GetRAM() Error: ", err.Error())
+		Log.ERROR("GetRAM() Error: ", err.Error())
 	}
 	return float64(memInfo.Total), err
 }
@@ -56,7 +56,7 @@ func getRAM() (float64, error) {
 func getSwap() (float64, error) {
 	memInfo, err := mem.SwapMemory()
 	if err != nil {
-		slog.Error("GetSwap() Error: ", err.Error())
+		Log.ERROR("GetSwap() Error: ", err.Error())
 	}
 	return float64(memInfo.Total), err
 }
@@ -66,7 +66,7 @@ func getDisk() ([]*Disk, error) {
 	res := make([]*Disk, 0)
 	partitions, err := disk.Partitions(true)
 	if err != nil {
-		slog.Error("GetDisk() Error: ", err.Error())
+		Log.ERROR("GetDisk() Error: ", err.Error())
 	}
 	for _, partition := range partitions {
 		// 筛选不必要的空磁盘
@@ -88,7 +88,7 @@ func getDisk() ([]*Disk, error) {
 func getCPUPercent() float64 {
 	percentages, err := cpu.Percent(time.Second, false)
 	if err != nil {
-		slog.Error("Error: ", err)
+		Log.ERROR("Error: ", err)
 		return 0
 	}
 	return percentages[0]
@@ -110,7 +110,7 @@ func getRAMMHz() (int, error) {
 	} else {
 		out, err := exec.Command("dmidecode", "-t", "memory").Output()
 		if err != nil {
-			slog.Error("GetRAMMHz() Error: ", err.Error())
+			Log.ERROR("GetRAMMHz() Error: ", err.Error())
 			return 0, err
 		}
 		res := string(out)
@@ -118,7 +118,7 @@ func getRAMMHz() (int, error) {
 		res = strings.Split(res, " ")[0]
 		resInt, err := strconv.Atoi(res)
 		if err != nil {
-			slog.Error("GetRAMMHz() Error: ", err.Error())
+			Log.ERROR("GetRAMMHz() Error: ", err.Error())
 			return 0, err
 		}
 		return resInt, nil

@@ -7,14 +7,13 @@
 package API
 
 import (
-	"LoongPanel/Panel/API/v1/auth"
+	"LoongPanel/Panel/Service/Auth"
+	"LoongPanel/Panel/Service/Log"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"os"
 )
 
 var App *gin.Engine
-var WORKDIR string
 var AppName = "LoongPanel"
 
 func Cors() gin.HandlerFunc {
@@ -42,7 +41,7 @@ func AuthUser() gin.HandlerFunc {
 		if Authorization != "" {
 			session = Authorization
 		}
-		if auth.SESSIONS[session] {
+		if Auth.SESSIONS[session] {
 			c.Next()
 		} else {
 			session = ""
@@ -68,12 +67,10 @@ func AuthUser() gin.HandlerFunc {
 }
 
 func init() {
-	var err error
-	WORKDIR, err = os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	App = gin.Default()
+	App = gin.New()
+	App.Use(Log.GinLogToFile())
+	App.Use(gin.Logger())
+	App.Use(gin.Recovery())
 	App.Use(Cors())
 	App.Use(AuthUser())
 

@@ -7,43 +7,47 @@
 package API
 
 import (
-	"LoongPanel/Panel/API/v1/auth"
+	AuthAPI "LoongPanel/Panel/API/v1/auth"
 	"LoongPanel/Panel/API/v1/clean"
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
 	"LoongPanel/Panel/API/v1/terminal"
-
+	"LoongPanel/Panel/Service/System"
 	"github.com/gin-gonic/gin"
 )
 
 func initRoute(app *gin.Engine) {
 	// 其他
-	app.Static("/assets", WORKDIR+"/dist/assets")
+	app.Static("/assets", System.WORKDIR+"/dist/assets")
+
+	// api v1
+	v1 := app.Group("/api/v1")
+	ws := app.Group("/api/ws")
 	//  home 首页
 	// -- home -> status 状态监控(实时)
-	app.GET("/api/v1/status/system_status", home.SystemStatus)
-	app.GET("/api/v1/status/system_info", home.SystemInfo)
-	app.GET("/api/v1/status/disks", home.Disks)
+	v1.GET("/status/system_status", home.SystemStatus)
+	v1.GET("/status/system_info", home.SystemInfo)
+	v1.GET("/status/disks", home.Disks)
 	// -- home -> clean 清理垃圾
-	app.GET("/api/v1/clean/pkg_auto_clean", clean.PkgAutoClean)
+	v1.GET("/clean/pkg_auto_clean", clean.PkgAutoClean)
 	// -- home -> power 电源操作
-	app.GET("/api/v1/power/shutdown", home.Reboot)
-	app.GET("/api/v1/power/reboot", home.Shutdown)
+	v1.GET("/power/shutdown", home.Reboot)
+	v1.GET("/power/reboot", home.Shutdown)
 
 	//  files 文件
-	app.GET("/api/v1/files/dir", files.FileDir)
+	v1.GET("/files/dir", files.FileDir)
 
 	//  terminal 终端
-	app.GET("/api/v1/screen/input", terminal.ScreenInput)
-	app.GET("/api/v1/screen/create", terminal.ScreenCreate)
-	app.GET("/api/v1/screen/close", terminal.ScreenClose)
-	app.GET("/api/v1/screen/output", terminal.ScreenOutput)
-	app.GET("/api/v1/screen/get_screens", terminal.GetScreens)
+	v1.GET("/screen/input", terminal.ScreenInput)
+	v1.GET("/screen/create", terminal.ScreenCreate)
+	v1.GET("/screen/close", terminal.ScreenClose)
+	v1.GET("/screen/output", terminal.ScreenOutput)
+	v1.GET("/screen/get_screens", terminal.GetScreens)
 	// -- terminal -> WebSocket
-	app.GET("/api/ws/screen", terminal.ScreenWs)
+	ws.GET("/api/ws/screen", terminal.ScreenWs)
 
 	// ping
-	app.GET("/api/v1/ping", func(c *gin.Context) {
+	v1.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"code": 200,
 			"msg":  "pong",
@@ -51,11 +55,11 @@ func initRoute(app *gin.Engine) {
 	})
 
 	// 登录
-	app.POST("/api/v1/login", auth.Login)
+	app.POST("/api/v1/login", AuthAPI.Login)
 
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {
-		c.File(WORKDIR + "/dist/index.html")
+		c.File(System.WORKDIR + "/dist/index.html")
 	})
 
 }

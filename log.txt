@@ -1,0 +1,154 @@
+[数据库模块]连接成功
+[权限管理]Casbin初始化成功
+http://127.0.0.1:8080
+GET / 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_info 127.0.0.1
+OPTIONS /api/v1/ping ::1
+GET /api/v1/ping ::1
+POST /api/v1/login 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_info 127.0.0.1
+OPTIONS /api/v1/ping ::1
+GET /api/v1/ping ::1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+[数据库模块]连接成功
+[权限管理]Casbin初始化成功
+http://127.0.0.1:8080
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET / 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_info 127.0.0.1
+OPTIONS /api/v1/ping ::1
+GET /api/v1/ping ::1
+POST /api/v1/login 127.0.0.1
+admin: 登录成功
+GET /api/v1/status/system_status 127.0.0.1
+OPTIONS /api/v1/ping ::1
+GET /api/v1/status/system_info 127.0.0.1
+GET /api/v1/ping ::1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /assets/TerminalPage-BBnfOWgV.js 127.0.0.1
+GET /api/v1/screen/get_screens 127.0.0.1
+GET /assets/FilesPage-BA0layKt.js 127.0.0.1
+GET /assets/File-C0QFI4m4.js 127.0.0.1
+GET /api/v1/files/dir 127.0.0.1
+GET /api/v1/screen/get_screens 127.0.0.1
+GET /api/v1/files/dir 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_info 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+GET /api/v1/status/system_status 127.0.0.1
+[数据库模块]连接成功
+[权限管理]Casbin初始化成功
+http://127.0.0.1:8080
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_info]
+[::1] -> [OPTIONS] -> [/api/v1/ping]
+[::1] -> [GET] -> [/api/v1/ping]
+[127.0.0.1] -> [POST] -> [/api/v1/login]
+admin: 登录成功
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_info]
+[::1] -> [OPTIONS] -> [/api/v1/ping]
+[::1] -> [GET] -> [/api/v1/ping]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]
+[127.0.0.1] -> [GET] -> [/api/v1/status/system_status]

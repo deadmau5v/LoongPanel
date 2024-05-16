@@ -12,8 +12,9 @@ import (
 )
 
 type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }
 
 func (user *User) Save() {
@@ -57,7 +58,7 @@ func Find(where map[string]interface{}) []User {
 func init() {
 	err := Database.DB.AutoMigrate(&User{})
 	if err != nil {
-		fmt.Println("初始化SQLite数据库失败")
+		Log.ERROR("初始化SQLite数据库失败")
 		return
 	}
 }
