@@ -21,10 +21,6 @@ func (user *User) Save() {
 	switch Database.UseDB {
 	case "sqlite":
 		Database.DB.Create(&user)
-	case "mysql":
-		// Todo 数据库操作兼容
-	case "redis":
-		// Todo 数据库操作兼容
 	}
 }
 
@@ -32,10 +28,6 @@ func (user *User) Delete() {
 	switch Database.UseDB {
 	case "sqlite":
 		Database.DB.Delete(&user)
-	case "mysql":
-		// Todo 数据库操作兼容
-	case "redis":
-		// Todo 数据库操作兼容
 	}
 }
 
@@ -58,10 +50,6 @@ func Find(where map[string]interface{}) []User {
 		} else {
 			Database.DB.Find(&Users)
 		}
-	case "mysql":
-		// Todo 数据库操作兼容
-	case "redis":
-		// Todo 数据库操作兼容
 	}
 	return Users
 }

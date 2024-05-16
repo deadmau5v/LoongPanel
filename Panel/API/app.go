@@ -7,6 +7,7 @@
 package API
 
 import (
+	"LoongPanel/Panel/API/v1/auth"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -34,6 +35,38 @@ func Cors() gin.HandlerFunc {
 	}
 }
 
+func AuthUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session, _ := c.Cookie("SESSION")
+		Authorization := c.GetHeader("Authorization")
+		if Authorization != "" {
+			session = Authorization
+		}
+		if auth.SESSIONS[session] {
+			c.Next()
+		} else {
+			session = ""
+		}
+
+		flag := false
+		if len(c.Request.URL.Path) > 4 {
+			if c.Request.URL.Path != "/api/v1/login" &&
+				c.Request.URL.Path[:4] == "/api" {
+				flag = true
+			}
+		}
+		if flag &&
+			session == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "未授权",
+			})
+			c.Abort()
+		}
+		c.Next()
+	}
+}
+
 func init() {
 	var err error
 	WORKDIR, err = os.Getwd()
@@ -42,6 +75,7 @@ func init() {
 	}
 	App = gin.Default()
 	App.Use(Cors())
+	App.Use(AuthUser())
 
 	gin.SetMode(gin.DebugMode)
 	initRoute(App)

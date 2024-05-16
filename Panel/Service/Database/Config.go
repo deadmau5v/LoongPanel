@@ -25,10 +25,6 @@ func init() {
 	err := errors.New("None")
 	_ = os.Mkdir("/resource", os.ModePerm)
 	switch UseDB {
-	case "mysql":
-		// Todo Mysql支持
-	case "redis":
-		// Todo Redis 支持
 	case "sqlite":
 		DB, err = gorm.Open(sqlite.Open("/resource/LoongPanel.db"))
 	}

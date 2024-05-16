@@ -7,6 +7,7 @@
 package API
 
 import (
+	"LoongPanel/Panel/API/v1/auth"
 	"LoongPanel/Panel/API/v1/clean"
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
@@ -16,11 +17,6 @@ import (
 )
 
 func initRoute(app *gin.Engine) {
-	// 静态页面
-	app.NoRoute(func(c *gin.Context) {
-		c.File(WORKDIR + "/dist/index.html")
-	})
-
 	// 其他
 	app.Static("/assets", WORKDIR+"/dist/assets")
 	//  home 首页
@@ -45,5 +41,21 @@ func initRoute(app *gin.Engine) {
 	app.GET("/api/v1/screen/get_screens", terminal.GetScreens)
 	// -- terminal -> WebSocket
 	app.GET("/api/ws/screen", terminal.ScreenWs)
+
+	// ping
+	app.GET("/api/v1/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "pong",
+		})
+	})
+
+	// 登录
+	app.POST("/api/v1/login", auth.Login)
+
+	// 静态页面
+	app.NoRoute(func(c *gin.Context) {
+		c.File(WORKDIR + "/dist/index.html")
+	})
 
 }
