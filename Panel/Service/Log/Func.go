@@ -52,10 +52,10 @@ func ERROR(args ...interface{}) {
 	logToFile(args)
 }
 
-func DEBUG(message string) {
+func DEBUG(args ...interface{}) {
 	if isDebug {
-		logWithColor("DEBUG", message)
-		logToFile(message)
+		logWithColor("DEBUG", args)
+		logToFile(args)
 	}
 }
 

@@ -55,7 +55,7 @@ func initRoute(app *gin.Engine) {
 	})
 
 	// 登录
-	app.POST("/api/v1/login", AuthAPI.Login)
+	app.POST("/api/v1/auth/login", AuthAPI.Login)
 
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {

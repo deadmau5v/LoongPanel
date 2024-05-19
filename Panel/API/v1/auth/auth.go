@@ -9,6 +9,7 @@ package Auth
 import (
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/User"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,19 +36,25 @@ func Login(c *gin.Context) {
 	}
 
 	// 验证用户名和密码
-	if req.Username == "admin" && req.Password == "123456" {
-		// 登录成功
-		Log.DEBUG(req.Username + ": 登录成功")
-		c.JSON(200, map[string]interface{}{
-			"code":    200,
-			"msg":     "登录成功",
-			"session": Auth.RandomSESSION(),
-		})
-		return
-	} else {
-		// 登录失败
-		Log.DEBUG(req.Username + ": 登录失败")
-		c.JSON(401, filed)
-		return
+	for _, user := range User.Find() {
+		if user.Name == req.Username && user.Password == req.Password {
+			// 登录成功
+			Log.DEBUG(req.Username + ": 登录成功")
+			c.JSON(200, map[string]interface{}{
+				"code":    200,
+				"msg":     "登录成功",
+				"session": Auth.RandomSESSION(req.Username),
+			})
+			return
+		} else {
+			Log.DEBUG(req.Username+": 登录失败", req.Password, " != ", user.Password)
+			continue
+		}
 	}
+
+	// 登录失败
+	Log.DEBUG(req.Username + ": 登录失败")
+	c.JSON(401, filed)
+	return
+
 }
