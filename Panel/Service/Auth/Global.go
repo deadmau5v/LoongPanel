@@ -1,7 +1,7 @@
 /*
  * 创建人： deadmau5v
  * 创建时间： 2024-5-16
- * 文件作用：
+ * 文件作用：Casbin全局变量
  */
 
 package Auth

@@ -70,7 +70,15 @@ func getDisk() ([]*Disk, error) {
 	}
 	for _, partition := range partitions {
 		// 筛选不必要的空磁盘
-		usage, _ := disk.Usage(partition.Mountpoint)
+		usage, err := disk.Usage(partition.Mountpoint)
+		if err != nil {
+			if err.Error() == "operation not permitted" {
+				Log.WARN("GetDisk() Error: 权限不足警告")
+			} else {
+				Log.ERROR("GetDisk() Error: ", err.Error())
+			}
+			continue
+		}
 		if usage.Total != 0 {
 			res = append(res, &Disk{
 				FileSystem:  partition.Device,
@@ -114,13 +122,23 @@ func getRAMMHz() (int, error) {
 			return 0, err
 		}
 		res := string(out)
-		res = strings.Split(res, "Speed: ")[1]
-		res = strings.Split(res, " ")[0]
-		resInt, err := strconv.Atoi(res)
-		if err != nil {
-			Log.ERROR("GetRAMMHz() Error: ", err.Error())
-			return 0, err
+		if strings.Contains(res, "Speed: Unknown") {
+			return 0, nil
 		}
-		return resInt, nil
+		if !strings.Contains(res, "Permission denied") {
+			Log.WARN("GetRAMMHz() Error: 权限不足警告")
+		}
+		if !strings.Contains(res, "Speed: ") {
+			res = strings.Split(res, "Speed: ")[1]
+			res = strings.Split(res, " ")[0]
+			resInt, err := strconv.Atoi(res)
+			if err != nil {
+				Log.ERROR("GetRAMMHz() Error: ", err.Error())
+				return 0, err
+			}
+			return resInt, nil
+		} else {
+			return 0, nil
+		}
 	}
 }

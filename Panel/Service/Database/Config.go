@@ -8,6 +8,7 @@ package Database
 
 import (
 	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/System"
 	"errors"
 	"os"
 
@@ -26,11 +27,11 @@ func init() {
 	_ = os.Mkdir("/resource", os.ModePerm)
 	switch UseDB {
 	case "sqlite":
-		DB, err = gorm.Open(sqlite.Open("/resource/LoongPanel.db"))
+		DB, err = gorm.Open(sqlite.Open(System.WORKDIR + "/resource/LoongPanel.db"))
 	}
 
 	if err != nil {
-		Log.INFO("使用的数据库: %v 使用的库: %v 详细: \n", UseDB, UseDatabase)
+		Log.ERROR("使用的数据库: ", UseDB, "使用的库:", UseDatabase, "详细: \n")
 		Log.ERROR(err.Error())
 		return
 	} else {
