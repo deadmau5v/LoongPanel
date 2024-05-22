@@ -1,0 +1,36 @@
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[D:\code\golang\LoongPanel/resource/LoongPanel.db]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[D:\code\golang\LoongPanel/resource/LoongPanel.db]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[D:\code\golang\LoongPanel\resource\LoongPanel.db]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]
+[使用的数据库:  sqlite 使用的库: LoongPanel 详细: 
+]
+[Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub]

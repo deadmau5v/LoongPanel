@@ -11,6 +11,7 @@ import (
 	"LoongPanel/Panel/Service/System"
 	"errors"
 	"os"
+	"path"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -24,10 +25,11 @@ var UseDatabase = "LoongPanel"
 
 func init() {
 	err := errors.New("none")
-	_ = os.Mkdir("/resource", os.ModePerm)
+	_ = os.Mkdir(path.Join(System.WORKDIR, "resource"), os.ModePerm)
+
 	switch UseDB {
 	case "sqlite":
-		DB, err = gorm.Open(sqlite.Open(System.WORKDIR + "/resource/LoongPanel.db"))
+		DB, err = gorm.Open(sqlite.Open(path.Join(System.WORKDIR, "resource", "LoongPanel.db")))
 	}
 
 	if err != nil {
