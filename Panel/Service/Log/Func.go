@@ -43,19 +43,19 @@ func INFO(args ...interface{}) {
 }
 
 func WARN(args ...interface{}) {
-	logWithColor("WARN", args)
-	logToFile(args)
+	logWithColor("WARN", args...)
+	logToFile(args...)
 }
 
 func ERROR(args ...interface{}) {
-	logWithColor("ERROR", args)
-	logToFile(args)
+	logWithColor("ERROR", args...)
+	logToFile(args...)
 }
 
 func DEBUG(args ...interface{}) {
 	if isDebug {
-		logWithColor("DEBUG", args)
-		logToFile(args)
+		logWithColor("DEBUG", args...)
+		logToFile(args...)
 	}
 }
 

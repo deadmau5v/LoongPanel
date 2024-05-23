@@ -9,6 +9,7 @@ package terminal
 import (
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/Terminal"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -23,9 +24,10 @@ var upgrade = websocket.Upgrader{
 }
 
 func ScreenWs(c *gin.Context) {
-	Log.INFO("ScreenWs创建")
+	Log.INFO("ScreenWs WebSocket 连接")
 	w := c.Writer
 	r := c.Request
+	Log.DEBUG("升级为websocket连接")
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		Log.ERROR("无法打开websocket连接")
@@ -33,6 +35,7 @@ func ScreenWs(c *gin.Context) {
 		return
 	}
 	defer func(conn *websocket.Conn) {
+		Log.DEBUG("websocket 连接关闭")
 		err := conn.Close()
 		if err != nil {
 			Log.ERROR("Ws链接异常关闭")
@@ -40,18 +43,23 @@ func ScreenWs(c *gin.Context) {
 	}(conn)
 
 	id := getIntQuery(c, "id")
+	Log.DEBUG("获取到id为", id)
 	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
+	Log.DEBUG(fmt.Sprintf("获取到的screen为%v", screen))
 	if screen.WS != nil {
 		screen.WS.Close()
 		screen.WS = conn
 	}
-
+	Log.DEBUG("创建输入管道...")
 	input := make(chan []byte, 1024)
+	Log.DEBUG("创建输出管道...")
 	output := screen.Subscribe()
 	defer close(input)
 
 	close_ := func() {
+		Log.DEBUG("close_() websocket 关闭中...")
 		id_, name_ := screen.Id, screen.Name
+		Log.DEBUG(id_, name_)
 		if screen.WS != nil && screen.WS == conn {
 			conn.Close()
 			screen.Close()
@@ -63,6 +71,7 @@ func ScreenWs(c *gin.Context) {
 		// 重建screen
 
 		_ = Terminal.MainScreenManager.Create(name_, id_)
+
 		c.Abort()
 	}
 

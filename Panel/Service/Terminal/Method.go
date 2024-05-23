@@ -71,8 +71,6 @@ func (sm *ScreenManager) Create(name string, id uint32) error {
 		return errors.New("已存在ID")
 	}
 
-	sm.Mu.Lock()
-	defer sm.Mu.Unlock()
 	var buf bytes.Buffer
 
 	c := getInitShell()
@@ -132,7 +130,6 @@ func (s *Screen) Close() {
 }
 
 func (sm *ScreenManager) Close(id int) {
-	sm.Mu.Unlock()
 	screens := make(map[uint32]*Screen)
 	for i, v := range sm.Screens {
 		if v.Id != uint32(id) {
@@ -140,7 +137,6 @@ func (sm *ScreenManager) Close(id int) {
 		}
 	}
 	sm.Screens = screens
-	sm.Mu.Unlock()
 }
 
 func getInitShell() *exec.Cmd {

@@ -118,17 +118,28 @@ func getRAMMHz() (int, error) {
 	} else {
 		out, err := exec.Command("dmidecode", "-t", "memory").Output()
 		if err != nil {
-			Log.ERROR("GetRAMMHz() Error: ", err.Error())
+			// executable file not found in
+			if strings.Contains(err.Error(), "executable file not found in") {
+				Log.WARN("GetRAMMHz() Error: dmidecode 命令不存在")
+			} else {
+				Log.ERROR("GetRAMMHz() Error: ", err.Error())
+			}
 			return 0, err
 		}
 		res := string(out)
 		if strings.Contains(res, "Speed: Unknown") {
+			// 如果频率未知
+			Log.DEBUG("GetRAMMHz() 频率未知")
 			return 0, nil
 		}
-		if !strings.Contains(res, "Permission denied") {
+		if strings.Contains(res, "Permission denied") {
+			// 如果权限不足
 			Log.WARN("GetRAMMHz() Error: 权限不足警告")
+			return 0, err
 		}
-		if !strings.Contains(res, "Speed: ") {
+
+		// 正常情况
+		if strings.Contains(res, "Speed: ") {
 			res = strings.Split(res, "Speed: ")[1]
 			res = strings.Split(res, " ")[0]
 			resInt, err := strconv.Atoi(res)

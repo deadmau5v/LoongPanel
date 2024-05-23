@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"github.com/gorilla/websocket"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -27,5 +26,4 @@ type Screen struct {
 
 type ScreenManager struct {
 	Screens map[uint32]*Screen
-	Mu      sync.RWMutex
 }

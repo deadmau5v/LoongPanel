@@ -12,6 +12,7 @@ import (
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
 	"LoongPanel/Panel/API/v1/terminal"
+	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/System"
 	"github.com/gin-gonic/gin"
 )
@@ -19,8 +20,7 @@ import (
 func initRoute(app *gin.Engine) {
 	// 其他
 	app.Static("/assets", System.WORKDIR+"/dist/assets")
-
-	// api v1
+	// api v1 ws
 	v1 := app.Group("/api/v1")
 	ws := app.Group("/api/ws")
 	//  home 首页
@@ -44,7 +44,7 @@ func initRoute(app *gin.Engine) {
 	v1.GET("/screen/output", terminal.ScreenOutput)
 	v1.GET("/screen/get_screens", terminal.GetScreens)
 	// -- terminal -> WebSocket
-	ws.GET("/api/ws/screen", terminal.ScreenWs)
+	ws.GET("/screen", terminal.ScreenWs)
 
 	// ping
 	v1.GET("/ping", func(c *gin.Context) {
@@ -59,7 +59,11 @@ func initRoute(app *gin.Engine) {
 
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {
+		Log.DEBUG("无路由访问...")
 		c.File(System.WORKDIR + "/dist/index.html")
 	})
+
+	// 信任代理
+	app.SetTrustedProxies([]string{"127.0.0.1"})
 
 }
