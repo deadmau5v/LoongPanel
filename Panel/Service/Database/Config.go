@@ -10,33 +10,46 @@ import (
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/System"
 	"errors"
+	"fmt"
+	"gorm.io/driver/mysql"
 	"os"
 	"path"
 
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-var UseDB = "sqlite"
-var Address = "localhost"
-var User = "root"
-var Password = ""
-var UseDatabase = "LoongPanel"
+var (
+	dbAddress     = "localhost"
+	dbUser        = "root"
+	dbPassword    = ""
+	dbUseDatabase = "LoongPanel" // 使用的数据库名
+	dbPort        = 4000
+)
 
 func init() {
+	// 创建资源目录
 	err := errors.New("none")
 	_ = os.Mkdir(path.Join(System.WORKDIR, "resource"), os.ModePerm)
 
-	switch UseDB {
-	case "sqlite":
-		DB, err = gorm.Open(sqlite.Open(path.Join(System.WORKDIR, "resource", "LoongPanel.db")))
-	}
+	// 配置 DSN
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&loc=Local",
+		dbUser, dbPassword, dbAddress, dbPort)
+
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		Log.ERROR("使用的数据库: ", UseDB, "使用的库:", UseDatabase, "详细: \n")
-		Log.ERROR(err.Error())
-		return
+		Log.ERROR("连接数据库失败")
+		panic("Connect database failed" + err.Error())
+		// Todo 自动下载TIDB运行环境
 	} else {
 		Log.INFO("[数据库模块]连接成功")
 	}
+
+	// 创建 LoongPanel使用的数据库
+	DB.Exec("CREATE DATABASE IF NOT EXISTS " + dbUseDatabase)
+	// 重新链接
+	dsn = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		dbUser, dbPassword, dbAddress, dbPort, dbUseDatabase)
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
 }

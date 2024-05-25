@@ -8,8 +8,8 @@ package Auth
 
 import (
 	"LoongPanel/Panel/Service/Auth"
+	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/User"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +36,7 @@ func Login(c *gin.Context) {
 	}
 
 	// 验证用户名和密码
-	for _, user := range User.Find() {
+	for _, user := range Database.UserFind() {
 		if user.Name == req.Username && user.Password == req.Password {
 			// 登录成功
 			Log.DEBUG(req.Username + ": 登录成功")

@@ -6,4 +6,4 @@
 
 package Log
 
-var isDebug = false
+var IsDebug = false

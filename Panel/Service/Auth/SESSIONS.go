@@ -7,8 +7,8 @@
 package Auth
 
 import (
+	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/User"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -58,8 +58,8 @@ func AuthUser() gin.HandlerFunc {
 
 		if SESSIONS[session] != "" {
 			username := SESSIONS[session]
-			users := User.Find()
-			var user User.User
+			users := Database.UserFind()
+			var user Database.User
 			for _, u := range users {
 				if u.Name == username {
 					user = u

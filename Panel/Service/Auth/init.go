@@ -13,6 +13,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"os"
+	"strings"
 )
 
 func init() {
@@ -47,7 +48,6 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 	Authenticator, _ = casbin.NewEnforcer(System.WORKDIR+"/resource/model.conf", a)
 	policy, err := Authenticator.GetPolicy()
 	Authenticator.EnableAutoSave(true)
-
 	if err != nil {
 		return
 	}
@@ -92,8 +92,10 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 		}
 	} else {
 		Log.INFO("[权限管理] 策略已加载")
+
 		for _, v := range policy {
-			Log.DEBUG("[权限管理] 策略", v)
+			msg := strings.Join(v, " ")
+			Log.DEBUG("[权限管理] 策略 [", msg, "]")
 		}
 	}
 

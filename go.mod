@@ -12,8 +12,6 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	// 文件系统框架
 	github.com/spf13/afero v1.11.0
-	// 数据库
-	gorm.io/driver/sqlite v1.5.5
 	// ORM
 	gorm.io/gorm v1.25.10
 )
@@ -22,6 +20,7 @@ require (
 	github.com/casbin/casbin/v2 v2.89.0
 	github.com/casbin/gorm-adapter/v3 v3.24.0
 	github.com/google/uuid v1.4.0
+	gorm.io/driver/mysql v1.5.6
 )
 
 require (
@@ -54,7 +53,6 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/microsoft/go-mssqldb v1.6.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -72,7 +70,6 @@ require (
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/mysql v1.5.6 // indirect
 	gorm.io/driver/postgres v1.5.7 // indirect
 	gorm.io/driver/sqlserver v1.5.3 // indirect
 	gorm.io/plugin/dbresolver v1.3.0 // indirect

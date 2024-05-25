@@ -7,5 +7,5 @@
 package Log
 
 func init() {
-	isDebug = true
+	IsDebug = true
 }

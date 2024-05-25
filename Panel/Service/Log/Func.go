@@ -10,13 +10,15 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
+	"runtime"
+	"strings"
 )
 
 var logColors = map[string]string{
-	"INFO":  "[INFO]\033[1;34m%s\033[0m",
-	"WARN":  "[WARN]\033[1;33m%s\033[0m",
-	"ERROR": "[ERROR]\033[1;31m%s\033[0m",
-	"DEBUG": "[DEBUG]\033[1;36m%s\033[0m",
+	"INFO":  "\033[1;32m[INF]\033[0m %s",
+	"WARN":  "\033[1;33m[WAR]\033[0m %s",
+	"ERROR": "\033[1;31m[ERR]\033[0m %s",
+	"DEBUG": "\033[0;33m[DEB]\033[0m %s", // 黄色（橙色）
 }
 
 func logWithColor(level string, args ...interface{}) {
@@ -24,17 +26,35 @@ func logWithColor(level string, args ...interface{}) {
 	if !ok {
 		color = "%s"
 	}
-	fmt.Println(fmt.Sprintf(color, args...))
+	output := make([]string, 0)
+	for _, arg := range args {
+		output = append(output, fmt.Sprintf("%v", arg))
+	}
+	outputStr := strings.Join(output, " ")
+	fmt.Println(fmt.Sprintf(color, outputStr))
 }
 
 func logToFile(args ...interface{}) {
 	_, err := os.Stat("./log.txt")
 	if os.IsNotExist(err) {
-		os.Create("./log.txt")
+		_, err := os.Create("./log.txt")
+		if err != nil {
+			ERROR("[日志模块]创建日志文件失败")
+			return
+		}
 	}
 	f, _ := os.OpenFile("./log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
-	f.WriteString(fmt.Sprintln(args...))
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			ERROR("[日志模块]关闭日志文件失败")
+		}
+	}(f)
+	_, err = f.WriteString(fmt.Sprintln(args...))
+	if err != nil {
+		ERROR("[日志模块]写入日志文件失败")
+		return
+	}
 }
 
 func INFO(args ...interface{}) {
@@ -53,7 +73,14 @@ func ERROR(args ...interface{}) {
 }
 
 func DEBUG(args ...interface{}) {
-	if isDebug {
+	if IsDebug {
+		pc, _, _, ok := runtime.Caller(2)
+		if ok {
+			f := runtime.FuncForPC(pc)
+			if f != nil {
+				args = append([]interface{}{f.Name()}, args...)
+			}
+		}
 		logWithColor("DEBUG", args...)
 		logToFile(args...)
 	}
