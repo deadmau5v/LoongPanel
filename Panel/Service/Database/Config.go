@@ -10,6 +10,7 @@ import (
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/System"
 	"errors"
+	"flag"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"os"
@@ -27,6 +28,15 @@ var (
 )
 
 func init() {
+
+	flag.StringVar(&dbAddress, "a", dbAddress, "数据库地址")
+	flag.StringVar(&dbUser, "u", dbUser, "数据库用户名")
+	flag.StringVar(&dbPassword, "p", dbPassword, "数据库密码")
+	flag.StringVar(&dbUseDatabase, "d", dbUseDatabase, "数据库名")
+	flag.IntVar(&dbPort, "P", dbPort, "数据库端口")
+
+	flag.Parse()
+
 	// 创建资源目录
 	err := errors.New("none")
 	_ = os.Mkdir(path.Join(System.WORKDIR, "resource"), os.ModePerm)
@@ -42,7 +52,7 @@ func init() {
 		panic("Connect database failed" + err.Error())
 		// Todo 自动下载TIDB运行环境
 	} else {
-		Log.INFO("[数据库模块]连接成功")
+		Log.INFO("[数据库模块] 连接成功")
 	}
 
 	// 创建 LoongPanel使用的数据库

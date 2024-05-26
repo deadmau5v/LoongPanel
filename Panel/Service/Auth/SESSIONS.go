@@ -23,7 +23,7 @@ func RandomSESSION(username string) string {
 	return uuid_
 }
 
-func AuthUser() gin.HandlerFunc {
+func UserAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 放行静态资源
 		skipPaths := []string{

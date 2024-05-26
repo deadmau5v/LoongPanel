@@ -7,3 +7,4 @@
 package Log
 
 var IsDebug = false
+var IsSaveToFile = false

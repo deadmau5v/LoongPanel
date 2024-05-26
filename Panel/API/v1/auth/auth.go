@@ -58,3 +58,22 @@ func Login(c *gin.Context) {
 	return
 
 }
+
+func Logout(c *gin.Context) {
+	// 读取请求的Json参数
+	var req struct {
+		Session string `json:"session"`
+	}
+
+	err := c.BindJSON(&req)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"code": 400,
+			"msg":  "参数错误",
+		})
+		return
+	}
+
+	return
+}

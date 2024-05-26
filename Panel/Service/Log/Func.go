@@ -35,6 +35,9 @@ func logWithColor(level string, args ...interface{}) {
 }
 
 func logToFile(args ...interface{}) {
+	if !IsSaveToFile {
+		return
+	}
 	_, err := os.Stat("./log.txt")
 	if os.IsNotExist(err) {
 		_, err := os.Create("./log.txt")
@@ -88,7 +91,7 @@ func DEBUG(args ...interface{}) {
 
 func GinLogToFile() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		logToFile(fmt.Sprintf("[%s] -> [%s] -> [%s]", c.ClientIP(), c.Request.Method, c.Request.URL.Path))
+		logToFile(fmt.Sprintf("%s %s %s", c.ClientIP(), c.Request.Method, c.Request.URL.Path))
 		c.Next()
 	}
 }

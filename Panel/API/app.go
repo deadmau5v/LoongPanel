@@ -7,6 +7,7 @@
 package API
 
 import (
+	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/Log"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -34,13 +35,14 @@ func Cors() gin.HandlerFunc {
 }
 
 func init() {
+	gin.SetMode(gin.ReleaseMode)
 	App = gin.New()
-	App.Use(Log.GinLogToFile())
-	App.Use(gin.Logger())
-	App.Use(gin.Recovery())
 	App.Use(Cors())
-	//App.Use(Auth.AuthUser())
 
-	gin.SetMode(gin.DebugMode)
+	App.Use(gin.Logger())
+	App.Use(Log.GinLogToFile())
+	App.Use(gin.Recovery())
+	App.Use(Auth.UserAuth())
+
 	initRoute(App)
 }

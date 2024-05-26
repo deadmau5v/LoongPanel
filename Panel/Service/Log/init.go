@@ -8,4 +8,5 @@ package Log
 
 func init() {
 	IsDebug = true
+	IsSaveToFile = true
 }
