@@ -14,19 +14,6 @@ import (
 	"strconv"
 )
 
-func getQuery(ctx *gin.Context, key string) string {
-	value := ctx.Query(key)
-	if value == "" {
-		data := map[string]interface{}{
-			"msg":    "无法获取参数: " + key,
-			"status": -1,
-		}
-		ctx.JSON(200, data)
-
-	}
-	return value
-}
-
 func getIntQuery(ctx *gin.Context, key string) int {
 	value, err := strconv.Atoi(ctx.Query(key))
 	if err != nil {
