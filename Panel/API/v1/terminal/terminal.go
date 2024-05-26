@@ -51,27 +51,6 @@ func GetScreens(ctx *gin.Context) {
 	ctx.JSON(200, data)
 }
 
-func ScreenOutput(ctx *gin.Context) {
-	id := getIntQuery(ctx, "id")
-	idx := getIntQuery(ctx, "idx")
-	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
-	if screen == nil {
-		data := map[string]interface{}{
-			"msg":    "无法查询到ID",
-			"status": -1,
-		}
-		ctx.JSON(200, data)
-		return
-	}
-
-	data := map[string]interface{}{
-		"msg":    "ok",
-		"status": 0,
-		"data":   screen.GetOutput()[idx:],
-	}
-	ctx.JSON(200, data)
-}
-
 func ScreenClose(ctx *gin.Context) {
 	id := getIntQuery(ctx, "id")
 	Terminal.MainScreenManager.Close(id)
@@ -109,17 +88,5 @@ func ScreenCreate(ctx *gin.Context) {
 	}
 	data["status"] = 0
 	data["msg"] = "ok"
-	ctx.JSON(200, data)
-}
-
-func ScreenInput(ctx *gin.Context) {
-	id := getIntQuery(ctx, "id")
-	cmd := getQuery(ctx, "cmd")
-	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
-	screen.Input(cmd)
-	data := map[string]interface{}{
-		"msg":    "ok",
-		"status": 0,
-	}
 	ctx.JSON(200, data)
 }

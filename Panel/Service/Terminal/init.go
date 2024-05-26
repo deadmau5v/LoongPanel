@@ -6,10 +6,16 @@
 
 package Terminal
 
+import "LoongPanel/Panel/Service/Log"
+
 func init() {
 	MainScreenManager = &ScreenManager{
 		Screens: make(map[uint32]*Screen),
 	}
 	_ = MainScreenManager.Create("default", 0)
 	DefaultScreen = MainScreenManager.GetScreen(0)
+	if DefaultScreen != nil {
+		Log.DEBUG("[网页终端] 初始化默认终端成功")
+	}
+	Log.DEBUG("[网页终端] 初始化终端管理器成功")
 }

@@ -92,10 +92,12 @@ func SystemStatus(ctx *gin.Context) {
 
 func Shutdown(ctx *gin.Context) {
 	System2.Shutdown()
+	ctx.Abort()
 	// 没必要返回数据 都关机了 无需返回
 }
 
 func Reboot(ctx *gin.Context) {
 	System2.Reboot()
+	ctx.Abort()
 	// 没必要返回数据 都重启了 无需返回
 }

@@ -14,7 +14,6 @@ import (
 )
 
 var App *gin.Engine
-var AppName = "LoongPanel"
 
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {

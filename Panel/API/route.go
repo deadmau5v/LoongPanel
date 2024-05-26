@@ -56,6 +56,7 @@ func initRoute(app *gin.Engine) {
 	SetRoute("GET", "/status/disks", home.Disks, v1, "磁盘信息", true)
 	// -- home -> clean 清理垃圾
 	SetRoute("GET", "/clean/pkg_auto_clean", clean.PkgAutoClean, v1, "清理过期包", false)
+	SetRoute("GET", "/clean/temp_dir_remove", clean.TempDirRemove, v1, "清理临时目录", false)
 	// -- home -> power 电源操作
 	SetRoute("POST", "/power/shutdown", home.Reboot, v1, "关机操作", false)
 	SetRoute("POST", "/power/reboot", home.Shutdown, v1, "重启操作", false)

@@ -8,6 +8,7 @@
 
 package Files
 
-func getUidGid(fileStat any) (uint32, uint32) {
+func getUidGid() (uint32, uint32) {
+	// Windows 平台暂不支持
 	return 0, 0
 }

@@ -53,8 +53,7 @@ func Dir(path string) ([]File, error) {
 		}
 		// 路径
 
-		fileInfo := fileStat.Sys()
-		file.User, file.Group = getUidGid(fileInfo) // 所属用户 所属组
+		file.User, file.Group = getUidGid() // 所属用户 所属组
 
 		file.Size = fileStat.Size()                                    // 大小
 		file.Mode = fileStat.Mode()                                    // 权限

@@ -11,6 +11,7 @@ import (
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/System"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func PkgAutoClean(ctx *gin.Context) {
@@ -72,4 +73,12 @@ func PkgAutoClean(ctx *gin.Context) {
 			"status": 0,
 		})
 	}
+}
+
+func TempDirRemove(ctx *gin.Context) {
+	Clean.RemoveTmpDir()
+	ctx.JSON(http.StatusOK, gin.H{
+		"msg":    "临时目录清理完成",
+		"status": "0",
+	})
 }

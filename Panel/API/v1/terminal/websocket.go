@@ -47,7 +47,11 @@ func ScreenWs(c *gin.Context) {
 	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
 	Log.DEBUG(fmt.Sprintf("获取到的screen为%v", screen))
 	if screen.WS != nil {
-		screen.WS.Close()
+		err := screen.WS.Close()
+		if err != nil {
+			Log.DEBUG("关闭原有连接失败")
+			return
+		}
 		screen.WS = conn
 	}
 	Log.DEBUG("创建输入管道...")
@@ -61,7 +65,11 @@ func ScreenWs(c *gin.Context) {
 		id_, name_ := screen.Id, screen.Name
 		Log.DEBUG(id_, name_)
 		if screen.WS != nil && screen.WS == conn {
-			conn.Close()
+			err := conn.Close()
+			if err != nil {
+				Log.DEBUG("关闭连接失败")
+				return
+			}
 			screen.Close()
 			conn = nil
 			screen.WS = nil
