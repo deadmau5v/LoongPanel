@@ -1,0 +1,14 @@
+version = 1
+
+exclude_patterns = [
+  "/bin",
+  "/dist",
+  "/.idea",
+  "/doc"
+]
+
+[[analyzers]]
+name = "go"
+
+  [analyzers.meta]
+  import_root = "github.com/deadmau5v/LoongPanel"
