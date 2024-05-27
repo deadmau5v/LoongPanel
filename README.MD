@@ -1,15 +1,15 @@
 <h1 align="center">
-  <img src="./doc/img/logo.png" alt="Logo" width="200">
+  <img src="./doc/img/logo.png" alt="Logo" style="width:120px">
   <br>LoongPanel<br>
 </h1>
 
 <h4 align="center">一个 LoongArch64 下的运维管理平台</h4>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/Go-1.22-blue">
-    <img src="https://img.shields.io/badge/Gin-1.9.1-blue">
-    <img src="https://img.shields.io/badge/arch-Loong64-red">
-    <img src="https://img.shields.io/badge/os-linux-red">
+    <img alt="info" src="https://img.shields.io/badge/Go-1.22-blue">
+    <img alt="info" src="https://img.shields.io/badge/Gin-1.9.1-blue">
+    <img alt="info" src="https://img.shields.io/badge/arch-Loong64-red">
+    <img alt="info" src="https://img.shields.io/badge/os-linux-red">
 </p>
 
 # 后端
