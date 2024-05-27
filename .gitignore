@@ -24,4 +24,5 @@ go.work
 test
 bin
 resource
-*.log!/dist/
+*.log
+/dist
