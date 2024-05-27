@@ -66,7 +66,7 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 		return
 	}
 	// 如果没有权限策略，添加默认策略
-	if !(len(policy) == 0) {
+	if len(policy) != 0 {
 		Log.INFO("[权限管理] 策略已加载")
 
 		for _, v := range policy {

@@ -25,5 +25,3 @@ test
 bin
 resource
 *.log
-
-/log.txt

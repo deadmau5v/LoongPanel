@@ -38,15 +38,15 @@ func logToFile(args ...interface{}) {
 	if !IsSaveToFile {
 		return
 	}
-	_, err := os.Stat("./log.txt")
+	_, err := os.Stat("./temp.log")
 	if os.IsNotExist(err) {
-		_, err := os.Create("./log.txt")
+		_, err := os.Create("./temp.log")
 		if err != nil {
 			ERROR("[日志模块]创建日志文件失败")
 			return
 		}
 	}
-	f, _ := os.OpenFile("./log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, _ := os.OpenFile("./temp.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	defer func(f *os.File) {
 		err := f.Close()
 		if err != nil {
