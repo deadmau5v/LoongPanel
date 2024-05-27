@@ -54,14 +54,10 @@ func UserAuth() gin.HandlerFunc {
 			}
 		}
 
-		session, _ := c.Cookie("SESSION")
 		Authorization := c.GetHeader("Authorization")
-		if Authorization != "" {
-			session = Authorization
-		}
-
-		if SESSIONS[session] != "" {
-			username := SESSIONS[session]
+		Log.DEBUG("Authorization", Authorization)
+		if SESSIONS[Authorization] != "" {
+			username := SESSIONS[Authorization]
 			users := Database.UserFind()
 			var user Database.User
 			for _, u := range users {
@@ -78,17 +74,22 @@ func UserAuth() gin.HandlerFunc {
 			} else {
 				if err != nil {
 					Log.ERROR(err)
+					c.JSON(http.StatusUnauthorized, gin.H{
+						"code": 401,
+						"msg":  "未授权",
+					})
+					c.Abort()
+					return
 				}
-				session = ""
 			}
 		} else {
-			session = ""
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "未授权",
+			})
+			c.Abort()
+			return
 		}
 
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code": 401,
-			"msg":  "未授权",
-		})
-		c.Abort()
 	}
 }

@@ -46,10 +46,9 @@ func Login(c *gin.Context) {
 				"msg":     "登录成功",
 				"session": Auth.RandomSESSION(req.Username),
 			})
-			c.Abort()
 			return
 		} else {
-			Log.DEBUG(req.Username+": 登录失败", req.Password, " != ", user.Password)
+			Log.DEBUG(req.Username+": 登录失败", req.Password, req.Username, " != ", user.Password, user.Name)
 			continue
 		}
 	}

@@ -11,4 +11,5 @@ type User struct {
 	Name     string `json:"name" comment:"用户名"`
 	Password string `json:"password" comment:"密码"`
 	Role     string `json:"role" comment:"角色"`
+	Mail     string `json:"mail" comment:"邮箱"`
 }
