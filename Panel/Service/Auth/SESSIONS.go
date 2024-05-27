@@ -13,17 +13,33 @@ import (
 	"github.com/google/uuid"
 	"net/http"
 	"regexp"
+	"time"
 )
 
-var SESSIONS = map[string]string{}
-
-func RandomSESSION(username string) string {
+func NewSESSION(user Database.User) string {
 	uuid_ := uuid.New().String()
-	SESSIONS[uuid_] = username
+	session := SESSION{
+		KEY:      uuid_,
+		User:     user,
+		TimeUnix: time.Now().Unix(),
+	}
+	err := Database.DB.Create(&session).Error
+	if err != nil {
+		Log.ERROR(err)
+		return ""
+	}
 	return uuid_
 }
 
+type SESSION struct {
+	KEY      string        `json:"key"`
+	UserID   uint          `json:"user_id"`
+	User     Database.User `json:"user" gorm:"foreignKey:UserID"`
+	TimeUnix int64         `json:"create_time"`
+}
+
 func UserAuth() gin.HandlerFunc {
+
 	return func(c *gin.Context) {
 		// 放行静态资源
 		skipPaths := []string{
@@ -56,33 +72,18 @@ func UserAuth() gin.HandlerFunc {
 
 		Authorization := c.GetHeader("Authorization")
 		Log.DEBUG("Authorization", Authorization)
-		if SESSIONS[Authorization] != "" {
-			username := SESSIONS[Authorization]
-			users := Database.UserFind()
-			var user Database.User
-			for _, u := range users {
-				if u.Name == username {
-					user = u
-					break
-				}
-			}
-
-			ok, err := Authenticator.Enforce(user.Role, c.Request.URL.Path, c.Request.Method)
-			if ok && err == nil {
-				c.Next()
-				return
+		var SESSIONS []SESSION
+		Database.DB.Find(&SESSIONS)
+		var userSession SESSION
+		for _, session := range SESSIONS {
+			if session.KEY == Authorization {
+				userSession = session
+				break
 			} else {
-				if err != nil {
-					Log.ERROR(err)
-					c.JSON(http.StatusUnauthorized, gin.H{
-						"code": 401,
-						"msg":  "未授权",
-					})
-					c.Abort()
-					return
-				}
+				Authorization = ""
 			}
-		} else {
+		}
+		if Authorization == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
 				"msg":  "未授权",
@@ -91,5 +92,29 @@ func UserAuth() gin.HandlerFunc {
 			return
 		}
 
+		ok, err := Authenticator.Enforce(userSession.User.Role, c.Request.URL.Path, c.Request.Method)
+		if ok && err == nil {
+			c.Next()
+			return
+		} else {
+			if err != nil {
+				Log.ERROR(err)
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"code": 401,
+					"msg":  "未授权",
+				})
+				c.Abort()
+				return
+			}
+		}
+
+	}
+}
+
+func init() {
+	err := Database.DB.AutoMigrate(&SESSION{})
+	if err != nil {
+		Log.DEBUG("[数据库模块] SESSIONS表创建失败")
+		return
 	}
 }

@@ -23,6 +23,7 @@ func Login(c *gin.Context) {
 	var req struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
+		Email    string `json:"email"`
 	}
 
 	err := c.BindJSON(&req)
@@ -38,18 +39,37 @@ func Login(c *gin.Context) {
 
 	// 验证用户名和密码
 	for _, user := range Database.UserFind() {
-		if user.Name == req.Username && user.Password == req.Password {
-			// 登录成功
-			Log.DEBUG(req.Username + ": 登录成功")
-			c.JSON(200, gin.H{
-				"code":    200,
-				"msg":     "登录成功",
-				"session": Auth.RandomSESSION(req.Username),
-			})
-			return
-		} else {
-			Log.DEBUG(req.Username+": 登录失败", req.Password, req.Username, " != ", user.Password, user.Name)
-			continue
+		// 使用邮箱登录
+		if req.Email != "" {
+			if user.Mail == req.Email && user.Password == req.Password {
+				// 登录成功
+				Log.DEBUG(req.Email + ": 登录成功")
+				c.JSON(200, gin.H{
+					"code":    200,
+					"msg":     "登录成功",
+					"session": Auth.NewSESSION(user),
+				})
+				return
+			} else {
+				Log.DEBUG(req.Email+": 登录失败", req.Password, req.Email, " != ", user.Password, user.Mail)
+				continue
+			}
+		}
+		// 使用用户名登录
+		if req.Username != "" {
+			if user.Name == req.Username && user.Password == req.Password {
+				// 登录成功
+				Log.DEBUG(req.Username + ": 登录成功")
+				c.JSON(200, gin.H{
+					"code":    200,
+					"msg":     "登录成功",
+					"session": Auth.NewSESSION(user),
+				})
+				return
+			} else {
+				Log.DEBUG(req.Username+": 登录失败", req.Password, req.Username, " != ", user.Password, user.Name)
+				continue
+			}
 		}
 	}
 
