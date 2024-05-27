@@ -17,11 +17,11 @@ import (
 func getIntQuery(ctx *gin.Context, key string) int {
 	value, err := strconv.Atoi(ctx.Query(key))
 	if err != nil {
-		data := map[string]interface{}{
+
+		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"msg":    "参数无效 需要Int: " + key,
 			"status": -1,
-		}
-		ctx.JSON(http.StatusInternalServerError, data)
+		})
 	}
 	return value
 }
@@ -53,11 +53,10 @@ func ScreenCreate(ctx *gin.Context) {
 	} else {
 		_id, err := strconv.Atoi(idStr)
 		if err != nil {
-			data := map[string]interface{}{
+			ctx.JSON(200, gin.H{
 				"msg":    "无法获取参数: id",
 				"status": -1,
-			}
-			ctx.JSON(200, data)
+			})
 			return
 		}
 		id = _id
@@ -65,15 +64,18 @@ func ScreenCreate(ctx *gin.Context) {
 
 	name := strconv.Itoa(id)
 	err := Terminal.MainScreenManager.Create(name, uint32(id))
-	data := map[string]interface{}{}
 	if err != nil {
-		data["status"] = -1
-		data["msg"] = err.Error()
-		ctx.JSON(200, data)
+
+		ctx.JSON(200, gin.H{
+			"status": -1,
+			"msg":    err.Error(),
+		})
 		Log.ERROR("创建Screen错误")
 		return
 	}
-	data["status"] = 0
-	data["msg"] = "ok"
-	ctx.JSON(200, data)
+
+	ctx.JSON(200, gin.H{
+		"status": 0,
+		"msg":    "ok",
+	})
 }

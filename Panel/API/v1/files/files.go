@@ -17,16 +17,18 @@ func FileDir(ctx *gin.Context) {
 	if path == "" {
 		path = "/"
 	}
-	data := map[string]interface{}{}
-	var err error
-	data["files"], err = FileService.Dir(path)
-	if err != nil {
-		data["status"] = -1
-		data["msg"] = err.Error()
-	} else {
-		data["status"] = 0
-		data["msg"] = ""
-	}
 
-	ctx.JSON(http.StatusOK, data)
+	files, err := FileService.Dir(path)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":    err.Error(),
+			"status": -1,
+		})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{
+			"files":  files,
+			"status": 0,
+			"msg":    "ok",
+		})
+	}
 }

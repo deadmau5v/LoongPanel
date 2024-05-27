@@ -42,6 +42,10 @@ func UserAuth() gin.HandlerFunc {
 			"/favicon.ico",
 			"/api/v1/auth/login",
 			"/index",
+			"/login",
+			"/user",
+			"/terminal",
+			"/files",
 		}
 		for _, path := range staticPaths {
 			if c.Request.URL.Path == path {

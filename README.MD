@@ -1,3 +1,4 @@
+<!--suppress HtmlDeprecatedAttribute -->
 <h1 align="center">
   <img src="./doc/img/logo.png" alt="Logo" style="width:120px">
   <br>LoongPanel<br>

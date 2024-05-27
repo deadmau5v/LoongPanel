@@ -32,6 +32,7 @@ func Login(c *gin.Context) {
 			"code": 400,
 			"msg":  "参数错误",
 		})
+		c.Abort()
 		return
 	}
 
@@ -40,11 +41,12 @@ func Login(c *gin.Context) {
 		if user.Name == req.Username && user.Password == req.Password {
 			// 登录成功
 			Log.DEBUG(req.Username + ": 登录成功")
-			c.JSON(200, map[string]interface{}{
+			c.JSON(200, gin.H{
 				"code":    200,
 				"msg":     "登录成功",
 				"session": Auth.RandomSESSION(req.Username),
 			})
+			c.Abort()
 			return
 		} else {
 			Log.DEBUG(req.Username+": 登录失败", req.Password, " != ", user.Password)
