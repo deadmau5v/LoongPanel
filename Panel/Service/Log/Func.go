@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"os"
-	"runtime"
 	"strings"
+	"time"
 )
 
 var logColors = map[string]string{
@@ -27,6 +27,8 @@ func logWithColor(level string, args ...interface{}) {
 		color = "%s"
 	}
 	output := make([]string, 0)
+	time_ := time.Now().Format("2006-01-02 - 15:04:05 |")
+	output = append(output, fmt.Sprintf("%v", time_))
 	for _, arg := range args {
 		output = append(output, fmt.Sprintf("%v", arg))
 	}
@@ -53,6 +55,7 @@ func logToFile(args ...interface{}) {
 			ERROR("[日志模块]关闭日志文件失败")
 		}
 	}(f)
+	args = append([]interface{}{time.Now().Format("2006-01-02 - 15:04:05")}, args...)
 	_, err = f.WriteString(fmt.Sprintln(args...))
 	if err != nil {
 		ERROR("[日志模块]写入日志文件失败")
@@ -77,13 +80,6 @@ func ERROR(args ...interface{}) {
 
 func DEBUG(args ...interface{}) {
 	if IsDebug {
-		pc, _, _, ok := runtime.Caller(2)
-		if ok {
-			f := runtime.FuncForPC(pc)
-			if f != nil {
-				args = append([]interface{}{f.Name()}, args...)
-			}
-		}
 		logWithColor("DEBUG", args...)
 		logToFile(args...)
 	}
