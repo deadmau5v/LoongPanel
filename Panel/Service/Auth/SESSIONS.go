@@ -75,15 +75,18 @@ func UserAuth() gin.HandlerFunc {
 		var SESSIONS []SESSION
 		Database.DB.Find(&SESSIONS)
 		var userSession SESSION
+		var flag = false
 		for _, session := range SESSIONS {
 			if session.KEY == Authorization {
 				userSession = session
+				Database.DB.Preload("User").Find(&userSession)
+
+				flag = true
 				break
-			} else {
-				Authorization = ""
 			}
 		}
-		if Authorization == "" {
+		if !flag {
+			Log.DEBUG("未授权1")
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
 				"msg":  "未授权",
@@ -93,19 +96,23 @@ func UserAuth() gin.HandlerFunc {
 		}
 
 		ok, err := Authenticator.Enforce(userSession.User.Role, c.Request.URL.Path, c.Request.Method)
+		Log.DEBUG("权限验证", userSession.User, c.Request.URL.Path, c.Request.Method, ok, err)
 		if ok && err == nil {
 			c.Next()
 			return
-		} else {
+		} else if err != nil || !ok {
+			Log.DEBUG("未授权2")
+
 			if err != nil {
 				Log.ERROR(err)
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"code": 401,
-					"msg":  "未授权",
-				})
-				c.Abort()
-				return
 			}
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "未授权",
+			})
+			c.Abort()
+			return
+
 		}
 
 	}
