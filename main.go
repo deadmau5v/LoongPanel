@@ -15,6 +15,8 @@ import (
 	"os/exec"
 )
 
+//region 下载前端文件
+
 // downloadDist 下载前端文件
 func downloadDist() {
 	Log.INFO("开始下载前端文件")
@@ -60,7 +62,10 @@ func downloadDist() {
 	}
 }
 
+//endregion
+
 func main() {
+	// 如果 "./dist" 不存在，则执行下载Dist函数
 	if _, err := os.Stat("./dist"); os.IsNotExist(err) {
 		downloadDist()
 	}
