@@ -19,7 +19,7 @@ import (
 )
 
 func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
-	Log.DEBUG("添加路由", Method, Path, comment)
+	Log.DEBUG("[添加路由]", Method, Path, comment)
 	if group != nil {
 		_, err := Auth.Authenticator.AddPolicy("admin", group.BasePath()+Path, Method)
 		if Public {
@@ -79,10 +79,19 @@ func initRoute(app *gin.Engine) {
 		})
 	}, v1, "权限测试", true)
 
-	// 登录
+	// auth 页面
 	SetRoute("POST", "/api/v1/auth/login", AuthAPI.Login, nil, "登录", true)
 	SetRoute("POST", "/api/v1/auth/logout", AuthAPI.Logout, nil, "登出", true)
-
+	// -- auth -> user 用户管理
+	SetRoute("GET", "/api/v1/auth/user", AuthAPI.GetUsers, nil, "获取用户", false)
+	SetRoute("POST", "/api/v1/auth/user", AuthAPI.CreateUser, nil, "创建用户", false)
+	SetRoute("PUT", "/api/v1/auth/user", AuthAPI.UpdateUser, nil, "更新用户", false)
+	SetRoute("DELETE", "/api/v1/auth/user", AuthAPI.DeleteUser, nil, "删除用户", false)
+	// -- auth -> role 角色管理
+	SetRoute("GET", "/api/v1/auth/role", AuthAPI.GetRoles, nil, "获取角色", false)
+	SetRoute("POST", "/api/v1/auth/role", AuthAPI.CreateRole, nil, "创建角色", false)
+	SetRoute("DELETE", "/api/v1/auth/role", AuthAPI.DeleteRole, nil, "删除角色", false)
+	SetRoute("GET", "/api/v1/auth/policy", AuthAPI.GetPolicy, nil, "获取权限", false)
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {
 		Log.DEBUG("无路由访问...")
