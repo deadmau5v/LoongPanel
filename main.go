@@ -65,14 +65,26 @@ func downloadDist() {
 //endregion
 
 func main() {
-	// 如果 "./dist" 不存在，则执行下载Dist函数
-	if _, err := os.Stat("./dist"); os.IsNotExist(err) {
-		downloadDist()
+	var run = true
+
+	//region 入口
+
+	if run {
+		// 如果 "./dist" 不存在，则执行下载Dist函数
+		if _, err := os.Stat("./dist"); os.IsNotExist(err) {
+			downloadDist()
+		}
+
+		Log.INFO("访问 http://127.0.0.1:8080")
+		err := API.App.Run(":8080")
+		if err != nil {
+			return
+		}
 	}
 
-	Log.INFO("访问 http://127.0.0.1:8080")
-	err := API.App.Run(":8080")
-	if err != nil {
-		return
-	}
+	//endregion
+
+	//region 测试
+
+	//endregion
 }

@@ -8,35 +8,35 @@ package SystemLog
 
 import (
 	Log2 "LoongPanel/Panel/Service/Log"
-	"errors"
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 type Log struct {
 	Path   string // 日志文件路径
 	Name   string // 日志名称
-	Err    error  // 错误信息
-	GetLog func() []byte
+	Ok     bool   // 是否通过检查
+	GetLog func(line int) []byte
 }
 
-func (log Log) CheckLogExist() Log {
-	if log.Err != nil {
-		return log
-	}
-
+func (log *Log) CheckLogExist() bool {
 	file, err := os.Stat(log.Path)
-	log.Err = err
-	if file == nil || file.IsDir() {
-		Log2.DEBUG("日志文件不存在或者是一个目录")
-		log.Err = errors.New("日志文件不存在或者是一个目录")
+
+	if err != nil {
+		Log2.ERROR("获取日志文件信息失败", log.Path)
+		return false
 	}
-	return log
+	if file != nil && file.IsDir() {
+		Log2.DEBUG("日志文件不存在或者是一个目录")
+		return false
+	}
+	return true
 }
 
-func GetLog(log *Log) []byte {
-	if log.Err != nil {
+func GetLog(log *Log, line int) []byte {
+	if !log.Ok {
 		return nil
 	}
 
@@ -57,7 +57,19 @@ func GetLog(log *Log) []byte {
 		Log2.ERROR("读取日志文件失败", log.Name, log.Path)
 		return nil
 	}
-	return all
+
+	if line == 0 {
+		return all
+	} else {
+		allStr := string(all)
+		allStrSplit := strings.Split(allStr, "\n")
+		if len(allStrSplit) > line {
+			allStrSplit = allStrSplit[len(allStrSplit)-line:]
+			all = []byte(strings.Join(allStrSplit, "\n"))
+		}
+		return all
+	}
+
 }
 
 // GetBootLog 获取启动日志
@@ -66,13 +78,14 @@ func GetBootLog() *Log {
 		Path: "/var/log/boot.log",
 		Name: "系统启动日志",
 	}
-	log.CheckLogExist()
-	if log.Err != nil {
+	log.Ok = log.CheckLogExist()
+
+	if !log.Ok {
 		return nil
 	}
 
-	log.GetLog = func() []byte {
-		return GetLog(log)
+	log.GetLog = func(line int) []byte {
+		return GetLog(log, line)
 	}
 
 	return log
@@ -84,13 +97,13 @@ func GetKDumpLog() *Log {
 		Path: "/var/log/kdump.log",
 		Name: "内核崩溃日志",
 	}
-	log.CheckLogExist()
-	if log.Err != nil {
+	log.Ok = log.CheckLogExist()
+	if !log.Ok {
 		return nil
 	}
 
-	log.GetLog = func() []byte {
-		return GetLog(log)
+	log.GetLog = func(line int) []byte {
+		return GetLog(log, line)
 	}
 
 	return log
@@ -102,13 +115,13 @@ func GetCronLog() *Log {
 		Path: "/var/log/cron.log",
 		Name: "定时任务日志",
 	}
-	log.CheckLogExist()
-	if log.Err != nil {
+	log.Ok = log.CheckLogExist()
+	if !log.Ok {
 		return nil
 	}
 
-	log.GetLog = func() []byte {
-		return GetLog(log)
+	log.GetLog = func(line int) []byte {
+		return GetLog(log, line)
 	}
 
 	return log
@@ -120,13 +133,13 @@ func GetFirewalldLog() *Log {
 		Path: "/var/log/firewalld",
 		Name: "防火墙日志",
 	}
-	log.CheckLogExist()
-	if log.Err != nil {
+	log.Ok = log.CheckLogExist()
+	if !log.Ok {
 		return nil
 	}
 
-	log.GetLog = func() []byte {
-		return GetLog(log)
+	log.GetLog = func(line int) []byte {
+		return GetLog(log, line)
 	}
 
 	return log
@@ -138,13 +151,13 @@ func GetMessagesLog() *Log {
 		Path: "/var/log/messages",
 		Name: "系统消息日志",
 	}
-	log.CheckLogExist()
-	if log.Err != nil {
+	log.Ok = log.CheckLogExist()
+	if !log.Ok {
 		return nil
 	}
 
-	log.GetLog = func() []byte {
-		return GetLog(log)
+	log.GetLog = func(line int) []byte {
+		return GetLog(log, line)
 	}
 
 	return log
@@ -156,13 +169,13 @@ func GetSecureLog() *Log {
 		Path: "/var/log/secure",
 		Name: "安全日志",
 	}
-	log.CheckLogExist()
-	if log.Err != nil {
+	log.Ok = log.CheckLogExist()
+	if !log.Ok {
 		return nil
 	}
 
-	log.GetLog = func() []byte {
-		return GetLog(log)
+	log.GetLog = func(line int) []byte {
+		return GetLog(log, line)
 	}
 
 	return log
@@ -174,16 +187,26 @@ func GetWtmpLog() *Log {
 		Path: "/var/log/wtmp",
 		Name: "登录日志",
 	}
-	log.CheckLogExist()
-	if log.Err != nil {
+	log.Ok = log.CheckLogExist()
+	if !log.Ok {
 		return nil
 	}
 
-	log.GetLog = func() []byte {
+	log.GetLog = func(line int) []byte {
 		output, err := exec.Command("utmpdump", log.Path).Output()
+
 		if err != nil {
 			return nil
 		}
+
+		// 切分出最后几行
+		outputStr := string(output)
+		outputStrSplite := strings.Split(outputStr, "\n")
+		if len(outputStrSplite) > line {
+			outputStrSplite = outputStrSplite[len(outputStrSplite)-line:]
+			output = []byte(strings.Join(outputStrSplite, "\n"))
+		}
+
 		return output
 	}
 
