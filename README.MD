@@ -58,14 +58,6 @@ https://github.com/deadmau5v/loong_panel_react
 
 需要将前端编译后 dist 目录放到后端目录下
 
-# 效果图
-
-<img align="center" src="doc/img/1.png">
----
-<img align="center" src="doc/img/2.png">
----
-<img align="center" src="doc/img/3.png">
----
 
 # TODO 开发计划
 
