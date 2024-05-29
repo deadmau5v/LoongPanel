@@ -3,16 +3,16 @@ module LoongPanel
 go 1.20
 
 require (
+	github.com/casbin/casbin/v2 v2.89.0
+	github.com/casbin/gorm-adapter/v3 v3.24.0
 	github.com/creack/pty v1.1.21
 	github.com/gin-gonic/gin v1.10.0
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/afero v1.11.0
-	gorm.io/gorm v1.25.10
-	github.com/casbin/casbin/v2 v2.89.0
-	github.com/casbin/gorm-adapter/v3 v3.24.0
-	github.com/google/uuid v1.6.0
 	gorm.io/driver/mysql v1.5.6
+	gorm.io/gorm v1.25.10
 )
 
 require (
