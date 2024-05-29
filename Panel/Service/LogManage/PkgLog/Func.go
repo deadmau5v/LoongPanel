@@ -4,46 +4,24 @@
  * 文件作用：包管理工具日志
  */
 
-package PkgLog
+package PkgLogManage
 
 import (
 	Log2 "LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/LogManage"
 	"io"
 	"os"
 	"strings"
 )
 
-type Log struct {
-	Path     string // 日志文件路径
-	Name     string // 包管理名称
-	Ok       bool   // 是否通过检查
-	GetLog   func(line int) []byte
-	ClearLog func()
-}
-
-// CheckLogExist 检查日志是否存在
-func (log *Log) CheckLogExist() bool {
-	file, err := os.Stat(log.Path)
-
-	if err != nil {
-		Log2.ERROR("获取日志文件信息失败", log.Path)
-		return false
-	}
-	if file != nil && file.IsDir() {
-		Log2.DEBUG("日志文件不存在或者是一个目录")
-		return false
-	}
-	return true
-}
-
-func createLog(path, name string, line int) *Log {
-	log := Log{
+func createLog(path, name string) *LogManage.Log_ {
+	log := LogManage.Log_{
 		Path: path,
 		Name: name,
 		Ok:   true,
 	}
 
-	if !log.CheckLogExist() {
+	if !log.CheckLog_Exist() {
 		return nil
 	}
 
@@ -52,15 +30,20 @@ func createLog(path, name string, line int) *Log {
 			Log2.DEBUG("[包管理日志] 错误跳过读取")
 			return nil
 		}
-		logFile, err := os.Open(log.Path)
+		file, err := os.Open(log.Path)
 		if err != nil {
 			Log2.ERROR("[包管理日志] 打开日志文件失败: ", err.Error())
 			log.Ok = false
 			return nil
 		}
-		defer logFile.Close()
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				Log2.ERROR("[包管理日志] 关闭日志文件失败: ", err.Error())
+			}
+		}(file)
 
-		all, err := io.ReadAll(logFile)
+		all, err := io.ReadAll(file)
 		if err != nil {
 			Log2.ERROR("[包管理日志] 读取日志文件失败: ", err.Error())
 			log.Ok = false
@@ -89,7 +72,12 @@ func createLog(path, name string, line int) *Log {
 			Log2.ERROR("[包管理日志] 打开日志文件失败: ", err.Error())
 			return
 		}
-		defer file.Close()
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				Log2.ERROR("[包管理日志] 关闭日志文件失败: ", err.Error())
+			}
+		}(file)
 
 		err = file.Truncate(0)
 		if err != nil {
@@ -103,16 +91,16 @@ func createLog(path, name string, line int) *Log {
 }
 
 // GetYumLog 获取yum日志
-func GetYumLog(line int) *Log {
-	return createLog("/var/log/yum.log", "yum", line)
+func GetYumLog() *LogManage.Log_ {
+	return createLog("/var/LogManage.Log_/yum.LogManage.Log_", "yum")
 }
 
 // GetDnfLog 获取dnf日志
-func GetDnfLog(line int) *Log {
-	return createLog("/var/log/dnf.log", "dnf", line)
+func GetDnfLog() *LogManage.Log_ {
+	return createLog("/var/LogManage.Log_/dnf.LogManage.Log_", "dnf")
 }
 
 // GetAptLog 获取apt日志
-func GetAptLog(line int) *Log {
-	return createLog("/var/log/apt/history.log", "apt", line)
+func GetAptLog() *LogManage.Log_ {
+	return createLog("/var/LogManage.Log_/apt/history.LogManage.Log_", "apt")
 }

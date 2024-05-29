@@ -8,38 +8,15 @@ package SystemLog
 
 import (
 	Log2 "LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/LogManage"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 )
 
-// Log 日志结构体
-type Log struct {
-	Path     string // 日志文件路径
-	Name     string // 日志名称
-	Ok       bool   // 是否通过检查
-	GetLog   func(line int) []byte
-	ClearLog func()
-}
-
-// CheckLogExist 检查日志是否存在
-func (log *Log) CheckLogExist() bool {
-	file, err := os.Stat(log.Path)
-
-	if err != nil {
-		Log2.ERROR("获取日志文件信息失败", log.Path)
-		return false
-	}
-	if file != nil && file.IsDir() {
-		Log2.DEBUG("日志文件不存在或者是一个目录")
-		return false
-	}
-	return true
-}
-
 // GetLog 获取日志
-func GetLog(log *Log, line int) []byte {
+func GetLog(log *LogManage.Log_, line int) []byte {
 	if !log.Ok {
 		return nil
 	}
@@ -76,7 +53,7 @@ func GetLog(log *Log, line int) []byte {
 }
 
 // ClearLog 清空日志
-func ClearLog(log *Log) {
+func ClearLog(log *LogManage.Log_) {
 	if !log.Ok {
 		return
 	}
@@ -100,12 +77,12 @@ func ClearLog(log *Log) {
 }
 
 // creatLog 创建日志对象 简化流程
-func createLog(path, name string, customGetLog func(log *Log, line int) []byte) *Log {
-	log := &Log{
+func createLog(path, name string, customGetLog func(log *LogManage.Log_, line int) []byte) *LogManage.Log_ {
+	log := &LogManage.Log_{
 		Path: path,
 		Name: name,
 	}
-	log.Ok = log.CheckLogExist()
+	log.Ok = log.CheckLog_Exist()
 
 	if !log.Ok {
 		return nil
@@ -125,38 +102,38 @@ func createLog(path, name string, customGetLog func(log *Log, line int) []byte) 
 }
 
 // GetBootLog 获取启动日志
-func GetBootLog() *Log {
+func GetBootLog() *LogManage.Log_ {
 	return createLog("/var/log/boot.log", "系统启动日志", nil)
 }
 
 // GetKDumpLog 获取KDump日志
-func GetKDumpLog() *Log {
+func GetKDumpLog() *LogManage.Log_ {
 	return createLog("/var/log/kdump.log", "内核崩溃日志", nil)
 }
 
 // GetCronLog 获取定时任务日志
-func GetCronLog() *Log {
+func GetCronLog() *LogManage.Log_ {
 	return createLog("/var/log/cron.log", "定时任务日志", nil)
 }
 
 // GetFirewalldLog 获取Firewalld日志
-func GetFirewalldLog() *Log {
+func GetFirewalldLog() *LogManage.Log_ {
 	return createLog("/var/log/firewalld", "防火墙日志", nil)
 }
 
 // GetMessagesLog 获取系统消息日志
-func GetMessagesLog() *Log {
+func GetMessagesLog() *LogManage.Log_ {
 	return createLog("/var/log/messages", "系统消息日志", nil)
 }
 
 // GetSecureLog 获取安全日志
-func GetSecureLog() *Log {
+func GetSecureLog() *LogManage.Log_ {
 	return createLog("/var/log/secure", "安全日志", nil)
 }
 
 // GetWtmpLog 获取登录日志
-func GetWtmpLog() *Log {
-	return createLog("/var/log/wtmp", "登录日志", func(log *Log, line int) []byte {
+func GetWtmpLog() *LogManage.Log_ {
+	return createLog("/var/log/wtmp", "登录日志", func(log *LogManage.Log_, line int) []byte {
 		output, err := exec.Command("utmpdump", log.Path).Output()
 		if err != nil {
 			Log2.ERROR("执行 utmpdump 命令失败", log.Name, log.Path)

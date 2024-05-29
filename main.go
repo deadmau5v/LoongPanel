@@ -75,7 +75,7 @@ func main() {
 			downloadDist()
 		}
 
-		Log.INFO("访问 http://127.0.0.1:8080")
+		Log.INFO("[入口] http://127.0.0.1:8080")
 		err := API.App.Run(":8080")
 		if err != nil {
 			return
