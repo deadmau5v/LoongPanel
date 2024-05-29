@@ -82,7 +82,7 @@ func createLog(path, name string, customGetLog func(log *LogManage.Log_, line in
 		Path: path,
 		Name: name,
 	}
-	log.Ok = log.CheckLog_Exist()
+	log.Ok = log.CheckLogExist()
 
 	if !log.Ok {
 		return nil
@@ -176,4 +176,15 @@ func GetKernelLog() *LogManage.Log_ {
 		}
 	}
 	return log
+}
+
+func init() {
+	LogManage.AddLog("系统启动日志", *GetBootLog())
+	LogManage.AddLog("内核崩溃日志", *GetKDumpLog())
+	LogManage.AddLog("定时任务日志", *GetCronLog())
+	LogManage.AddLog("防火墙日志", *GetFirewalldLog())
+	LogManage.AddLog("系统消息日志", *GetMessagesLog())
+	LogManage.AddLog("安全日志", *GetSecureLog())
+	LogManage.AddLog("登录日志", *GetWtmpLog())
+	LogManage.AddLog("内核日志", *GetKernelLog())
 }

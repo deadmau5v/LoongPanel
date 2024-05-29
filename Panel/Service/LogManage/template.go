@@ -11,13 +11,6 @@ import (
 	"os"
 )
 
-type Log interface {
-	// GetLog 获取日志
-	GetLog()
-	// ClearLog 清空日志
-	ClearLog()
-}
-
 type Log_ struct {
 	Path     string // 日志文件路径
 	Name     string // 日志名称
@@ -26,8 +19,8 @@ type Log_ struct {
 	ClearLog func()
 }
 
-// CheckLog_Exist 检查日志是否存在
-func (Log_ *Log_) CheckLog_Exist() bool {
+// CheckLogExist 检查日志是否存在
+func (Log_ *Log_) CheckLogExist() bool {
 	file, err := os.Stat(Log_.Path)
 
 	if err != nil {

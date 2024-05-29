@@ -21,7 +21,7 @@ func createLog(path, name string) *LogManage.Log_ {
 		Ok:   true,
 	}
 
-	if !log.CheckLog_Exist() {
+	if !log.CheckLogExist() {
 		return nil
 	}
 
@@ -103,4 +103,10 @@ func GetDnfLog() *LogManage.Log_ {
 // GetAptLog 获取apt日志
 func GetAptLog() *LogManage.Log_ {
 	return createLog("/var/log/apt/history.log", "apt")
+}
+
+func init() {
+	LogManage.AddLog("yum包管理工具日志", *GetYumLog())
+	LogManage.AddLog("dnf包管理工具日志", *GetDnfLog())
+	LogManage.AddLog("apt包管理工具日志", *GetAptLog())
 }

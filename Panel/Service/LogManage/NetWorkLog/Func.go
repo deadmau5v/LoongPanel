@@ -45,3 +45,7 @@ func GetNetWorkLog() *LogManage.Log_ {
 
 	return &log
 }
+
+func init() {
+	LogManage.AddLog("网络日志", *GetNetWorkLog())
+}

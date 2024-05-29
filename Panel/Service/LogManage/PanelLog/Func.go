@@ -22,7 +22,7 @@ func GetPanelLog() *LogManage.Log_ {
 		Ok:   true,
 	}
 
-	log.Ok = log.CheckLog_Exist()
+	log.Ok = log.CheckLogExist()
 	if !log.Ok {
 		return nil
 	}
@@ -67,4 +67,8 @@ func GetPanelLog() *LogManage.Log_ {
 	}
 
 	return log
+}
+
+func init() {
+	LogManage.AddLog("yum包管理工具日志", *GetPanelLog())
 }
