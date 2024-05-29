@@ -150,3 +150,30 @@ func GetWtmpLog() *LogManage.Log_ {
 		return []byte(strings.Join(outputStrSplit, "\n"))
 	})
 }
+
+// GetKernelLog 获取内核日志
+func GetKernelLog() *LogManage.Log_ {
+	log := createLog("", "内核日志", func(log *LogManage.Log_, line int) []byte {
+		output, err := exec.Command("journalctl", "-k").Output()
+		if err != nil {
+			Log2.ERROR("执行 journalctl 命令失败", log.Name)
+			return nil
+		}
+
+		// 将输出转换为字符串并按行分割
+		outputStr := string(output)
+		outputStrSplit := strings.Split(outputStr, "\n")
+
+		if len(outputStrSplit) > line {
+			outputStrSplit = outputStrSplit[len(outputStrSplit)-line:]
+		}
+		return []byte(strings.Join(outputStrSplit, "\n"))
+	})
+	log.ClearLog = func() {
+		err := exec.Command("journalctl", "--rotate").Run()
+		if err != nil {
+			Log2.ERROR("执行 journalctl --rotate 命令失败", log.Name)
+		}
+	}
+	return log
+}
