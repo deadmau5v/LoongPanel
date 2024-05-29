@@ -92,15 +92,15 @@ func createLog(path, name string) *LogManage.Log_ {
 
 // GetYumLog 获取yum日志
 func GetYumLog() *LogManage.Log_ {
-	return createLog("/var/LogManage.Log_/yum.LogManage.Log_", "yum")
+	return createLog("/var/log/yum.log", "yum")
 }
 
 // GetDnfLog 获取dnf日志
 func GetDnfLog() *LogManage.Log_ {
-	return createLog("/var/LogManage.Log_/dnf.LogManage.Log_", "dnf")
+	return createLog("/var/log/dnf.log", "dnf")
 }
 
 // GetAptLog 获取apt日志
 func GetAptLog() *LogManage.Log_ {
-	return createLog("/var/LogManage.Log_/apt/history.LogManage.Log_", "apt")
+	return createLog("/var/log/apt/history.log", "apt")
 }
