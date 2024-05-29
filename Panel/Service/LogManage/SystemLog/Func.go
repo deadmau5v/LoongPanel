@@ -15,10 +15,11 @@ import (
 )
 
 type Log struct {
-	Path   string // 日志文件路径
-	Name   string // 日志名称
-	Ok     bool   // 是否通过检查
-	GetLog func(line int) []byte
+	Path     string // 日志文件路径
+	Name     string // 日志名称
+	Ok       bool   // 是否通过检查
+	GetLog   func(line int) []byte
+	ClearLog func()
 }
 
 func (log *Log) CheckLogExist() bool {
@@ -72,6 +73,29 @@ func GetLog(log *Log, line int) []byte {
 
 }
 
+func ClearLog(log *Log) {
+	if !log.Ok {
+		return
+	}
+
+	file, err := os.Open(log.Path)
+	if err != nil {
+		Log2.ERROR("[系统日志] 打开日志文件错误", err.Error())
+		return
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			Log2.ERROR("[系统日志] 关闭日志文件错误", err.Error())
+		}
+	}(file)
+	// 截断文件
+	err = file.Truncate(0)
+	if err != nil {
+		Log2.ERROR("[系统日志] 清空日志文件错误", err.Error())
+	}
+}
+
 // GetBootLog 获取启动日志
 func GetBootLog() *Log {
 	log := &Log{
@@ -105,6 +129,9 @@ func GetKDumpLog() *Log {
 	log.GetLog = func(line int) []byte {
 		return GetLog(log, line)
 	}
+	log.ClearLog = func() {
+		ClearLog(log)
+	}
 
 	return log
 }
@@ -122,6 +149,9 @@ func GetCronLog() *Log {
 
 	log.GetLog = func(line int) []byte {
 		return GetLog(log, line)
+	}
+	log.ClearLog = func() {
+		ClearLog(log)
 	}
 
 	return log
@@ -141,6 +171,9 @@ func GetFirewalldLog() *Log {
 	log.GetLog = func(line int) []byte {
 		return GetLog(log, line)
 	}
+	log.ClearLog = func() {
+		ClearLog(log)
+	}
 
 	return log
 }
@@ -159,6 +192,9 @@ func GetMessagesLog() *Log {
 	log.GetLog = func(line int) []byte {
 		return GetLog(log, line)
 	}
+	log.ClearLog = func() {
+		ClearLog(log)
+	}
 
 	return log
 }
@@ -176,6 +212,9 @@ func GetSecureLog() *Log {
 
 	log.GetLog = func(line int) []byte {
 		return GetLog(log, line)
+	}
+	log.ClearLog = func() {
+		ClearLog(log)
 	}
 
 	return log
@@ -208,6 +247,9 @@ func GetWtmpLog() *Log {
 		}
 
 		return output
+	}
+	log.ClearLog = func() {
+		ClearLog(log)
 	}
 
 	return log
