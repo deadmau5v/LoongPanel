@@ -14,6 +14,7 @@ import (
 	"strings"
 )
 
+// Log 日志结构体
 type Log struct {
 	Path     string // 日志文件路径
 	Name     string // 日志名称
@@ -22,6 +23,7 @@ type Log struct {
 	ClearLog func()
 }
 
+// CheckLogExist 检查日志是否存在
 func (log *Log) CheckLogExist() bool {
 	file, err := os.Stat(log.Path)
 
@@ -36,6 +38,7 @@ func (log *Log) CheckLogExist() bool {
 	return true
 }
 
+// GetLog 获取日志
 func GetLog(log *Log, line int) []byte {
 	if !log.Ok {
 		return nil
@@ -70,9 +73,9 @@ func GetLog(log *Log, line int) []byte {
 		}
 		return all
 	}
-
 }
 
+// ClearLog 清空日志
 func ClearLog(log *Log) {
 	if !log.Ok {
 		return
@@ -96,11 +99,11 @@ func ClearLog(log *Log) {
 	}
 }
 
-// GetBootLog 获取启动日志
-func GetBootLog() *Log {
+// creatLog 创建日志对象 简化流程
+func createLog(path, name string, customGetLog func(log *Log, line int) []byte) *Log {
 	log := &Log{
-		Path: "/var/log/boot.log",
-		Name: "系统启动日志",
+		Path: path,
+		Name: name,
 	}
 	log.Ok = log.CheckLogExist()
 
@@ -109,148 +112,64 @@ func GetBootLog() *Log {
 	}
 
 	log.GetLog = func(line int) []byte {
+		if customGetLog != nil {
+			return customGetLog(log, line)
+		}
 		return GetLog(log, line)
+	}
+	log.ClearLog = func() {
+		ClearLog(log)
 	}
 
 	return log
+}
+
+// GetBootLog 获取启动日志
+func GetBootLog() *Log {
+	return createLog("/var/log/boot.log", "系统启动日志", nil)
 }
 
 // GetKDumpLog 获取KDump日志
 func GetKDumpLog() *Log {
-	log := &Log{
-		Path: "/var/log/kdump.log",
-		Name: "内核崩溃日志",
-	}
-	log.Ok = log.CheckLogExist()
-	if !log.Ok {
-		return nil
-	}
-
-	log.GetLog = func(line int) []byte {
-		return GetLog(log, line)
-	}
-	log.ClearLog = func() {
-		ClearLog(log)
-	}
-
-	return log
+	return createLog("/var/log/kdump.log", "内核崩溃日志", nil)
 }
 
 // GetCronLog 获取定时任务日志
 func GetCronLog() *Log {
-	log := &Log{
-		Path: "/var/log/cron.log",
-		Name: "定时任务日志",
-	}
-	log.Ok = log.CheckLogExist()
-	if !log.Ok {
-		return nil
-	}
-
-	log.GetLog = func(line int) []byte {
-		return GetLog(log, line)
-	}
-	log.ClearLog = func() {
-		ClearLog(log)
-	}
-
-	return log
+	return createLog("/var/log/cron.log", "定时任务日志", nil)
 }
 
 // GetFirewalldLog 获取Firewalld日志
 func GetFirewalldLog() *Log {
-	log := &Log{
-		Path: "/var/log/firewalld",
-		Name: "防火墙日志",
-	}
-	log.Ok = log.CheckLogExist()
-	if !log.Ok {
-		return nil
-	}
-
-	log.GetLog = func(line int) []byte {
-		return GetLog(log, line)
-	}
-	log.ClearLog = func() {
-		ClearLog(log)
-	}
-
-	return log
+	return createLog("/var/log/firewalld", "防火墙日志", nil)
 }
 
 // GetMessagesLog 获取系统消息日志
 func GetMessagesLog() *Log {
-	log := &Log{
-		Path: "/var/log/messages",
-		Name: "系统消息日志",
-	}
-	log.Ok = log.CheckLogExist()
-	if !log.Ok {
-		return nil
-	}
-
-	log.GetLog = func(line int) []byte {
-		return GetLog(log, line)
-	}
-	log.ClearLog = func() {
-		ClearLog(log)
-	}
-
-	return log
+	return createLog("/var/log/messages", "系统消息日志", nil)
 }
 
 // GetSecureLog 获取安全日志
 func GetSecureLog() *Log {
-	log := &Log{
-		Path: "/var/log/secure",
-		Name: "安全日志",
-	}
-	log.Ok = log.CheckLogExist()
-	if !log.Ok {
-		return nil
-	}
-
-	log.GetLog = func(line int) []byte {
-		return GetLog(log, line)
-	}
-	log.ClearLog = func() {
-		ClearLog(log)
-	}
-
-	return log
+	return createLog("/var/log/secure", "安全日志", nil)
 }
 
 // GetWtmpLog 获取登录日志
 func GetWtmpLog() *Log {
-	log := &Log{
-		Path: "/var/log/wtmp",
-		Name: "登录日志",
-	}
-	log.Ok = log.CheckLogExist()
-	if !log.Ok {
-		return nil
-	}
-
-	log.GetLog = func(line int) []byte {
+	return createLog("/var/log/wtmp", "登录日志", func(log *Log, line int) []byte {
 		output, err := exec.Command("utmpdump", log.Path).Output()
-
 		if err != nil {
+			Log2.ERROR("执行 utmpdump 命令失败", log.Name, log.Path)
 			return nil
 		}
 
-		// 切分出最后几行
+		// 将输出转换为字符串并按行分割
 		outputStr := string(output)
-		outputStrSplite := strings.Split(outputStr, "\n")
-		if len(outputStrSplite) > line {
-			outputStrSplite = outputStrSplite[len(outputStrSplite)-line:]
-			output = []byte(strings.Join(outputStrSplite, "\n"))
+		outputStrSplit := strings.Split(outputStr, "\n")
+
+		if len(outputStrSplit) > line {
+			outputStrSplit = outputStrSplit[len(outputStrSplit)-line:]
 		}
-
-		return output
-	}
-	log.ClearLog = func() {
-		ClearLog(log)
-	}
-
-	return log
+		return []byte(strings.Join(outputStrSplit, "\n"))
+	})
 }
