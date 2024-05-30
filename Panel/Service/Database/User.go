@@ -30,7 +30,7 @@ func UserFind() []User {
 func init() {
 	err := DB.AutoMigrate(&User{})
 	if err != nil {
-		Log.ERROR("初始化SQLite数据库失败")
+		Log.ERROR("初始化数据库失败")
 		return
 	}
 

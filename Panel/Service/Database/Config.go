@@ -15,6 +15,7 @@ import (
 	"gorm.io/driver/mysql"
 	"os"
 	"path"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -48,8 +49,14 @@ func init() {
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
-		Log.ERROR("连接数据库失败")
-		panic("Connect database failed" + err.Error())
+		if strings.Contains(err.Error(), "Unknown database") {
+			Log.ERROR("[数据库模块] 数据库不存在")
+		} else if strings.Contains(err.Error(), "Access denied") {
+			Log.ERROR("[数据库模块] 用户名或密码错误")
+		} else {
+			Log.ERROR("[数据库模块] 连接数据库失败")
+		}
+		panic(err.Error())
 		// Todo 自动下载TIDB运行环境
 	} else {
 		Log.INFO("[数据库模块] 连接成功")
