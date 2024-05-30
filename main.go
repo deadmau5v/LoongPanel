@@ -9,6 +9,11 @@ package main
 import (
 	"LoongPanel/Panel/API"
 	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/LogManage"
+	"LoongPanel/Panel/Service/LogManage/NetWorkLog"
+	"LoongPanel/Panel/Service/LogManage/PanelLog"
+	PkgLogManage "LoongPanel/Panel/Service/LogManage/PkgLog"
+	"LoongPanel/Panel/Service/LogManage/SystemLog"
 	"io"
 	"net/http"
 	"os"
@@ -65,7 +70,7 @@ func downloadDist() {
 //endregion
 
 func main() {
-	var run = true
+	var run = false
 
 	//region 入口
 
@@ -85,6 +90,25 @@ func main() {
 	//endregion
 
 	//region 测试
+
+	LogManage.AllLog = make(map[string]LogManage.Log_)
+	LogManage.AddLog("系统启动日志", SystemLog.GetBootLog)
+	LogManage.AddLog("内核崩溃日志", SystemLog.GetKDumpLog)
+	LogManage.AddLog("定时任务日志", SystemLog.GetCronLog)
+	LogManage.AddLog("防火墙日志", SystemLog.GetFirewalldLog)
+	LogManage.AddLog("系统消息日志", SystemLog.GetMessagesLog)
+	LogManage.AddLog("安全日志", SystemLog.GetSecureLog)
+	LogManage.AddLog("登录日志", SystemLog.GetWtmpLog)
+	LogManage.AddLog("内核日志", SystemLog.GetKernelLog)
+	LogManage.AddLog("yum包管理工具日志", PkgLogManage.GetYumLog)
+	LogManage.AddLog("dnf包管理工具日志", PkgLogManage.GetDnfLog)
+	LogManage.AddLog("apt包管理工具日志", PkgLogManage.GetAptLog)
+	LogManage.AddLog("yum包管理工具日志", PanelLog.GetPanelLog)
+	LogManage.AddLog("网络日志", NetWorkLog.GetNetWorkLog)
+
+	for _, log := range LogManage.AllLog {
+		Log.DEBUG(log.Name, log.Ok)
+	}
 
 	//endregion
 }

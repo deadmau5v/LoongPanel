@@ -106,7 +106,5 @@ func GetAptLog() *LogManage.Log_ {
 }
 
 func init() {
-	LogManage.AddLog("yum包管理工具日志", *GetYumLog())
-	LogManage.AddLog("dnf包管理工具日志", *GetDnfLog())
-	LogManage.AddLog("apt包管理工具日志", *GetAptLog())
+
 }

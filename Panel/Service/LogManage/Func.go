@@ -8,8 +8,11 @@ package LogManage
 
 import Log2 "LoongPanel/Panel/Service/Log"
 
-func AddLog(Name string, log Log_) {
-	Log2.DEBUG("[日志管理] 添加日志支持", Name, log.Path)
-	// Name仅作为答应提高可读性 使用log.Name作为键值 确保一致性
-	AllLog[log.Name] = log
+func AddLog(Name string, fn func() *Log_) {
+	log := fn()
+	if log != nil {
+		Log2.DEBUG("[日志管理] 添加日志支持", Name, log.Path)
+		// Name仅作为答应提高可读性 使用log.Name作为键值 确保一致性
+		AllLog[log.Name] = *log
+	}
 }

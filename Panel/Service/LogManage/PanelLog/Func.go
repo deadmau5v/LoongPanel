@@ -70,5 +70,5 @@ func GetPanelLog() *LogManage.Log_ {
 }
 
 func init() {
-	LogManage.AddLog("yum包管理工具日志", *GetPanelLog())
+
 }

@@ -6,4 +6,4 @@
 
 package LogManage
 
-var AllLog = make(map[string]Log_)
+var AllLog map[string]Log_

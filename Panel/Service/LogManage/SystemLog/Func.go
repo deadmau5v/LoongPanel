@@ -24,17 +24,20 @@ func GetLog(log *LogManage.Log_, line int) []byte {
 	Log2.DEBUG("获取日志", log.Name, log.Path)
 	file, err := os.Open(log.Path)
 	if err != nil {
+		log.Ok = false
 		Log2.ERROR("打开日志文件失败", log.Name, log.Path)
 		return nil
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
+			log.Ok = false
 			Log2.ERROR("关闭日志文件失败", log.Name, log.Path)
 		}
 	}(file)
 	all, err := io.ReadAll(file)
 	if err != nil {
+		log.Ok = false
 		Log2.ERROR("读取日志文件失败", log.Name, log.Path)
 		return nil
 	}
@@ -60,19 +63,23 @@ func ClearLog(log *LogManage.Log_) {
 
 	file, err := os.Open(log.Path)
 	if err != nil {
+		log.Ok = false
 		Log2.ERROR("[系统日志] 打开日志文件错误", err.Error())
 		return
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
+			log.Ok = false
 			Log2.ERROR("[系统日志] 关闭日志文件错误", err.Error())
 		}
 	}(file)
 	// 截断文件
 	err = file.Truncate(0)
 	if err != nil {
+		log.Ok = false
 		Log2.ERROR("[系统日志] 清空日志文件错误", err.Error())
+		return
 	}
 }
 
@@ -136,6 +143,7 @@ func GetWtmpLog() *LogManage.Log_ {
 	return createLog("/var/log/wtmp", "登录日志", func(log *LogManage.Log_, line int) []byte {
 		output, err := exec.Command("utmpdump", log.Path).Output()
 		if err != nil {
+			log.Ok = false
 			Log2.ERROR("执行 utmpdump 命令失败", log.Name, log.Path)
 			return nil
 		}
@@ -156,6 +164,7 @@ func GetKernelLog() *LogManage.Log_ {
 	log := createLog("", "内核日志", func(log *LogManage.Log_, line int) []byte {
 		output, err := exec.Command("journalctl", "-k").Output()
 		if err != nil {
+			log.Ok = false
 			Log2.ERROR("执行 journalctl 命令失败", log.Name)
 			return nil
 		}
@@ -169,22 +178,21 @@ func GetKernelLog() *LogManage.Log_ {
 		}
 		return []byte(strings.Join(outputStrSplit, "\n"))
 	})
+
+	if log == nil {
+		return nil
+	}
 	log.ClearLog = func() {
 		err := exec.Command("journalctl", "--rotate").Run()
 		if err != nil {
+			log.Ok = false
 			Log2.ERROR("执行 journalctl --rotate 命令失败", log.Name)
 		}
+		return
 	}
 	return log
 }
 
 func init() {
-	LogManage.AddLog("系统启动日志", *GetBootLog())
-	LogManage.AddLog("内核崩溃日志", *GetKDumpLog())
-	LogManage.AddLog("定时任务日志", *GetCronLog())
-	LogManage.AddLog("防火墙日志", *GetFirewalldLog())
-	LogManage.AddLog("系统消息日志", *GetMessagesLog())
-	LogManage.AddLog("安全日志", *GetSecureLog())
-	LogManage.AddLog("登录日志", *GetWtmpLog())
-	LogManage.AddLog("内核日志", *GetKernelLog())
+
 }
