@@ -4,7 +4,7 @@
  * 文件作用：包管理工具日志
  */
 
-package PkgLogManage
+package PkgLog
 
 import (
 	Log2 "LoongPanel/Panel/Service/Log"

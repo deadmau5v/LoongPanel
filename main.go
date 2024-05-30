@@ -12,7 +12,7 @@ import (
 	"LoongPanel/Panel/Service/LogManage"
 	"LoongPanel/Panel/Service/LogManage/NetWorkLog"
 	"LoongPanel/Panel/Service/LogManage/PanelLog"
-	PkgLogManage "LoongPanel/Panel/Service/LogManage/PkgLog"
+	"LoongPanel/Panel/Service/LogManage/PkgLog"
 	"LoongPanel/Panel/Service/LogManage/SystemLog"
 	"io"
 	"net/http"
@@ -100,9 +100,9 @@ func main() {
 	LogManage.AddLog("安全日志", SystemLog.GetSecureLog)
 	LogManage.AddLog("登录日志", SystemLog.GetWtmpLog)
 	LogManage.AddLog("内核日志", SystemLog.GetKernelLog)
-	LogManage.AddLog("yum包管理工具日志", PkgLogManage.GetYumLog)
-	LogManage.AddLog("dnf包管理工具日志", PkgLogManage.GetDnfLog)
-	LogManage.AddLog("apt包管理工具日志", PkgLogManage.GetAptLog)
+	LogManage.AddLog("yum包管理工具日志", PkgLog.GetYumLog)
+	LogManage.AddLog("dnf包管理工具日志", PkgLog.GetDnfLog)
+	LogManage.AddLog("apt包管理工具日志", PkgLog.GetAptLog)
 	LogManage.AddLog("yum包管理工具日志", PanelLog.GetPanelLog)
 	LogManage.AddLog("网络日志", NetWorkLog.GetNetWorkLog)
 
