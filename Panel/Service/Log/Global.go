@@ -1,10 +1,9 @@
 /*
  * 创建人： deadmau5v
- * 创建时间： 2024-5-18
- * 文件作用：全局日志
+ * 创建时间： 2024-5-30
+ * 文件作用：存入全部日志支持
  */
 
 package Log
 
-var IsDebug = false
-var IsSaveToFile = false
+var AllLog map[string]Log_

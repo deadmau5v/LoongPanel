@@ -7,7 +7,7 @@
 package Files
 
 import (
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,7 +17,7 @@ func Dir(path string) ([]File, error) {
 	path, err := filepath.Abs(path)
 	path = filepath.Clean(path)
 	if err != nil {
-		Log.ERROR(err.Error())
+		PanelLog.ERROR(err.Error())
 		return nil, err
 	}
 

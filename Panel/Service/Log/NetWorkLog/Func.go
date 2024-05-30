@@ -7,14 +7,14 @@
 package NetWorkLog
 
 import (
-	Log2 "LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/LogManage"
+	"LoongPanel/Panel/Service/Log"
+	Log2 "LoongPanel/Panel/Service/PanelLog"
 	"os/exec"
 	"strconv"
 )
 
-func GetNetWorkLog() *LogManage.Log_ {
-	log := LogManage.Log_{
+func GetNetWorkLog() *Log.Log_ {
+	log := Log.Log_{
 		Ok:   true,
 		Name: "网络日志",
 	}

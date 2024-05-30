@@ -9,7 +9,7 @@ package Auth
 import (
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/Database"
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -19,13 +19,13 @@ func GetUsers(ctx *gin.Context) {
 	var Users []Database.User
 	id, err := strconv.Atoi(ctx.Query("id"))
 	if err == nil {
-		Log.DEBUG("查询用户ID: ", id)
+		PanelLog.DEBUG("查询用户ID: ", id)
 		Database.DB.First(&Users, id)
 	} else {
-		Log.DEBUG("查询所有用户")
+		PanelLog.DEBUG("查询所有用户")
 		Database.DB.Find(&Users)
 	}
-	Log.INFO("[权限管理] 获取用户列表")
+	PanelLog.INFO("[权限管理] 获取用户列表")
 	ctx.JSON(200, Users)
 }
 
@@ -34,12 +34,12 @@ func CheckUserExist(user Database.User) gin.H {
 
 	var count int64
 	Database.DB.Model(&Database.User{}).Where("name = ?", user.Name).Count(&count)
-	Log.DEBUG("用户名重复数量: ", count)
+	PanelLog.DEBUG("用户名重复数量: ", count)
 	if count > 0 {
 		return gin.H{"msg": "用户名已存在"}
 	}
 	Database.DB.Model(&Database.User{}).Where("email = ?", user.Mail).Count(&count)
-	Log.DEBUG("邮箱重复数量: ", count)
+	PanelLog.DEBUG("邮箱重复数量: ", count)
 	if count > 0 {
 		return gin.H{"msg": "邮箱已存在"}
 	}
@@ -51,12 +51,12 @@ func CheckUserUpdate(user Database.User) gin.H {
 	// 忽略自己
 	var count int64
 	Database.DB.Model(&Database.User{}).Where("name = ? AND id != ?", user.Name, user.ID).Count(&count)
-	Log.DEBUG("用户名重复数量: ", count)
+	PanelLog.DEBUG("用户名重复数量: ", count)
 	if count > 1 {
 		return gin.H{"msg": "用户名已存在"}
 	}
 	Database.DB.Model(&Database.User{}).Where("email = ? AND id != ?", user.Mail, user.ID).Count(&count)
-	Log.DEBUG("邮箱重复数量: ", count)
+	PanelLog.DEBUG("邮箱重复数量: ", count)
 	if count > 1 {
 		return gin.H{"msg": "邮箱已存在"}
 	}
@@ -69,7 +69,7 @@ func CreateUser(ctx *gin.Context) {
 	err := ctx.BindJSON(&user)
 
 	if err != nil {
-		Log.ERROR("[权限管理] 绑定JSON失败", err)
+		PanelLog.ERROR("[权限管理] 绑定JSON失败", err)
 		return
 	}
 
@@ -79,7 +79,7 @@ func CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	Log.INFO("[权限管理] 创建用户: ", user.Name)
+	PanelLog.INFO("[权限管理] 创建用户: ", user.Name)
 	Database.DB.Create(&user)
 	ctx.JSON(200, user)
 }
@@ -102,7 +102,7 @@ func UpdateUser(ctx *gin.Context) {
 
 	err = ctx.BindJSON(&updateUser)
 	if err != nil {
-		Log.ERROR("[权限管理] 绑定JSON失败", err)
+		PanelLog.ERROR("[权限管理] 绑定JSON失败", err)
 		return
 	}
 
@@ -117,7 +117,7 @@ func UpdateUser(ctx *gin.Context) {
 	}
 
 	Database.DB.Save(&user)
-	Log.INFO("[权限管理] 更新用户: ", user.Name)
+	PanelLog.INFO("[权限管理] 更新用户: ", user.Name)
 	ctx.JSON(200, user)
 }
 
@@ -131,7 +131,7 @@ func DeleteUser(ctx *gin.Context) {
 	}
 	Database.DB.First(&user, id)
 	Database.DB.Delete(&user)
-	Log.INFO("[权限管理] 删除用户: ", user.Name)
+	PanelLog.INFO("[权限管理] 删除用户: ", user.Name)
 	ctx.JSON(200, gin.H{"msg": "删除成功"})
 }
 
@@ -139,10 +139,10 @@ func DeleteUser(ctx *gin.Context) {
 func GetRoles(ctx *gin.Context) {
 	roles, err := Auth.Authenticator.GetAllRoles()
 	if err != nil {
-		Log.ERROR("[权限管理] 获取角色列表失败", err)
+		PanelLog.ERROR("[权限管理] 获取角色列表失败", err)
 		return
 	}
-	Log.INFO("[权限管理] 获取角色列表")
+	PanelLog.INFO("[权限管理] 获取角色列表")
 	ctx.JSON(200, roles)
 }
 
@@ -151,10 +151,10 @@ func CreateRole(ctx *gin.Context) {
 	RoleName := ctx.Query("name")
 	ok, err := Auth.Authenticator.AddRoleForUser(RoleName, RoleName)
 	if err != nil {
-		Log.ERROR("[权限管理] 创建角色失败", err)
+		PanelLog.ERROR("[权限管理] 创建角色失败", err)
 		return
 	}
-	Log.INFO("[权限管理] 创建角色: ", RoleName)
+	PanelLog.INFO("[权限管理] 创建角色: ", RoleName)
 	if ok {
 		ctx.JSON(200, gin.H{
 			"msg":    "创建成功",
@@ -173,10 +173,10 @@ func DeleteRole(ctx *gin.Context) {
 	RoleName := ctx.Query("name")
 	ok, err := Auth.Authenticator.DeleteRole(RoleName)
 	if err != nil {
-		Log.ERROR("[权限管理] 删除角色失败", err)
+		PanelLog.ERROR("[权限管理] 删除角色失败", err)
 		return
 	}
-	Log.INFO("[权限管理] 删除角色: ", RoleName)
+	PanelLog.INFO("[权限管理] 删除角色: ", RoleName)
 	if ok {
 		ctx.JSON(200, gin.H{
 			"msg":    "删除成功",
@@ -202,7 +202,7 @@ func GetPolicy(ctx *gin.Context) {
 
 	Policy, err := Auth.Authenticator.GetPolicy()
 	if err != nil {
-		Log.ERROR("[权限管理] 获取权限列表失败", err)
+		PanelLog.ERROR("[权限管理] 获取权限列表失败", err)
 		return
 	}
 
@@ -214,6 +214,6 @@ func GetPolicy(ctx *gin.Context) {
 		})
 	}
 
-	Log.INFO("[权限管理] 获取权限列表")
+	PanelLog.INFO("[权限管理] 获取权限列表")
 	ctx.JSON(200, policy_list)
 }

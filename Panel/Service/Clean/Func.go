@@ -7,7 +7,7 @@
 package Clean
 
 import (
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"fmt"
 	"os/exec"
 	"regexp"
@@ -70,7 +70,7 @@ func RemoveTmpDir() {
 	for _, dir := range TmpDirs {
 		_, err := exec.Command("rm", "-rf", dir).Output()
 		if err != nil {
-			Log.ERROR("RemoveTmpDir() Error: ", err.Error())
+			PanelLog.ERROR("RemoveTmpDir() Error: ", err.Error())
 		}
 	}
 }

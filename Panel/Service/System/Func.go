@@ -7,7 +7,7 @@
 package System
 
 import (
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
@@ -32,7 +32,7 @@ func LoadAverage() ([3]float32, error) {
 	out = out[:len(out)-1] // 去除 \n 换行符
 
 	if err != nil {
-		Log.ERROR("loadAverage1m() 1 Error: ", err.Error())
+		PanelLog.ERROR("loadAverage1m() 1 Error: ", err.Error())
 		// 出现问题就返回 0, 0, 0 默认值 不至于崩溃
 		return [3]float32{0, 0, 0}, err
 	}
@@ -47,7 +47,7 @@ func LoadAverage() ([3]float32, error) {
 	for idx := range numbers {
 		number, err := strconv.ParseFloat(numbers[idx], 32)
 		if err != nil {
-			Log.ERROR("loadAverage1m() 2 Error: ", err.Error())
+			PanelLog.ERROR("loadAverage1m() 2 Error: ", err.Error())
 			return [3]float32{0, 0, 0}, err
 		}
 		res[idx] = float32(number)
@@ -66,7 +66,7 @@ func LoadAverage1m() (float32, error) {
 func MemoryUsage() (float32, error) {
 	res, err := mem.VirtualMemory()
 	if err != nil {
-		Log.ERROR("MemoryUsage() Error: ", err.Error())
+		PanelLog.ERROR("MemoryUsage() Error: ", err.Error())
 		return 0, err
 	}
 	return float32(res.UsedPercent), nil
@@ -147,7 +147,7 @@ func NetworkIO() ([]NetworkIOStat, error) {
 func MonitorCPUPerCore() ([]float64, error) {
 	percentages, err := cpu.Percent(time.Second, true)
 	if err != nil {
-		Log.ERROR("Error: ", err)
+		PanelLog.ERROR("Error: ", err)
 		return []float64{}, err
 	}
 	return percentages, nil
@@ -199,7 +199,7 @@ func GetRunTime() string {
 	}
 	out, err := exec.Command("uptime").Output()
 	if err != nil {
-		Log.ERROR("GetRunTime() Error: ", err.Error())
+		PanelLog.ERROR("GetRunTime() Error: ", err.Error())
 		return ""
 	}
 
@@ -225,7 +225,7 @@ func GetLinuxVersion() string {
 	}
 	out, err := exec.Command("uname", "-sr").Output()
 	if err != nil {
-		Log.ERROR("GetLinuxVersion() Error: ", err.Error())
+		PanelLog.ERROR("GetLinuxVersion() Error: ", err.Error())
 		return ""
 	}
 	res := string(out)
@@ -247,7 +247,7 @@ func Shutdown() {
 	}
 	err := exec.Command("shutdown -h now").Run()
 	if err != nil {
-		Log.ERROR("Shutdown Error: ", err.Error())
+		PanelLog.ERROR("Shutdown Error: ", err.Error())
 		return
 	}
 }
@@ -259,7 +259,7 @@ func Reboot() {
 	}
 	err := exec.Command("reboot").Run()
 	if err != nil {
-		Log.ERROR("Shutdown Error: ", err.Error())
+		PanelLog.ERROR("Shutdown Error: ", err.Error())
 		return
 	}
 }
@@ -284,4 +284,66 @@ func getPkgManager() string {
 func GetRAMUsedAndFree() (uint64, uint64) {
 	memory, _ := mem.VirtualMemory()
 	return memory.Free, memory.Used
+}
+
+// SetDNS 设置DNS
+func SetDNS(dns string) {
+	if SkipWindows() {
+		return
+	}
+	err := exec.Command("echo", "nameserver "+dns, ">", "/etc/resolv.conf").Run()
+	if err != nil {
+		PanelLog.ERROR("SetDNS Error: ", err.Error())
+		return
+	}
+}
+
+// SetHOSTS 设置HOSTS
+func SetHOSTS(hosts string) {
+	if SkipWindows() {
+		return
+	}
+	err := exec.Command("echo", hosts, ">", "/etc/hosts").Run()
+	if err != nil {
+		PanelLog.ERROR("SetHOSTS Error: ", err.Error())
+		return
+	}
+}
+
+// SetHOSTNAME 设置主机名
+func SetHOSTNAME(hostname string) {
+	if SkipWindows() {
+		return
+	}
+	err := exec.Command("hostnamectl", "set-hostname", hostname).Run()
+	if err != nil {
+		PanelLog.ERROR("SetHOSTNAME Error: ", err.Error())
+		return
+	} else {
+		Data.HostName = hostname
+	}
+}
+
+// SetTimeZone 设置时区
+func SetTimeZone(timezone string) {
+	if SkipWindows() {
+		return
+	}
+	err := exec.Command("timedatectl", "set-timezone", timezone).Run()
+	if err != nil {
+		PanelLog.ERROR("SetTimeZone Error: ", err.Error())
+		return
+	}
+}
+
+// TimeSync 时间同步
+func TimeSync() {
+	if SkipWindows() {
+		return
+	}
+	err := exec.Command("ntpdate", "cn.pool.ntp.org").Run()
+	if err != nil {
+		PanelLog.ERROR("TimeSync Error: ", err.Error())
+		return
+	}
 }

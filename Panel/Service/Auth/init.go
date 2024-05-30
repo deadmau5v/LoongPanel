@@ -8,7 +8,7 @@ package Auth
 
 import (
 	"LoongPanel/Panel/Service/Database"
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/System"
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
@@ -51,13 +51,13 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 	// 获取策略组 g
 	groups, _ := Authenticator.GetGroupingPolicy()
 	if len(groups) == 0 {
-		Log.INFO("[权限管理] 初始化策略组")
+		PanelLog.INFO("[权限管理] 初始化策略组")
 		_, _ = Authenticator.AddGroupingPolicy("admin", "admin")
 		_, _ = Authenticator.AddGroupingPolicy("admin", "user")
 		_, _ = Authenticator.AddGroupingPolicy("user", "user")
 	} else {
 		for _, group := range groups {
-			Log.DEBUG("[权限管理] 策略组: ", group)
+			PanelLog.DEBUG("[权限管理] 策略组: ", group)
 		}
 	}
 
@@ -70,9 +70,9 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 
 		for _, v := range policy {
 			msg := strings.Join(v, " ")
-			Log.DEBUG("[权限管理] 策略 ", msg, " 已加载")
+			PanelLog.DEBUG("[权限管理] 策略 ", msg, " 已加载")
 		}
-		Log.INFO("[权限管理] 策略已加载完成")
+		PanelLog.INFO("[权限管理] 策略已加载完成")
 	}
 
 }

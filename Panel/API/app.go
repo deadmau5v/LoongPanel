@@ -8,7 +8,7 @@ package API
 
 import (
 	"LoongPanel/Panel/Service/Auth"
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -39,7 +39,7 @@ func init() {
 	App.Use(Cors())
 
 	App.Use(gin.Logger())
-	App.Use(Log.GinLogToFile())
+	App.Use(PanelLog.GinLogToFile())
 	App.Use(gin.Recovery())
 	App.Use(Auth.UserAuth())
 

@@ -4,10 +4,10 @@
  * 文件作用：
  */
 
-package LogManage
+package Log
 
 import (
-	Log2 "LoongPanel/Panel/Service/Log"
+	Log2 "LoongPanel/Panel/Service/PanelLog"
 	"os"
 )
 

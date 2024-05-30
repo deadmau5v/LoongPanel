@@ -7,15 +7,15 @@
 package PkgLog
 
 import (
-	Log2 "LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/LogManage"
+	"LoongPanel/Panel/Service/Log"
+	Log2 "LoongPanel/Panel/Service/PanelLog"
 	"io"
 	"os"
 	"strings"
 )
 
-func createLog(path, name string) *LogManage.Log_ {
-	log := LogManage.Log_{
+func createLog(path, name string) *Log.Log_ {
+	log := Log.Log_{
 		Path: path,
 		Name: name,
 		Ok:   true,
@@ -91,17 +91,17 @@ func createLog(path, name string) *LogManage.Log_ {
 }
 
 // GetYumLog 获取yum日志
-func GetYumLog() *LogManage.Log_ {
+func GetYumLog() *Log.Log_ {
 	return createLog("/var/log/yum.log", "yum")
 }
 
 // GetDnfLog 获取dnf日志
-func GetDnfLog() *LogManage.Log_ {
+func GetDnfLog() *Log.Log_ {
 	return createLog("/var/log/dnf.log", "dnf")
 }
 
 // GetAptLog 获取apt日志
-func GetAptLog() *LogManage.Log_ {
+func GetAptLog() *Log.Log_ {
 	return createLog("/var/log/apt/history.log", "apt")
 }
 

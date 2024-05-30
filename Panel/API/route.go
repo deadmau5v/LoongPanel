@@ -13,20 +13,20 @@ import (
 	"LoongPanel/Panel/API/v1/home"
 	"LoongPanel/Panel/API/v1/terminal"
 	"LoongPanel/Panel/Service/Auth"
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/System"
 	"github.com/gin-gonic/gin"
 )
 
 func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
-	Log.DEBUG("[添加路由]", Method, Path, comment)
+	PanelLog.DEBUG("[添加路由]", Method, Path, comment)
 	if group != nil {
 		_, err := Auth.Authenticator.AddPolicy("admin", group.BasePath()+Path, Method)
 		if Public {
 			_, err = Auth.Authenticator.AddPolicy("user", group.BasePath()+Path, Method)
 		}
 		if err != nil {
-			Log.ERROR("添加权限策略失败", err)
+			PanelLog.ERROR("添加权限策略失败", err)
 			panic(err)
 			return
 		}
@@ -35,7 +35,7 @@ func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gi
 		_, err := Auth.Authenticator.AddPolicy("admin", Path, Method)
 		_, err = Auth.Authenticator.AddPolicy("user", Path, Method)
 		if err != nil {
-			Log.ERROR("添加权限策略失败", err)
+			PanelLog.ERROR("添加权限策略失败", err)
 			panic(err)
 			return
 		}
@@ -94,14 +94,14 @@ func initRoute(app *gin.Engine) {
 	SetRoute("GET", "/api/v1/auth/policy", AuthAPI.GetPolicy, nil, "获取权限", false)
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {
-		Log.DEBUG("无路由访问...")
+		PanelLog.DEBUG("无路由访问...")
 		c.File(System.WORKDIR + "/dist/index.html")
 	})
 
 	// 信任代理
 	err := app.SetTrustedProxies([]string{"127.0.0.1"})
 	if err != nil {
-		Log.DEBUG("设置信任代理失败", err)
+		PanelLog.DEBUG("设置信任代理失败", err)
 		return
 	}
 

@@ -7,7 +7,7 @@
 package terminal
 
 import (
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/Terminal"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -45,7 +45,7 @@ func ScreenClose(ctx *gin.Context) {
 }
 
 func ScreenCreate(ctx *gin.Context) {
-	Log.INFO("screenCreate")
+	PanelLog.INFO("screenCreate")
 	idStr := ctx.Query("id")
 	var id int
 	if idStr == "" {
@@ -70,7 +70,7 @@ func ScreenCreate(ctx *gin.Context) {
 			"status": -1,
 			"msg":    err.Error(),
 		})
-		Log.ERROR("创建Screen错误")
+		PanelLog.ERROR("创建Screen错误")
 		return
 	}
 

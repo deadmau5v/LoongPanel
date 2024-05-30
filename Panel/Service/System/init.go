@@ -7,7 +7,7 @@
 package System
 
 import (
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"os"
 )
 
@@ -16,7 +16,7 @@ func init() {
 	Data, err = GetOSData()
 	temp, err := getPublicIP()
 	if err != nil {
-		Log.ERROR("GetPublicIP() Error: ", err.Error())
+		PanelLog.ERROR("GetPublicIP() Error: ", err.Error())
 	}
 	PublicIP = temp
 	WORKDIR, err = os.Getwd()

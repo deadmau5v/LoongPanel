@@ -4,7 +4,7 @@
  * 文件作用：初始化日志模块
  */
 
-package Log
+package PanelLog
 
 func init() {
 	IsDebug = true

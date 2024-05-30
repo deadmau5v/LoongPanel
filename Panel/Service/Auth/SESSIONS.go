@@ -8,7 +8,7 @@ package Auth
 
 import (
 	"LoongPanel/Panel/Service/Database"
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -25,7 +25,7 @@ func NewSESSION(user Database.User) string {
 	}
 	err := Database.DB.Create(&session).Error
 	if err != nil {
-		Log.ERROR(err)
+		PanelLog.ERROR(err)
 		return ""
 	}
 	return uuid_
@@ -71,7 +71,7 @@ func UserAuth() gin.HandlerFunc {
 		}
 
 		Authorization := c.GetHeader("Authorization")
-		Log.DEBUG("Authorization", Authorization)
+		PanelLog.DEBUG("Authorization", Authorization)
 		var SESSIONS []SESSION
 		Database.DB.Find(&SESSIONS)
 		var userSession SESSION
@@ -86,7 +86,7 @@ func UserAuth() gin.HandlerFunc {
 			}
 		}
 		if !flag {
-			Log.DEBUG("未授权1")
+			PanelLog.DEBUG("未授权1")
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
 				"msg":  "未授权",
@@ -96,15 +96,15 @@ func UserAuth() gin.HandlerFunc {
 		}
 
 		ok, err := Authenticator.Enforce(userSession.User.Role, c.Request.URL.Path, c.Request.Method)
-		Log.DEBUG("权限验证", userSession.User, c.Request.URL.Path, c.Request.Method, ok, err)
+		PanelLog.DEBUG("权限验证", userSession.User, c.Request.URL.Path, c.Request.Method, ok, err)
 		if ok && err == nil {
 			c.Next()
 			return
 		} else if err != nil || !ok {
-			Log.DEBUG("未授权2")
+			PanelLog.DEBUG("未授权2")
 
 			if err != nil {
-				Log.ERROR(err)
+				PanelLog.ERROR(err)
 			}
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
@@ -121,7 +121,7 @@ func UserAuth() gin.HandlerFunc {
 func init() {
 	err := Database.DB.AutoMigrate(&SESSION{})
 	if err != nil {
-		Log.DEBUG("[数据库模块] SESSIONS表创建失败")
+		PanelLog.DEBUG("[数据库模块] SESSIONS表创建失败")
 		return
 	}
 }

@@ -1,24 +1,24 @@
 /*
  * 创建人： deadmau5v
- * 创建时间： 2024-5-29
- * 文件作用：面板日志
+ * 创建时间： 2024-0-0
+ * 文件作用：
  */
 
-package PanelLog
+package DataBaseLog
 
 import (
-	Log2 "LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/LogManage"
+	"LoongPanel/Panel/Service/Log"
+	Log2 "LoongPanel/Panel/Service/PanelLog"
 	"io"
 	"os"
 	"strings"
 )
 
-func GetPanelLog() *LogManage.Log_ {
+func GetDataBaseLog() *Log.Log_ {
 
-	log := &LogManage.Log_{
-		Path: "./temp.log",
-		Name: "面板日志",
+	log := &Log.Log_{
+		Path: "/var/log/tidb.log",
+		Name: "数据库日志",
 		Ok:   true,
 	}
 
@@ -67,8 +67,4 @@ func GetPanelLog() *LogManage.Log_ {
 	}
 
 	return log
-}
-
-func init() {
-
 }

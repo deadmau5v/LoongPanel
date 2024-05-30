@@ -7,8 +7,8 @@
 package SystemLog
 
 import (
-	Log2 "LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/LogManage"
+	"LoongPanel/Panel/Service/Log"
+	Log2 "LoongPanel/Panel/Service/PanelLog"
 	"io"
 	"os"
 	"os/exec"
@@ -16,7 +16,7 @@ import (
 )
 
 // GetLog 获取日志
-func GetLog(log *LogManage.Log_, line int) []byte {
+func GetLog(log *Log.Log_, line int) []byte {
 	if !log.Ok {
 		return nil
 	}
@@ -56,7 +56,7 @@ func GetLog(log *LogManage.Log_, line int) []byte {
 }
 
 // ClearLog 清空日志
-func ClearLog(log *LogManage.Log_) {
+func ClearLog(log *Log.Log_) {
 	if !log.Ok {
 		return
 	}
@@ -84,8 +84,8 @@ func ClearLog(log *LogManage.Log_) {
 }
 
 // creatLog 创建日志对象 简化流程
-func createLog(path, name string, customGetLog func(log *LogManage.Log_, line int) []byte) *LogManage.Log_ {
-	log := &LogManage.Log_{
+func createLog(path, name string, customGetLog func(log *Log.Log_, line int) []byte) *Log.Log_ {
+	log := &Log.Log_{
 		Path: path,
 		Name: name,
 	}
@@ -109,38 +109,38 @@ func createLog(path, name string, customGetLog func(log *LogManage.Log_, line in
 }
 
 // GetBootLog 获取启动日志
-func GetBootLog() *LogManage.Log_ {
+func GetBootLog() *Log.Log_ {
 	return createLog("/var/log/boot.log", "系统启动日志", nil)
 }
 
 // GetKDumpLog 获取KDump日志
-func GetKDumpLog() *LogManage.Log_ {
+func GetKDumpLog() *Log.Log_ {
 	return createLog("/var/log/kdump.log", "内核崩溃日志", nil)
 }
 
 // GetCronLog 获取定时任务日志
-func GetCronLog() *LogManage.Log_ {
+func GetCronLog() *Log.Log_ {
 	return createLog("/var/log/cron", "定时任务日志", nil)
 }
 
 // GetFirewalldLog 获取Firewalld日志
-func GetFirewalldLog() *LogManage.Log_ {
+func GetFirewalldLog() *Log.Log_ {
 	return createLog("/var/log/firewalld", "防火墙日志", nil)
 }
 
 // GetMessagesLog 获取系统消息日志
-func GetMessagesLog() *LogManage.Log_ {
+func GetMessagesLog() *Log.Log_ {
 	return createLog("/var/log/messages", "系统消息日志", nil)
 }
 
 // GetSecureLog 获取安全日志
-func GetSecureLog() *LogManage.Log_ {
+func GetSecureLog() *Log.Log_ {
 	return createLog("/var/log/secure", "安全日志", nil)
 }
 
 // GetWtmpLog 获取登录日志
-func GetWtmpLog() *LogManage.Log_ {
-	return createLog("/var/log/wtmp", "登录日志", func(log *LogManage.Log_, line int) []byte {
+func GetWtmpLog() *Log.Log_ {
+	return createLog("/var/log/wtmp", "登录日志", func(log *Log.Log_, line int) []byte {
 		output, err := exec.Command("utmpdump", log.Path).Output()
 		if err != nil {
 			log.Ok = false
@@ -160,8 +160,8 @@ func GetWtmpLog() *LogManage.Log_ {
 }
 
 // GetKernelLog 获取内核日志
-func GetKernelLog() *LogManage.Log_ {
-	log := createLog("", "内核日志", func(log *LogManage.Log_, line int) []byte {
+func GetKernelLog() *Log.Log_ {
+	log := createLog("", "内核日志", func(log *Log.Log_, line int) []byte {
 		output, err := exec.Command("journalctl", "-k").Output()
 		if err != nil {
 			log.Ok = false
