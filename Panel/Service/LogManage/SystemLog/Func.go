@@ -120,7 +120,7 @@ func GetKDumpLog() *LogManage.Log_ {
 
 // GetCronLog 获取定时任务日志
 func GetCronLog() *LogManage.Log_ {
-	return createLog("/var/log/cron.log", "定时任务日志", nil)
+	return createLog("/var/log/cron", "定时任务日志", nil)
 }
 
 // GetFirewalldLog 获取Firewalld日志

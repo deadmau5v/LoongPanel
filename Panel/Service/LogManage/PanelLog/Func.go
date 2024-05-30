@@ -17,7 +17,7 @@ import (
 func GetPanelLog() *LogManage.Log_ {
 
 	log := &LogManage.Log_{
-		Path: "panel.log",
+		Path: "./temp.log",
 		Name: "面板日志",
 		Ok:   true,
 	}
