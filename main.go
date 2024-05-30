@@ -10,6 +10,7 @@ import (
 	"LoongPanel/Panel/API"
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/LogManage"
+	"LoongPanel/Panel/Service/LogManage/DataBaseLog"
 	"LoongPanel/Panel/Service/LogManage/NetWorkLog"
 	"LoongPanel/Panel/Service/LogManage/PanelLog"
 	"LoongPanel/Panel/Service/LogManage/PkgLog"
@@ -105,7 +106,7 @@ func main() {
 	LogManage.AddLog("apt包管理工具日志", PkgLog.GetAptLog)
 	LogManage.AddLog("yum包管理工具日志", PanelLog.GetPanelLog)
 	LogManage.AddLog("网络日志", NetWorkLog.GetNetWorkLog)
-
+	LogManage.AddLog("数据库日志", DataBaseLog.GetDataBaseLog)
 	for _, log := range LogManage.AllLog {
 		Log.DEBUG(log.Name, log.Ok)
 	}
