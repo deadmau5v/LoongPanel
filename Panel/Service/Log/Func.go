@@ -8,7 +8,7 @@ package Log
 
 import Log2 "LoongPanel/Panel/Service/PanelLog"
 
-func AddLog(Name string, fn func() *Log_) {
+func Add(Name string, fn func() *Log_) {
 	log := fn()
 	if log != nil {
 		Log2.DEBUG("[日志管理] 添加日志支持", Name, log.Path)
