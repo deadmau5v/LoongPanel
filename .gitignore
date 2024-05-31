@@ -26,3 +26,4 @@ bin
 resource
 *.log
 /dist
+/.idea
