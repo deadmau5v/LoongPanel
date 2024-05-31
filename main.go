@@ -73,24 +73,7 @@ func downloadDist() {
 func main() {
 	var run = false
 
-	//region 入口
-
-	if run {
-		// 如果 "./dist" 不存在，则执行下载Dist函数
-		if _, err := os.Stat("./dist"); os.IsNotExist(err) {
-			downloadDist()
-		}
-
-		PanelLog.INFO("[入口] http://127.0.0.1:8080")
-		err := API.App.Run(":8080")
-		if err != nil {
-			return
-		}
-	}
-
-	//endregion
-
-	//region 测试
+	//region 初始化日志
 
 	Log.AllLog = make(map[string]Log.Log_)
 	Log.Add("系统启动日志", SystemLog.GetBootLog)
@@ -109,6 +92,23 @@ func main() {
 	Log.Add("数据库日志", DataBaseLog.GetDataBaseLog)
 	for _, log := range Log.AllLog {
 		PanelLog.DEBUG(log.Name, log.Ok)
+	}
+
+	//endregion
+
+	//region 入口
+
+	if run {
+		// 如果 "./dist" 不存在，则执行下载Dist函数
+		if _, err := os.Stat("./dist"); os.IsNotExist(err) {
+			downloadDist()
+		}
+
+		PanelLog.INFO("[入口] http://127.0.0.1:8080")
+		err := API.App.Run(":8080")
+		if err != nil {
+			return
+		}
 	}
 
 	//endregion
