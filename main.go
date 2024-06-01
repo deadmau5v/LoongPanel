@@ -71,7 +71,7 @@ func downloadDist() {
 //endregion
 
 func main() {
-	var run = false
+	var run = true
 
 	//region 初始化日志
 

@@ -27,3 +27,4 @@ resource
 *.log
 /dist
 /.idea
+dist

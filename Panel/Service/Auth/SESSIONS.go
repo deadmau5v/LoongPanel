@@ -62,6 +62,9 @@ func UserAuth() gin.HandlerFunc {
 			"/user",
 			"/terminal",
 			"/files",
+			"/auth/global",
+			"/auth/role",
+			"/auth/user",
 		}
 		for _, path := range staticPaths {
 			if c.Request.URL.Path == path {

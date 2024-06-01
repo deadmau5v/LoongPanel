@@ -135,6 +135,11 @@ func DeleteUser(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{"msg": "删除成功"})
 }
 
+type role struct {
+	Name       string   `json:"name"`
+	PolicyList []policy `json:"policy_list"`
+}
+
 // GetRoles 获取角色列表
 func GetRoles(ctx *gin.Context) {
 	roles, err := Auth.Authenticator.GetAllRoles()
@@ -143,7 +148,17 @@ func GetRoles(ctx *gin.Context) {
 		return
 	}
 	PanelLog.INFO("[权限管理] 获取角色列表")
-	ctx.JSON(200, roles)
+	roles_ := make([]role, 0)
+
+	for _, r := range roles {
+		role_ := role{
+			Name:       r,
+			PolicyList: getPolicy(r),
+		}
+		roles_ = append(roles_, role_)
+	}
+
+	ctx.JSON(200, roles_)
 }
 
 // CreateRole 创建角色
@@ -196,24 +211,26 @@ type policy struct {
 	Path   string `json:"path"`
 }
 
-// GetPolicy 获取权限列表
-func GetPolicy(ctx *gin.Context) {
-	var policy_list []policy
+// getPolicy 获取权限列表
+func getPolicy(role string) []policy {
+	policyList := make([]policy, 0)
 
-	Policy, err := Auth.Authenticator.GetPolicy()
-	if err != nil {
-		PanelLog.ERROR("[权限管理] 获取权限列表失败", err)
-		return
+	allPolicy, err := Auth.Authenticator.GetPolicy()
+	for _, policy_ := range allPolicy {
+		if policy_[0] == role {
+			policyList = append(policyList, policy{
+				Role:   policy_[0],
+				Path:   policy_[1],
+				Method: policy_[2],
+			})
+		}
 	}
 
-	for _, strings := range Policy {
-		policy_list = append(policy_list, policy{
-			Role:   strings[0],
-			Path:   strings[1],
-			Method: strings[2],
-		})
+	if err != nil {
+		PanelLog.ERROR("[权限管理] 获取权限列表失败", err)
+		return nil
 	}
 
 	PanelLog.INFO("[权限管理] 获取权限列表")
-	ctx.JSON(200, policy_list)
+	return policyList
 }

@@ -91,7 +91,6 @@ func initRoute(app *gin.Engine) {
 	SetRoute("GET", "/api/v1/auth/role", AuthAPI.GetRoles, nil, "获取角色", false)
 	SetRoute("POST", "/api/v1/auth/role", AuthAPI.CreateRole, nil, "创建角色", false)
 	SetRoute("DELETE", "/api/v1/auth/role", AuthAPI.DeleteRole, nil, "删除角色", false)
-	SetRoute("GET", "/api/v1/auth/policy", AuthAPI.GetPolicy, nil, "获取权限", false)
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {
 		PanelLog.DEBUG("无路由访问...")
