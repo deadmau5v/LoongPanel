@@ -7,7 +7,6 @@
 package Auth
 
 import (
-	"LoongPanel/Panel/API"
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/gin-gonic/gin"
@@ -42,6 +41,7 @@ type SESSION struct {
 func UserAuth() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
+
 		// 放行静态资源
 		skipPaths := []string{
 			"/assets/*",
@@ -98,7 +98,6 @@ func UserAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
 		path := PathParse(c.Request.URL.Path)
 		ok, err := Authenticator.Enforce(userSession.User.Role, path, c.Request.Method)
 		PanelLog.DEBUG("权限验证", userSession.User, c.Request.URL.Path, c.Request.Method, ok, err)
@@ -123,27 +122,24 @@ func UserAuth() gin.HandlerFunc {
 	}
 }
 
+// PathParse 路径解析
+func PathParse(path string) string {
+	for k, v := range map[string]string{
+		`^/api/v1/auth/user/(\d+)$`: "/api/v1/auth/user/:id",
+	} {
+		if match, _ := regexp.MatchString(k, path); match {
+			return v
+		}
+	}
+	return path
+}
+
 func GetSessionByKey(key string) (*SESSION, error) {
 	var Session SESSION
 	Database.DB.Model(&SESSION{}).Where("`key` = ?", key).Find(&Session)
 	// 获取关联的用户
 	Database.DB.Model(&Session).Preload("User").Find(&Session)
 	return &Session, nil
-}
-
-// PathParse 路径解析
-func PathParse(url string) string {
-	for _, route := range API.AllRoutes {
-		if route.Re != nil {
-			// 正则匹配
-			if regexp.MustCompile(route.Path).MatchString(url) {
-				return route.Path
-			}
-		} else if route.Path == url {
-			return route.Path
-		}
-	}
-	return ""
 }
 
 func init() {

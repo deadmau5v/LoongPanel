@@ -18,19 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Route struct {
-	Method      string
-	Path        string
-	HandlerFunc gin.HandlerFunc
-	Group       *gin.RouterGroup
-	Comment     string
-	Public      bool
-	Re          *string // 正则匹配 用于鉴定权限
-}
-
-var AllRoutes []Route
-
-func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool, Re *string) {
+func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
 	PanelLog.DEBUG("[添加路由]", Method, Path, comment)
 	if group != nil {
 		_, err := Auth.Authenticator.AddPolicy("admin", group.BasePath()+Path, Method)
@@ -53,21 +41,9 @@ func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gi
 		}
 		App.Handle(Method, Path, HandlerFunc)
 	}
-	route := Route{
-		Method:      Method,
-		Path:        Path,
-		HandlerFunc: HandlerFunc,
-		Group:       group,
-		Comment:     comment,
-		Public:      Public,
-		Re:          Re,
-	}
-	AllRoutes = append(AllRoutes, route)
 }
 
 func initRoute(app *gin.Engine) {
-	AllRoutes = make([]Route, 0)
-
 	// 其他
 	app.Static("/assets", System.WORKDIR+"/dist/assets")
 	// api v1 ws
@@ -75,25 +51,25 @@ func initRoute(app *gin.Engine) {
 	ws := app.Group("/api/ws")
 	//  home 首页
 	// -- home -> status 状态监控(实时)
-	SetRoute("GET", "/status/system_status", home.SystemStatus, v1, "系统状态", true, nil)
-	SetRoute("GET", "/status/system_info", home.SystemInfo, v1, "系统信息", true, nil)
-	SetRoute("GET", "/status/disks", home.Disks, v1, "磁盘信息", true, nil)
+	SetRoute("GET", "/status/system_status", home.SystemStatus, v1, "系统状态", true)
+	SetRoute("GET", "/status/system_info", home.SystemInfo, v1, "系统信息", true)
+	SetRoute("GET", "/status/disks", home.Disks, v1, "磁盘信息", true)
 	// -- home -> clean 清理垃圾
-	SetRoute("GET", "/clean/pkg_auto_clean", clean.PkgAutoClean, v1, "清理过期包", false, nil)
-	SetRoute("GET", "/clean/temp_dir_remove", clean.TempDirRemove, v1, "清理临时目录", false, nil)
+	SetRoute("GET", "/clean/pkg_auto_clean", clean.PkgAutoClean, v1, "清理过期包", false)
+	SetRoute("GET", "/clean/temp_dir_remove", clean.TempDirRemove, v1, "清理临时目录", false)
 	// -- home -> power 电源操作
-	SetRoute("POST", "/power/shutdown", home.Reboot, v1, "关机操作", false, nil)
-	SetRoute("POST", "/power/reboot", home.Shutdown, v1, "重启操作", false, nil)
+	SetRoute("POST", "/power/shutdown", home.Reboot, v1, "关机操作", false)
+	SetRoute("POST", "/power/reboot", home.Shutdown, v1, "重启操作", false)
 
 	//  files 文件
-	SetRoute("GET", "/files/dir", files.FileDir, v1, "获取文件列表", true, nil)
+	SetRoute("GET", "/files/dir", files.FileDir, v1, "获取文件列表", true)
 
 	//  terminal 终端
-	SetRoute("GET", "/screen/create", terminal.ScreenCreate, v1, "终端创建", false, nil)
-	SetRoute("GET", "/screen/close", terminal.ScreenClose, v1, "终端关闭", false, nil)
-	SetRoute("GET", "/screen/get_screens", terminal.GetScreens, v1, "获取终端列表", false, nil)
+	SetRoute("GET", "/screen/create", terminal.ScreenCreate, v1, "终端创建", false)
+	SetRoute("GET", "/screen/close", terminal.ScreenClose, v1, "终端关闭", false)
+	SetRoute("GET", "/screen/get_screens", terminal.GetScreens, v1, "获取终端列表", false)
 	// -- terminal -> WebSocket
-	SetRoute("GET", "/screen", terminal.ScreenWs, ws, "使用网页终端", false, nil)
+	SetRoute("GET", "/screen", terminal.ScreenWs, ws, "使用网页终端", false)
 
 	// ping
 	SetRoute("GET", "/ping", func(c *gin.Context) {
@@ -101,24 +77,23 @@ func initRoute(app *gin.Engine) {
 			"code": 200,
 			"msg":  "pong",
 		})
-	}, v1, "权限测试", true, nil)
+	}, v1, "权限测试", true)
 
 	// auth 页面
-	SetRoute("POST", "/api/v1/auth/login", AuthAPI.Login, nil, "登录", true, nil)
-	SetRoute("POST", "/api/v1/auth/logout", AuthAPI.Logout, nil, "登出", true, nil)
+	SetRoute("POST", "/api/v1/auth/login", AuthAPI.Login, nil, "登录", true)
+	SetRoute("POST", "/api/v1/auth/logout", AuthAPI.Logout, nil, "登出", true)
 	// -- auth -> user 用户管理
-	SetRoute("GET", "/api/v1/auth/users", AuthAPI.GetUsers, nil, "获取全部用户", false, nil)
-	SetRoute("DELETE", "/api/v1/auth/users", AuthAPI.DelUsers, nil, "获取全部用户", false, nil)
-	var userRe = `/api/v1/auth/user/\d+`
-	SetRoute("GET", "/api/v1/auth/user/:id", AuthAPI.GetUser, nil, "获取用户", false, &userRe)
-	SetRoute("GET", "/api/v1/auth/user", AuthAPI.GetUser, nil, "获取用户", false, nil)
-	SetRoute("POST", "/api/v1/auth/user", AuthAPI.CreateUser, nil, "创建用户", false, nil)
-	SetRoute("PUT", "/api/v1/auth/user", AuthAPI.UpdateUser, nil, "更新用户", false, nil)
-	SetRoute("DELETE", "/api/v1/auth/user", AuthAPI.DeleteUser, nil, "删除用户", false, nil)
+	SetRoute("GET", "/api/v1/auth/users", AuthAPI.GetUsers, nil, "获取全部用户", false)
+	SetRoute("DELETE", "/api/v1/auth/users", AuthAPI.DelUsers, nil, "获取全部用户", false)
+	SetRoute("GET", "/api/v1/auth/user/:id", AuthAPI.GetUser, nil, "获取用户", false)
+	SetRoute("GET", "/api/v1/auth/user", AuthAPI.GetUser, nil, "获取用户", false)
+	SetRoute("POST", "/api/v1/auth/user", AuthAPI.CreateUser, nil, "创建用户", false)
+	SetRoute("PUT", "/api/v1/auth/user", AuthAPI.UpdateUser, nil, "更新用户", false)
+	SetRoute("DELETE", "/api/v1/auth/user", AuthAPI.DeleteUser, nil, "删除用户", false)
 	// -- auth -> role 角色管理
-	SetRoute("GET", "/api/v1/auth/role", AuthAPI.GetRoles, nil, "获取角色", false, nil)
-	SetRoute("POST", "/api/v1/auth/role", AuthAPI.CreateRole, nil, "创建角色", false, nil)
-	SetRoute("DELETE", "/api/v1/auth/role", AuthAPI.DeleteRole, nil, "删除角色", false, nil)
+	SetRoute("GET", "/api/v1/auth/role", AuthAPI.GetRoles, nil, "获取角色", false)
+	SetRoute("POST", "/api/v1/auth/role", AuthAPI.CreateRole, nil, "创建角色", false)
+	SetRoute("DELETE", "/api/v1/auth/role", AuthAPI.DeleteRole, nil, "删除角色", false)
 	// 静态页面
 	app.NoRoute(func(c *gin.Context) {
 		PanelLog.DEBUG("无路由访问...")
