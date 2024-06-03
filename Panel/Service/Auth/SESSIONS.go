@@ -125,7 +125,7 @@ func UserAuth() gin.HandlerFunc {
 // PathParse 路径解析
 func PathParse(path string) string {
 	for k, v := range map[string]string{
-		`^/api/v1/auth/user/(\d+)$`: "/api/v1/auth/user/:id",
+		`/api/v1/auth/user/(\d+)$`: "/api/v1/auth/user/:id",
 	} {
 		if match, _ := regexp.MatchString(k, path); match {
 			return v

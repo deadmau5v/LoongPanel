@@ -11,6 +11,7 @@ import (
 	"LoongPanel/Panel/API/v1/clean"
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
+	"LoongPanel/Panel/API/v1/log"
 	"LoongPanel/Panel/API/v1/terminal"
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/PanelLog"
@@ -50,31 +51,44 @@ func initRoute(app *gin.Engine) {
 	v1 := app.Group("/api/v1")
 	ws := app.Group("/api/ws")
 
-	SetRoute("GET", "/status/system_status", home.SystemStatus, v1, "系统状态", true)
-	SetRoute("GET", "/status/system_info", home.SystemInfo, v1, "系统信息", true)
-	SetRoute("GET", "/status/disks", home.Disks, v1, "磁盘信息", true)
-	SetRoute("GET", "/clean/pkg_auto_clean", clean.PkgAutoClean, v1, "清理过期包", false)
-	SetRoute("GET", "/clean/temp_dir_remove", clean.TempDirRemove, v1, "清理临时目录", false)
-	SetRoute("POST", "/power/shutdown", home.Reboot, v1, "关机操作", false)
-	SetRoute("POST", "/power/reboot", home.Shutdown, v1, "重启操作", false)
-	SetRoute("GET", "/files/dir", files.FileDir, v1, "获取文件列表", true)
-	SetRoute("POST", "/screen", terminal.ScreenCreate, v1, "终端创建", false)
-	SetRoute("DELETE", "/screen", terminal.ScreenClose, v1, "终端关闭", false)
-	SetRoute("GET", "/screen", terminal.GetScreens, v1, "获取终端列表", false)
+	GroupAuth := v1.Group("/auth")
+	GroupStatus := v1.Group("/status")
+	GroupClean := v1.Group("/clean")
+	GroupPower := v1.Group("/power")
+	GroupFiles := v1.Group("/files")
+	GroupScreen := v1.Group("/screen")
+	GroupLog := v1.Group("/log")
+
+	SetRoute("GET", "/system_status", home.SystemStatus, GroupStatus, "系统状态", true)
+	SetRoute("GET", "/system_info", home.SystemInfo, GroupStatus, "系统信息", true)
+	SetRoute("GET", "/disks", home.Disks, GroupStatus, "磁盘信息", true)
+	SetRoute("GET", "/pkg_auto_clean", clean.PkgAutoClean, GroupClean, "清理过期包", false)
+	SetRoute("GET", "/temp_dir_remove", clean.TempDirRemove, GroupClean, "清理临时目录", false)
+	SetRoute("POST", "/shutdown", home.Reboot, GroupPower, "关机操作", false)
+	SetRoute("POST", "/reboot", home.Shutdown, GroupPower, "重启操作", false)
+	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "获取文件列表", true)
+	SetRoute("POST", "/screen", terminal.ScreenCreate, GroupScreen, "终端创建", false)
+	SetRoute("DELETE", "/screen", terminal.ScreenClose, GroupScreen, "终端关闭", false)
+	SetRoute("GET", "/screen", terminal.GetScreens, GroupScreen, "获取终端列表", false)
 	SetRoute("GET", "/screen", terminal.ScreenWs, ws, "使用网页终端", false)
 	SetRoute("GET", "/ping", ping, v1, "权限测试", true)
-	SetRoute("POST", "/api/v1/auth/login", AuthAPI.Login, nil, "登录", true)
-	SetRoute("POST", "/api/v1/auth/logout", AuthAPI.Logout, nil, "登出", true)
-	SetRoute("GET", "/api/v1/auth/users", AuthAPI.GetUsers, nil, "获取全部用户", false)
-	SetRoute("DELETE", "/api/v1/auth/users", AuthAPI.DelUsers, nil, "获取全部用户", false)
-	SetRoute("GET", "/api/v1/auth/user/:id", AuthAPI.GetUser, nil, "获取用户", false)
-	SetRoute("GET", "/api/v1/auth/user", AuthAPI.GetUser, nil, "获取用户", false)
-	SetRoute("POST", "/api/v1/auth/user", AuthAPI.CreateUser, nil, "创建用户", false)
-	SetRoute("PUT", "/api/v1/auth/user", AuthAPI.UpdateUser, nil, "更新用户", false)
-	SetRoute("DELETE", "/api/v1/auth/user", AuthAPI.DeleteUser, nil, "删除用户", false)
-	SetRoute("GET", "/api/v1/auth/role", AuthAPI.GetRoles, nil, "获取角色", false)
-	SetRoute("POST", "/api/v1/auth/role", AuthAPI.CreateRole, nil, "创建角色", false)
-	SetRoute("DELETE", "/api/v1/auth/role", AuthAPI.DeleteRole, nil, "删除角色", false)
+	SetRoute("POST", "/login", AuthAPI.Login, GroupAuth, "登录", true)
+	SetRoute("POST", "/logout", AuthAPI.Logout, GroupAuth, "登出", true)
+	SetRoute("GET", "/users", AuthAPI.GetUsers, GroupAuth, "获取全部用户", false)
+	SetRoute("DELETE", "/users", AuthAPI.DelUsers, GroupAuth, "获取全部用户", false)
+	SetRoute("GET", "/user/:id", AuthAPI.GetUser, GroupAuth, "获取用户", false)
+	SetRoute("GET", "/user", AuthAPI.GetUser, GroupAuth, "获取用户", false)
+	SetRoute("POST", "/user", AuthAPI.CreateUser, GroupAuth, "创建用户", false)
+	SetRoute("PUT", "/user", AuthAPI.UpdateUser, GroupAuth, "更新用户", false)
+	SetRoute("DELETE", "/user", AuthAPI.DeleteUser, GroupAuth, "删除用户", false)
+	SetRoute("GET", "/role", AuthAPI.GetRoles, GroupAuth, "获取角色", false)
+	SetRoute("POST", "/role", AuthAPI.CreateRole, GroupAuth, "创建角色", false)
+	SetRoute("DELETE", "/role", AuthAPI.DeleteRole, GroupAuth, "删除角色", false)
+	SetRoute("GET", "/logs", log.GetLogs, GroupLog, "获取可用日志", false)
+	SetRoute("GET", "/log", log.GetLog, GroupLog, "获取日志", false)
+	SetRoute("DELETE", "/log", log.ClearLog, GroupLog, "清理日志", false)
+
+	// 增加参数记得检查Auth匹配 Service.Auth.SESSIONS.PathParse
 
 	app.NoRoute(func(c *gin.Context) {
 		PanelLog.DEBUG("无路由访问...")
