@@ -7,6 +7,7 @@
 package Auth
 
 import (
+	"LoongPanel/Panel/API"
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/gin-gonic/gin"
@@ -98,7 +99,8 @@ func UserAuth() gin.HandlerFunc {
 			return
 		}
 
-		ok, err := Authenticator.Enforce(userSession.User.Role, c.Request.URL.Path, c.Request.Method)
+		path := PathParse(c.Request.URL.Path)
+		ok, err := Authenticator.Enforce(userSession.User.Role, path, c.Request.Method)
 		PanelLog.DEBUG("权限验证", userSession.User, c.Request.URL.Path, c.Request.Method, ok, err)
 		if ok && err == nil {
 			c.Next()
@@ -127,6 +129,21 @@ func GetSessionByKey(key string) (*SESSION, error) {
 	// 获取关联的用户
 	Database.DB.Model(&Session).Preload("User").Find(&Session)
 	return &Session, nil
+}
+
+// PathParse 路径解析
+func PathParse(url string) string {
+	for _, route := range API.AllRoutes {
+		if route.Re != nil {
+			// 正则匹配
+			if regexp.MustCompile(route.Path).MatchString(url) {
+				return route.Path
+			}
+		} else if route.Path == url {
+			return route.Path
+		}
+	}
+	return ""
 }
 
 func init() {
