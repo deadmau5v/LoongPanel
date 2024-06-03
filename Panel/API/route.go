@@ -83,7 +83,10 @@ func initRoute(app *gin.Engine) {
 	SetRoute("POST", "/api/v1/auth/login", AuthAPI.Login, nil, "登录", true)
 	SetRoute("POST", "/api/v1/auth/logout", AuthAPI.Logout, nil, "登出", true)
 	// -- auth -> user 用户管理
-	SetRoute("GET", "/api/v1/auth/user", AuthAPI.GetUsers, nil, "获取用户", false)
+	SetRoute("GET", "/api/v1/auth/users", AuthAPI.GetUsers, nil, "获取全部用户", false)
+	SetRoute("DELETE", "/api/v1/auth/users", AuthAPI.DelUsers, nil, "获取全部用户", false)
+	SetRoute("GET", "/api/v1/auth/user/:id", AuthAPI.GetUser, nil, "获取用户", false)
+	SetRoute("GET", "/api/v1/auth/user", AuthAPI.GetUser, nil, "获取用户", false)
 	SetRoute("POST", "/api/v1/auth/user", AuthAPI.CreateUser, nil, "创建用户", false)
 	SetRoute("PUT", "/api/v1/auth/user", AuthAPI.UpdateUser, nil, "更新用户", false)
 	SetRoute("DELETE", "/api/v1/auth/user", AuthAPI.DeleteUser, nil, "删除用户", false)

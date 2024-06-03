@@ -121,6 +121,14 @@ func UserAuth() gin.HandlerFunc {
 	}
 }
 
+func GetSessionByKey(key string) (*SESSION, error) {
+	var Session SESSION
+	Database.DB.Model(&SESSION{}).Where("`key` = ?", key).Find(&Session)
+	// 获取关联的用户
+	Database.DB.Model(&Session).Preload("User").Find(&Session)
+	return &Session, nil
+}
+
 func init() {
 	err := Database.DB.AutoMigrate(&SESSION{})
 	if err != nil {

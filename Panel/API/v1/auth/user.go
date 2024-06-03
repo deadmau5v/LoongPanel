@@ -10,38 +10,79 @@ import (
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"regexp"
 	"strconv"
+	"unicode"
 )
 
 // GetUsers 获取用户列表
 func GetUsers(ctx *gin.Context) {
 	var Users []Database.User
-	id, err := strconv.Atoi(ctx.Query("id"))
-	if err == nil {
-		PanelLog.DEBUG("查询用户ID: ", id)
-		Database.DB.First(&Users, id)
-	} else {
-		PanelLog.DEBUG("查询所有用户")
-		Database.DB.Find(&Users)
-	}
+
+	PanelLog.DEBUG("查询所有用户")
+	Database.DB.Find(&Users)
+
 	PanelLog.INFO("[权限管理] 获取用户列表")
 	ctx.JSON(200, Users)
 }
 
+// DelUsers 批量删除用户
+func DelUsers(ctx *gin.Context) {
+	var ids []int
+	err := ctx.BindJSON(&ids)
+	if err != nil {
+		PanelLog.ERROR("[权限管理] 绑定JSON失败", err)
+		return
+	}
+
+	PanelLog.INFO("[权限管理] 批量删除用户: ", ids)
+	Database.DB.Where("id IN (?)", ids).Delete(&Database.User{})
+	ctx.JSON(200, gin.H{"msg": "删除成功", "status": 0})
+}
+
+// GetUser 获取用户
+func GetUser(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		session, err := Auth.GetSessionByKey(ctx.GetHeader("Authorization"))
+		if err != nil {
+			PanelLog.ERROR("[权限管理] 获取SESSION失败", err)
+			ctx.JSON(400, gin.H{"msg": err.Error(), "status": 1})
+			return
+		} else {
+			PanelLog.DEBUG("[权限管理] 获取SESSION成功 使用默认ID: ", session.User.ID)
+			id = session.User.ID
+		}
+	}
+
+	var user Database.User
+	Database.DB.Model(&Database.User{}).Where("id = ?", id).First(&user)
+	PanelLog.INFO("[权限管理] 获取用户: ", user.Name)
+	ctx.JSON(200, user)
+}
+
 // CheckUserExist 检查用户是否存在
 func CheckUserExist(user Database.User) gin.H {
-
 	var count int64
+	err := CheckUserName(user.Name)
+	if err != nil {
+		return gin.H{"msg": err.Error(), "status": 1}
+	}
+	err = CheckMail(user.Mail)
+	if err != nil {
+		return gin.H{"msg": err.Error(), "status": 1}
+	}
 	Database.DB.Model(&Database.User{}).Where("name = ?", user.Name).Count(&count)
 	PanelLog.DEBUG("用户名重复数量: ", count)
 	if count > 0 {
-		return gin.H{"msg": "用户名已存在"}
+		return gin.H{"msg": "用户名已存在", "status": 1}
 	}
-	Database.DB.Model(&Database.User{}).Where("email = ?", user.Mail).Count(&count)
+	Database.DB.Model(&Database.User{}).Where("mail = ?", user.Mail).Count(&count)
 	PanelLog.DEBUG("邮箱重复数量: ", count)
 	if count > 0 {
-		return gin.H{"msg": "邮箱已存在"}
+		return gin.H{"msg": "邮箱已存在", "status": 1}
 	}
 	return nil
 }
@@ -50,15 +91,58 @@ func CheckUserExist(user Database.User) gin.H {
 func CheckUserUpdate(user Database.User) gin.H {
 	// 忽略自己
 	var count int64
+	err := CheckUserName(user.Name)
+	if err != nil {
+		return gin.H{"msg": err.Error(), "status": 1}
+	}
+	err = CheckMail(user.Mail)
+	if err != nil {
+		return gin.H{"msg": err.Error(), "status": 1}
+	}
 	Database.DB.Model(&Database.User{}).Where("name = ? AND id != ?", user.Name, user.ID).Count(&count)
 	PanelLog.DEBUG("用户名重复数量: ", count)
 	if count > 1 {
-		return gin.H{"msg": "用户名已存在"}
+		return gin.H{"msg": "用户名已存在", "status": 1}
 	}
-	Database.DB.Model(&Database.User{}).Where("email = ? AND id != ?", user.Mail, user.ID).Count(&count)
+	Database.DB.Model(&Database.User{}).Where("mail = ? AND id != ?", user.Mail, user.ID).Count(&count)
 	PanelLog.DEBUG("邮箱重复数量: ", count)
 	if count > 1 {
-		return gin.H{"msg": "邮箱已存在"}
+		return gin.H{"msg": "邮箱已存在", "status": 1}
+	}
+	return nil
+}
+
+// isChinese 检查是否为中文
+func isChinese(r rune) bool {
+	return unicode.Is(unicode.Han, r)
+}
+
+// CheckUserName 检查用户名是否重复
+func CheckUserName(name string) error {
+	// 长度
+	if len(name) < 3 || len(name) > 20 {
+		return errors.New("用户名长度不合法")
+	}
+
+	// 字符
+	for _, c := range name {
+		if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && !isChinese(c) {
+			return errors.New("用户名包含非法字符")
+		}
+
+	}
+	return nil
+}
+
+// CheckMail 检查邮箱格式是否合法
+func CheckMail(mail string) error {
+	if len(mail) < 5 || len(mail) > 50 {
+		return errors.New("邮箱长度不合法")
+	}
+	// 正则检查邮箱是否合法
+	regex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	if !regex.MatchString(mail) {
+		return errors.New("邮箱格式不合法")
 	}
 	return nil
 }
@@ -90,10 +174,23 @@ func UpdateUser(ctx *gin.Context) {
 	var updateUser Database.User
 	id, err := strconv.Atoi(ctx.Query("id"))
 	if err != nil {
-		ctx.JSON(400, gin.H{"msg": "ID错误"})
-		return
+		// 更新SESSION获取到的用户ID
+		sessionKey := ctx.GetHeader("Authorization")
+		if sessionKey != "" {
+			session, err := Auth.GetSessionByKey(sessionKey)
+			if err != nil {
+				PanelLog.ERROR("[权限管理] 获取SESSION失败", err)
+				ctx.JSON(400, gin.H{"msg": err.Error()})
+				return
+			}
+			id = session.User.ID
+		} else {
+			PanelLog.ERROR("[权限管理] ID错误")
+			ctx.JSON(400, gin.H{"msg": "ID错误"})
+			return
+		}
 	}
-	Database.DB.First(&user, id)
+	Database.DB.Model(&Database.User{}).Where("id = ?", id).First(&user)
 
 	if user.ID == 0 && user.Name == "" {
 		ctx.JSON(404, gin.H{"msg": "用户不存在"})
@@ -126,10 +223,11 @@ func DeleteUser(ctx *gin.Context) {
 	var user Database.User
 	id, err := strconv.Atoi(ctx.Query("id"))
 	if err != nil {
+		PanelLog.ERROR("[权限管理] ID错误", err)
 		ctx.JSON(400, gin.H{"msg": "ID错误"})
 		return
 	}
-	Database.DB.First(&user, id)
+	Database.DB.Model(&Database.User{}).Where("id = ?", id).First(&user)
 	Database.DB.Delete(&user)
 	PanelLog.INFO("[权限管理] 删除用户: ", user.Name)
 	ctx.JSON(200, gin.H{"msg": "删除成功"})
