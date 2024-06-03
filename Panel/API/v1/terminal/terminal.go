@@ -45,7 +45,7 @@ func ScreenClose(ctx *gin.Context) {
 }
 
 func ScreenCreate(ctx *gin.Context) {
-	PanelLog.INFO("screenCreate")
+	PanelLog.INFO("[网页终端] 创建终端")
 	idStr := ctx.Query("id")
 	var id int
 	if idStr == "" {
