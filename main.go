@@ -26,7 +26,6 @@ import (
 // downloadDist 下载前端文件
 func downloadDist() {
 	PanelLog.INFO("开始下载前端文件")
-	// 下载地址：https://cdn1.d5v.cc/CDN/Project/LoongPanel/bin/dist.zip
 	const DistURL = "https://cdn1.d5v.cc/CDN/Project/LoongPanel/bin/dist.zip"
 	const DistPath = "./dist.zip"
 	const DistDir = "./dist"
@@ -36,6 +35,7 @@ func downloadDist() {
 		PanelLog.ERROR(err.Error())
 		return
 	}
+
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -48,6 +48,7 @@ func downloadDist() {
 		PanelLog.ERROR(err.Error())
 		return
 	}
+
 	defer func(File *os.File) {
 		err := File.Close()
 		if err != nil {
@@ -71,8 +72,6 @@ func downloadDist() {
 //endregion
 
 func main() {
-	var run = true
-
 	//region 初始化日志
 
 	Log.AllLog = make(map[string]Log.Log_)
@@ -98,17 +97,15 @@ func main() {
 
 	//region 入口
 
-	if run {
-		// 如果 "./dist" 不存在，则执行下载Dist函数
-		if _, err := os.Stat("./dist"); os.IsNotExist(err) {
-			downloadDist()
-		}
+	// 如果 "./dist" 不存在，则执行下载Dist函数
+	if _, err := os.Stat("./dist"); os.IsNotExist(err) {
+		downloadDist()
+	}
 
-		PanelLog.INFO("[入口] http://127.0.0.1:8080")
-		err := API.App.Run(":8080")
-		if err != nil {
-			return
-		}
+	PanelLog.INFO("[入口] http://127.0.0.1:8080")
+	err := API.App.Run(":8080")
+	if err != nil {
+		return
 	}
 
 	//endregion

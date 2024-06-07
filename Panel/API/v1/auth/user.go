@@ -224,13 +224,17 @@ func DeleteUser(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Query("id"))
 	if err != nil {
 		PanelLog.ERROR("[权限管理] ID错误", err)
-		ctx.JSON(400, gin.H{"msg": "ID错误"})
+		ctx.JSON(400, gin.H{"msg": "ID错误", "status": 1})
 		return
 	}
 	Database.DB.Model(&Database.User{}).Where("id = ?", id).First(&user)
+	if user.Name == "admin" {
+		ctx.JSON(401, gin.H{"msg": "无法删除内置用户", "status": 1})
+		return
+	}
 	Database.DB.Delete(&user)
 	PanelLog.INFO("[权限管理] 删除用户: ", user.Name)
-	ctx.JSON(200, gin.H{"msg": "删除成功"})
+	ctx.JSON(200, gin.H{"msg": "删除成功", "status": 0})
 }
 
 type role struct {
@@ -284,11 +288,20 @@ func CreateRole(ctx *gin.Context) {
 // DeleteRole 删除角色
 func DeleteRole(ctx *gin.Context) {
 	RoleName := ctx.Query("name")
+	if RoleName == "admin" || RoleName == "user" {
+		ctx.JSON(401, gin.H{
+			"msg":    "无法删除内置角色",
+			"status": 1,
+		})
+		return
+	}
+
 	ok, err := Auth.Authenticator.DeleteRole(RoleName)
 	if err != nil {
 		PanelLog.ERROR("[权限管理] 删除角色失败", err)
 		return
 	}
+
 	PanelLog.INFO("[权限管理] 删除角色: ", RoleName)
 	if ok {
 		ctx.JSON(200, gin.H{
