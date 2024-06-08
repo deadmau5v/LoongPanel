@@ -68,7 +68,9 @@ func GetPanelLog() *Log.Log_ {
 			if err != nil {
 				continue
 			}
-			res = append(res, *entry)
+			if entry != nil {
+				res = append(res, *entry)
+			}
 		}
 
 		return res
@@ -116,6 +118,14 @@ func GetPanelLog() *Log.Log_ {
 // ParsePanelLog 解析面板日志
 func parsePanelLog(logLine string) (*LogEntry, error) {
 	pattern := `^\[(.*?)\] (.*?) - (.*?) \[(.*?)\] (.*)$`
+
+	checkLogLine := strings.Replace(logLine, " ", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\t", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\n", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\r", "", -1)
+	if strings.Trim(checkLogLine, " ") == "" {
+		return nil, errors.New("空行")
+	}
 	re := regexp.MustCompile(pattern)
 
 	matches := re.FindStringSubmatch(logLine)
