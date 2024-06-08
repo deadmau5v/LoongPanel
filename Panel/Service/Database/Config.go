@@ -50,16 +50,16 @@ func init() {
 
 	if err != nil {
 		if strings.Contains(err.Error(), "Unknown database") {
-			PanelLog.ERROR("[数据库模块] 数据库不存在")
+			PanelLog.ERROR("[数据库] 数据库不存在")
 		} else if strings.Contains(err.Error(), "Access denied") {
-			PanelLog.ERROR("[数据库模块] 用户名或密码错误")
+			PanelLog.ERROR("[数据库] 用户名或密码错误")
 		} else {
-			PanelLog.ERROR("[数据库模块] 连接数据库失败")
+			PanelLog.ERROR("[数据库] 连接数据库失败")
 		}
 		panic(err.Error())
 		// Todo 自动下载TIDB运行环境
 	} else {
-		PanelLog.INFO("[数据库模块] 连接成功")
+		PanelLog.INFO("[数据库] 连接成功")
 	}
 
 	// 创建 LoongPanel使用的数据库

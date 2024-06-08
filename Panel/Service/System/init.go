@@ -16,7 +16,7 @@ func init() {
 	Data, err = GetOSData()
 	temp, err := getPublicIP()
 	if err != nil {
-		PanelLog.ERROR("GetPublicIP() Error: ", err.Error())
+		PanelLog.ERROR("[系统管理] GetPublicIP() Error: ", err.Error())
 	}
 	PublicIP = temp
 	WORKDIR, err = os.Getwd()

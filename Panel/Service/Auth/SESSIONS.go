@@ -25,7 +25,7 @@ func NewSESSION(user Database.User) string {
 	}
 	err := Database.DB.Create(&session).Error
 	if err != nil {
-		PanelLog.ERROR(err)
+		PanelLog.ERROR("[权限管理]", err)
 		return ""
 	}
 	return uuid_
@@ -66,6 +66,7 @@ func UserAuth() gin.HandlerFunc {
 			"/auth/global",
 			"/auth/role",
 			"/auth/user",
+			"/log",
 		}
 		for _, path := range staticPaths {
 			if c.Request.URL.Path == path {
@@ -120,7 +121,7 @@ func UserAuth() gin.HandlerFunc {
 			PanelLog.DEBUG("[权限管理] 未授权 code: 2")
 
 			if err != nil {
-				PanelLog.ERROR(err)
+				PanelLog.ERROR("[权限管理]", err.Error())
 			}
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
@@ -157,7 +158,7 @@ func GetSessionByKey(key string) (*SESSION, error) {
 func init() {
 	err := Database.DB.AutoMigrate(&SESSION{})
 	if err != nil {
-		PanelLog.DEBUG("[数据库模块] SESSIONS表创建失败")
+		PanelLog.DEBUG("[数据库] SESSIONS表创建失败")
 		return
 	}
 }

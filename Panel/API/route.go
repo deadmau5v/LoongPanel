@@ -27,7 +27,7 @@ func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gi
 			_, err = Auth.Authenticator.AddPolicy("user", group.BasePath()+Path, Method)
 		}
 		if err != nil {
-			PanelLog.ERROR("添加权限策略失败", err)
+			PanelLog.ERROR("[权限管理]", "添加权限策略失败", err)
 			panic(err)
 			return
 		}
@@ -36,7 +36,7 @@ func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gi
 		_, err := Auth.Authenticator.AddPolicy("admin", Path, Method)
 		_, err = Auth.Authenticator.AddPolicy("user", Path, Method)
 		if err != nil {
-			PanelLog.ERROR("添加权限策略失败", err)
+			PanelLog.ERROR("[权限管理]", "添加权限策略失败", err)
 			panic(err)
 			return
 		}

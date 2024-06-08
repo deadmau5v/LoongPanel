@@ -27,46 +27,46 @@ import (
 
 // downloadDist 下载前端文件
 func downloadDist() {
-	PanelLog.INFO("开始下载前端文件")
+	PanelLog.INFO("[LoonPanel]", "开始下载前端文件")
 	const DistURL = "https://cdn1.d5v.cc/CDN/Project/LoongPanel/bin/dist.zip"
 	const DistPath = "./dist.zip"
 	const DistDir = "./dist"
 
 	resp, err := http.Get(DistURL)
 	if err != nil {
-		PanelLog.ERROR(err.Error())
+		PanelLog.ERROR("[LoongPanel]", err.Error())
 		return
 	}
 
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			PanelLog.ERROR(err.Error())
+			PanelLog.ERROR("[LoongPanel]", err.Error())
 		}
 	}(resp.Body)
 	//创建文件
 	distFile, err := os.Create(DistPath)
 	if err != nil {
-		PanelLog.ERROR(err.Error())
+		PanelLog.ERROR("[LoongPanel]", err.Error())
 		return
 	}
 
 	defer func(File *os.File) {
 		err := File.Close()
 		if err != nil {
-			PanelLog.ERROR(err.Error())
+			PanelLog.ERROR("[LoongPanel]", err.Error())
 		}
 	}(distFile)
 	//写入文件
 	_, err = io.Copy(distFile, resp.Body)
 	if err != nil {
-		PanelLog.ERROR(err.Error())
+		PanelLog.ERROR("[LoongPanel]", err.Error())
 		return
 	}
 	//解压文件
 	err = exec.Command("unzip", DistPath, "-d", DistDir).Run()
 	if err != nil {
-		PanelLog.ERROR(err.Error())
+		PanelLog.ERROR("[LoongPanel]", err.Error())
 		return
 	}
 }

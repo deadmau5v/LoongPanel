@@ -9,7 +9,6 @@ package terminal
 import (
 	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/Terminal"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -24,50 +23,44 @@ var upgrade = websocket.Upgrader{
 }
 
 func ScreenWs(c *gin.Context) {
-	PanelLog.INFO("ScreenWs WebSocket 连接")
+	PanelLog.INFO("[网页终端]", "ScreenWs WebSocket 连接")
 	w := c.Writer
 	r := c.Request
-	PanelLog.DEBUG("升级为websocket连接")
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
-		PanelLog.ERROR("无法打开websocket连接")
+		PanelLog.ERROR("[网页终端] 无法打开websocket连接")
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 		return
 	}
 	defer func(conn *websocket.Conn) {
-		PanelLog.DEBUG("websocket 连接关闭")
+		PanelLog.DEBUG("[网页终端]", "websocket 连接关闭")
 		err := conn.Close()
 		if err != nil {
-			PanelLog.ERROR("Ws链接异常关闭")
+			PanelLog.ERROR("[网页终端]", "Ws链接异常关闭")
 		}
 	}(conn)
 
 	id := getIntQuery(c, "id")
-	PanelLog.DEBUG("获取到id为", id)
 	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
-	PanelLog.DEBUG(fmt.Sprintf("获取到的screen为%v", screen))
 	if screen.WS != nil {
 		err := screen.WS.Close()
 		if err != nil {
-			PanelLog.DEBUG("关闭原有连接失败")
+			PanelLog.DEBUG("[网页终端] 关闭原有连接失败")
 			return
 		}
 		screen.WS = conn
 	}
-	PanelLog.DEBUG("创建输入管道...")
 	input := make(chan []byte, 1024)
-	PanelLog.DEBUG("创建输出管道...")
 	output := screen.Subscribe()
 	defer close(input)
 
 	close_ := func() {
-		PanelLog.DEBUG("close_() websocket 关闭中...")
+		PanelLog.DEBUG("[网页终端] websocket 关闭中...")
 		id_, name_ := screen.Id, screen.Name
-		PanelLog.DEBUG(id_, name_)
 		if screen.WS != nil && screen.WS == conn {
 			err := conn.Close()
 			if err != nil {
-				PanelLog.DEBUG("关闭连接失败")
+				PanelLog.DEBUG("[网页终端] 关闭连接失败")
 				return
 			}
 			screen.Close()

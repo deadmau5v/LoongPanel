@@ -20,8 +20,6 @@ import (
 // GetUsers 获取用户列表
 func GetUsers(ctx *gin.Context) {
 	var Users []Database.User
-
-	PanelLog.DEBUG("查询所有用户")
 	Database.DB.Find(&Users)
 
 	PanelLog.INFO("[权限管理] 获取用户列表")
@@ -75,12 +73,10 @@ func CheckUserExist(user Database.User) gin.H {
 		return gin.H{"msg": err.Error(), "status": 1}
 	}
 	Database.DB.Model(&Database.User{}).Where("name = ?", user.Name).Count(&count)
-	PanelLog.DEBUG("用户名重复数量: ", count)
 	if count > 0 {
 		return gin.H{"msg": "用户名已存在", "status": 1}
 	}
 	Database.DB.Model(&Database.User{}).Where("mail = ?", user.Mail).Count(&count)
-	PanelLog.DEBUG("邮箱重复数量: ", count)
 	if count > 0 {
 		return gin.H{"msg": "邮箱已存在", "status": 1}
 	}
@@ -100,12 +96,10 @@ func CheckUserUpdate(user Database.User) gin.H {
 		return gin.H{"msg": err.Error(), "status": 1}
 	}
 	Database.DB.Model(&Database.User{}).Where("name = ? AND id != ?", user.Name, user.ID).Count(&count)
-	PanelLog.DEBUG("用户名重复数量: ", count)
 	if count > 1 {
 		return gin.H{"msg": "用户名已存在", "status": 1}
 	}
 	Database.DB.Model(&Database.User{}).Where("mail = ? AND id != ?", user.Mail, user.ID).Count(&count)
-	PanelLog.DEBUG("邮箱重复数量: ", count)
 	if count > 1 {
 		return gin.H{"msg": "邮箱已存在", "status": 1}
 	}

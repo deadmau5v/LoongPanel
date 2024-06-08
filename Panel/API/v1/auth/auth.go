@@ -43,7 +43,7 @@ func Login(c *gin.Context) {
 		if req.Email != "" {
 			if user.Mail == req.Email && user.Password == req.Password {
 				// 登录成功
-				PanelLog.DEBUG(req.Email + ": 登录成功")
+				PanelLog.DEBUG("[权限管理]", req.Email+": 登录成功")
 				c.JSON(200, gin.H{
 					"code":    200,
 					"msg":     "登录成功",
@@ -51,7 +51,7 @@ func Login(c *gin.Context) {
 				})
 				return
 			} else {
-				PanelLog.DEBUG(req.Email+": 登录失败", req.Password, req.Email, " != ", user.Password, user.Mail)
+				PanelLog.DEBUG("[权限管理]", "尝试登录"+user.Name+"失败")
 				continue
 			}
 		}
@@ -59,7 +59,7 @@ func Login(c *gin.Context) {
 		if req.Username != "" {
 			if user.Name == req.Username && user.Password == req.Password {
 				// 登录成功
-				PanelLog.DEBUG(req.Username + ": 登录成功")
+				PanelLog.DEBUG("[权限管理]", req.Username+": 登录成功")
 				c.JSON(200, gin.H{
 					"code":    200,
 					"msg":     "登录成功",
@@ -67,14 +67,13 @@ func Login(c *gin.Context) {
 				})
 				return
 			} else {
-				PanelLog.DEBUG(req.Username+": 登录失败", req.Password, req.Username, " != ", user.Password, user.Name)
 				continue
 			}
 		}
 	}
 
 	// 登录失败
-	PanelLog.DEBUG(req.Username + ": 登录失败")
+	PanelLog.DEBUG("[权限管理]", req.Username+": 登录失败")
 	c.JSON(401, filed)
 	return
 

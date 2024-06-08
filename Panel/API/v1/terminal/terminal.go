@@ -70,7 +70,7 @@ func ScreenCreate(ctx *gin.Context) {
 			"status": -1,
 			"msg":    err.Error(),
 		})
-		PanelLog.ERROR("创建Screen错误")
+		PanelLog.ERROR("[网页终端]", "创建Screen错误")
 		return
 	}
 

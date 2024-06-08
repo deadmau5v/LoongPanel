@@ -17,7 +17,7 @@ func Dir(path string) ([]File, error) {
 	path, err := filepath.Abs(path)
 	path = filepath.Clean(path)
 	if err != nil {
-		PanelLog.ERROR(err.Error())
+		PanelLog.ERROR("[文件管理]", err.Error())
 		return nil, err
 	}
 

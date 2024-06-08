@@ -28,13 +28,13 @@ func UserFind() []User {
 func init() {
 	err := DB.AutoMigrate(&User{})
 	if err != nil {
-		PanelLog.ERROR("初始化数据库失败")
+		PanelLog.ERROR("[数据库] 初始化数据库失败")
 		return
 	}
 
 	// 初始化管理员
 	if len(UserFind()) == 0 {
-		PanelLog.INFO("[数据库模块]初始化管理员")
+		PanelLog.INFO("[数据库]初始化管理员")
 		admin := User{
 			Name:     "admin",
 			Password: "123456",
@@ -44,7 +44,7 @@ func init() {
 	}
 	// 初始化用户
 	if len(UserFind()) == 1 {
-		PanelLog.INFO("[数据库模块]初始化用户")
+		PanelLog.INFO("[数据库]初始化用户")
 		user := User{
 			Name:     "user",
 			Password: "123456",

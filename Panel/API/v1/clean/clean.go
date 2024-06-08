@@ -16,7 +16,7 @@ import (
 
 func PkgAutoClean(ctx *gin.Context) {
 	if System.Data.OSName == "windows" {
-		PanelLog.INFO("Windows OS 无法使用 PkgAutoClean 函数，跳过")
+		PanelLog.INFO("[垃圾清理] Windows OS 无法使用 PkgAutoClean 函数，跳过")
 		ctx.JSON(200, gin.H{
 			"msg":    "Windows OS does not support this function, pass",
 			"status": 0,
@@ -28,7 +28,7 @@ func PkgAutoClean(ctx *gin.Context) {
 	case "apt":
 		msg, err := Clean.AptAutoClean()
 		if err != nil {
-			PanelLog.ERROR("AptAutoClean() Error: ", err.Error())
+			PanelLog.ERROR("[垃圾清理] AptAutoClean() Error: ", err.Error())
 			ctx.JSON(200, gin.H{
 				"msg":    "AptAutoClean() Error: " + err.Error(),
 				"status": 1,
@@ -37,7 +37,7 @@ func PkgAutoClean(ctx *gin.Context) {
 		}
 		msg2, err := Clean.AptAutoRemove()
 		if err != nil {
-			PanelLog.ERROR("AptAutoRemove() Error: ", err.Error())
+			PanelLog.ERROR("[垃圾清理]", "AptAutoRemove() Error: ", err.Error())
 			ctx.JSON(200, gin.H{
 				"msg":    "AptAutoRemove() Error: " + err.Error(),
 				"status": 1,
@@ -52,7 +52,7 @@ func PkgAutoClean(ctx *gin.Context) {
 	case "yum":
 		msg, err := Clean.YumAutoClean()
 		if err != nil {
-			PanelLog.ERROR("YumAutoClean() Error: ", err.Error())
+			PanelLog.ERROR("[垃圾清理]", "YumAutoClean() Error: ", err.Error())
 			ctx.JSON(200, gin.H{
 				"msg":    "YumAutoClean() Error: " + err.Error(),
 				"status": 1,
@@ -61,7 +61,7 @@ func PkgAutoClean(ctx *gin.Context) {
 		}
 		msg2, err := Clean.YumAutoRemove()
 		if err != nil {
-			PanelLog.ERROR("YumAutoRemove() Error: ", err.Error())
+			PanelLog.ERROR("[垃圾清理]", "YumAutoRemove() Error: ", err.Error())
 			ctx.JSON(200, gin.H{
 				"msg":    "YumAutoRemove() Error: " + err.Error(),
 				"status": 1,

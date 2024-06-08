@@ -70,7 +70,7 @@ func RemoveTmpDir() {
 	for _, dir := range TmpDirs {
 		_, err := exec.Command("rm", "-rf", dir).Output()
 		if err != nil {
-			PanelLog.ERROR("RemoveTmpDir() Error: ", err.Error())
+			PanelLog.ERROR("[垃圾清理]", "RemoveTmpDir() Error: ", err.Error())
 		}
 	}
 }
