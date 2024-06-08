@@ -18,7 +18,8 @@ func GetNetWorkLog() *Log.Log_ {
 		Ok:   true,
 		Name: "网络日志",
 	}
-	log.GetLog = func(line int) []byte {
+
+	log.GetLog = func(line int) interface{} {
 		output, err := exec.Command("journalctl", "-u", "NetworkManager", "-n", strconv.Itoa(line)).Output()
 		if err != nil {
 			log.Ok = false
@@ -38,6 +39,9 @@ func GetNetWorkLog() *Log.Log_ {
 		}
 		return
 	}
+
+	// 测试是否可用
+	log.GetLog(1)
 
 	if !log.Ok {
 		return nil

@@ -15,6 +15,8 @@ import (
 	"LoongPanel/Panel/Service/Log/PkgLog"
 	"LoongPanel/Panel/Service/Log/SystemLog"
 	"LoongPanel/Panel/Service/PanelLog"
+	"flag"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -90,7 +92,11 @@ func main() {
 	Log.Add("网络日志", NetWorkLog.GetNetWorkLog)
 	Log.Add("数据库日志", DataBaseLog.GetDataBaseLog)
 	for _, log := range Log.AllLog {
-		PanelLog.DEBUG(log.Name, log.Ok)
+		status := "初始化失败"
+		if log.Ok {
+			status = "初始化成功"
+		}
+		PanelLog.DEBUG("[日志管理]", log.Name, status)
 	}
 
 	//endregion
@@ -102,11 +108,18 @@ func main() {
 		downloadDist()
 	}
 
-	PanelLog.INFO("[入口] http://127.0.0.1:8080")
-	err := API.App.Run(":8080")
+	port := flag.String("port", "8080", "端口")
+	host := flag.String("host", "0.0.0.0", "监控主机地址, 0.0.0.0监控全部访问 127.0.0.1 监控本机访问")
+	flag.Parse()
+	PanelLog.INFO(fmt.Sprintf("[LoongPanel] http://%s:%s", *host, *port))
+	err := API.App.Run(*host + ":" + *port)
 	if err != nil {
 		return
 	}
 
 	//endregion
+
+	defer func() {
+		PanelLog.INFO("[LoongPanel] 程序退出")
+	}()
 }

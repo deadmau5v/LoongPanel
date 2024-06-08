@@ -25,7 +25,7 @@ func createLog(path, name string) *Log.Log_ {
 		return nil
 	}
 
-	log.GetLog = func(line int) []byte {
+	log.GetLog = func(line int) interface{} {
 		if !log.Ok {
 			Log2.DEBUG("[包管理日志] 错误跳过读取")
 			return nil

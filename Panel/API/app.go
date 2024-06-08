@@ -10,7 +10,6 @@ import (
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 var App *gin.Engine
@@ -27,7 +26,7 @@ func Cors() gin.HandlerFunc {
 			c.Header("Access-Control-Allow-Credentials", "true")
 		}
 		if method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
+			c.JSON(200, "Options Request!")
 		}
 		c.Next()
 	}

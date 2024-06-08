@@ -75,7 +75,15 @@ func UserAuth() gin.HandlerFunc {
 		}
 
 		Authorization := c.GetHeader("Authorization")
-		PanelLog.DEBUG("Authorization", Authorization)
+		if Authorization != "" {
+			PanelLog.DEBUG("[权限管理] Authorization", Authorization)
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "未授权",
+			})
+			return
+		}
 		var SESSIONS []SESSION
 		Database.DB.Find(&SESSIONS)
 		var userSession SESSION
@@ -90,7 +98,7 @@ func UserAuth() gin.HandlerFunc {
 			}
 		}
 		if !flag {
-			PanelLog.DEBUG("未授权1")
+			PanelLog.DEBUG("[权限管理] 未授权 code: 1")
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
 				"msg":  "未授权",
@@ -100,12 +108,16 @@ func UserAuth() gin.HandlerFunc {
 		}
 		path := PathParse(c.Request.URL.Path)
 		ok, err := Authenticator.Enforce(userSession.User.Role, path, c.Request.Method)
-		PanelLog.DEBUG("权限验证", userSession.User, c.Request.URL.Path, c.Request.Method, ok, err)
+		status := "未通过"
+		if ok {
+			status = "通过"
+		}
+		PanelLog.DEBUG("[权限管理] 权限验证", userSession.User.Name, c.Request.URL.Path, c.Request.Method, status)
 		if ok && err == nil {
 			c.Next()
 			return
 		} else if err != nil || !ok {
-			PanelLog.DEBUG("未授权2")
+			PanelLog.DEBUG("[权限管理] 未授权 code: 2")
 
 			if err != nil {
 				PanelLog.ERROR(err)

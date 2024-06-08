@@ -22,7 +22,10 @@ func GetLogs(c *gin.Context) {
 			allOkLog = append(allOkLog, log.Name)
 		}
 	}
-	c.JSON(200, allOkLog)
+	c.JSON(200, gin.H{
+		"status": 0,
+		"data":   allOkLog,
+	})
 }
 
 // GetLog 获取日志
@@ -43,12 +46,30 @@ func GetLog(c *gin.Context) {
 		if log.Name == name {
 			output := log.GetLog(lineInt)
 			if output != nil && log.Ok {
-				c.JSON(200, gin.H{"msg": string(output), "status": 0})
+				c.JSON(200, gin.H{"data": output, "status": 0})
 				return
 			} else {
 				c.JSON(400, gin.H{"msg": "日志获取错误", "status": 1})
 				return
 			}
+		}
+	}
+
+	c.JSON(400, gin.H{"msg": "未找到日志", "status": 1})
+}
+
+// GetLogStruct 获取日志结构
+func GetLogStruct(c *gin.Context) {
+	name := c.Query("name")
+	if name == "" {
+		c.JSON(400, gin.H{"msg": "缺少参数"})
+		return
+	}
+
+	for _, log := range Log.AllLog {
+		if log.Name == name {
+			c.JSON(200, gin.H{"data": log.Struct, "status": 0})
+			return
 		}
 	}
 

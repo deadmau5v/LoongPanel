@@ -86,19 +86,19 @@ func initRoute(app *gin.Engine) {
 	SetRoute("DELETE", "/role", AuthAPI.DeleteRole, GroupAuth, "删除角色", false)
 	SetRoute("GET", "/logs", log.GetLogs, GroupLog, "获取可用日志", false)
 	SetRoute("GET", "/log", log.GetLog, GroupLog, "获取日志", false)
+	SetRoute("GET", "/options", log.GetLogStruct, GroupLog, "获取日志结构", false)
 	SetRoute("DELETE", "/log", log.ClearLog, GroupLog, "清理日志", false)
 
 	// 增加参数记得检查Auth匹配 Service.Auth.SESSIONS.PathParse
 
 	app.NoRoute(func(c *gin.Context) {
-		PanelLog.DEBUG("无路由访问...")
 		c.File(System.WORKDIR + "/dist/index.html")
 	})
 
 	// 信任代理
 	err := app.SetTrustedProxies([]string{"127.0.0.1"})
 	if err != nil {
-		PanelLog.DEBUG("设置信任代理失败", err)
+		PanelLog.DEBUG("[权限管理] 设置信任代理失败", err)
 		return
 	}
 

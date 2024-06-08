@@ -95,7 +95,7 @@ func createLog(path, name string, customGetLog func(log *Log.Log_, line int) []b
 		return nil
 	}
 
-	log.GetLog = func(line int) []byte {
+	log.GetLog = func(line int) interface{} {
 		if customGetLog != nil {
 			return customGetLog(log, line)
 		}

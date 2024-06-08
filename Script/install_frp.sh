@@ -12,7 +12,6 @@ fi
 
 # 检查包管理器
 if [ -x "$(command -v apt)" ]; then
-    apt update
     apt install wget -y
 elif [ -x "$(command -v yum)" ]; then
     yum install wget -y

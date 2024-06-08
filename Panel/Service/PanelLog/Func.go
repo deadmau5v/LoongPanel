@@ -36,7 +36,7 @@ func logWithColor(level string, args ...interface{}) {
 	fmt.Println(fmt.Sprintf(color, outputStr))
 }
 
-func logToFile(args ...interface{}) {
+func logToFile(level string, args ...interface{}) {
 	if !IsSaveToFile {
 		return
 	}
@@ -56,7 +56,7 @@ func logToFile(args ...interface{}) {
 		}
 	}(f)
 	args = append([]interface{}{time.Now().Format("2006-01-02 - 15:04:05")}, args...)
-	_, err = f.WriteString(fmt.Sprintln(args...))
+	_, err = f.WriteString(fmt.Sprintf("[%s] ", level) + fmt.Sprintln(args...))
 	if err != nil {
 		ERROR("[日志模块]写入日志文件失败")
 		return
@@ -65,29 +65,31 @@ func logToFile(args ...interface{}) {
 
 func INFO(args ...interface{}) {
 	logWithColor("INFO", args...)
-	logToFile(args...)
+	logToFile("INFO", args...)
 }
 
 func WARN(args ...interface{}) {
 	logWithColor("WARN", args...)
-	logToFile(args...)
+	logToFile("WARN", args...)
 }
 
 func ERROR(args ...interface{}) {
 	logWithColor("ERROR", args...)
-	logToFile(args...)
+	logToFile("ERROR", args...)
 }
 
 func DEBUG(args ...interface{}) {
 	if IsDebug {
 		logWithColor("DEBUG", args...)
-		logToFile(args...)
+		logToFile("DEBUG", args...)
 	}
 }
 
 func GinLogToFile() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		logToFile(fmt.Sprintf("%s %s %s", c.ClientIP(), c.Request.Method, c.Request.URL.Path))
-		c.Next()
+		if c.Request.Method != "OPTIONS" {
+			logToFile("INFO", fmt.Sprintf("[用户访问] %s %s %s", c.ClientIP(), c.Request.Method, c.Request.URL.Path))
+			c.Next()
+		}
 	}
 }

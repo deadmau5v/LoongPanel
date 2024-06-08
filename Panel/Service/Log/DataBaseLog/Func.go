@@ -27,7 +27,7 @@ func GetDataBaseLog() *Log.Log_ {
 		return nil
 	}
 
-	log.GetLog = func(line int) []byte {
+	log.GetLog = func(line int) interface{} {
 		file, err := os.Open(log.Path)
 		if err != nil {
 			Log2.ERROR("[面板日志] 打开日志文件失败: ", err.Error())
