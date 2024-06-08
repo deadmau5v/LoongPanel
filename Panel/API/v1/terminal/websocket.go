@@ -26,6 +26,7 @@ func ScreenWs(c *gin.Context) {
 	PanelLog.INFO("[网页终端]", "ScreenWs WebSocket 连接")
 	w := c.Writer
 	r := c.Request
+	PanelLog.DEBUG("[网页终端]", "升级连接")
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		PanelLog.ERROR("[网页终端] 无法打开websocket连接")
@@ -40,6 +41,7 @@ func ScreenWs(c *gin.Context) {
 		}
 	}(conn)
 
+	PanelLog.DEBUG("[网页终端]", "获取参数")
 	id := getIntQuery(c, "id")
 	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
 	if screen.WS != nil {
@@ -50,33 +52,13 @@ func ScreenWs(c *gin.Context) {
 		}
 		screen.WS = conn
 	}
+	PanelLog.DEBUG("[网页终端]", "创建新连接")
 	input := make(chan []byte, 1024)
 	output := screen.Subscribe()
 	defer close(input)
 
-	close_ := func() {
-		PanelLog.DEBUG("[网页终端] websocket 关闭中...")
-		id_, name_ := screen.Id, screen.Name
-		if screen.WS != nil && screen.WS == conn {
-			err := conn.Close()
-			if err != nil {
-				PanelLog.DEBUG("[网页终端] 关闭连接失败")
-				return
-			}
-			screen.Close()
-			conn = nil
-			screen.WS = nil
-		}
-
-		Terminal.MainScreenManager.Close(id)
-		// 重建screen
-
-		_ = Terminal.MainScreenManager.Create(name_, id_)
-
-		c.Abort()
-	}
-
 	go func() {
+		PanelLog.DEBUG("[网页终端]", "开始发送数据")
 		for {
 			screen.Publish()
 			time.Sleep(100)
@@ -84,24 +66,24 @@ func ScreenWs(c *gin.Context) {
 	}()
 
 	go func() {
+		PanelLog.DEBUG("[网页终端]", "开始读取数据")
 		for {
 			if conn != nil {
 				_, message, err := conn.ReadMessage()
 				if err != nil {
-					close_()
 					return
 				}
 				input <- message
 			}
 		}
 	}()
+
 	for {
 		if conn != nil {
 			select {
 			case o := <-output:
 				err := conn.WriteMessage(1, o)
 				if err != nil {
-					close_()
 					return
 				}
 			case i := <-input:
