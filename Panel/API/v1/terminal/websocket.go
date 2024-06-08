@@ -1,9 +1,3 @@
-/*
- * 创建人： deadmau5v
- * 创建时间： 2024-5-7
- * 文件作用：提供 terminal 的流式传输
- */
-
 package terminal
 
 import (
@@ -29,15 +23,15 @@ func ScreenWs(c *gin.Context) {
 	PanelLog.DEBUG("[网页终端]", "升级连接")
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
-		PanelLog.ERROR("[网页终端] 无法打开websocket连接")
+		PanelLog.ERROR("[网页终端] 无法打开 WebSocket 连接: ", err)
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 		return
 	}
 	defer func(conn *websocket.Conn) {
-		PanelLog.DEBUG("[网页终端]", "websocket 连接关闭")
+		PanelLog.DEBUG("[网页终端]", "WebSocket 连接关闭")
 		err := conn.Close()
 		if err != nil {
-			PanelLog.ERROR("[网页终端]", "Ws链接异常关闭")
+			PanelLog.ERROR("[网页终端]", "Ws 链接异常关闭: ", err)
 		}
 	}(conn)
 
@@ -47,11 +41,11 @@ func ScreenWs(c *gin.Context) {
 	if screen.WS != nil {
 		err := screen.WS.Close()
 		if err != nil {
-			PanelLog.DEBUG("[网页终端] 关闭原有连接失败")
+			PanelLog.ERROR("[网页终端] 关闭原有连接失败: ", err)
 			return
 		}
-		screen.WS = conn
 	}
+	screen.WS = conn
 	PanelLog.DEBUG("[网页终端]", "创建新连接")
 	input := make(chan []byte, 1024)
 	output := screen.Subscribe()
@@ -60,8 +54,10 @@ func ScreenWs(c *gin.Context) {
 	go func() {
 		PanelLog.DEBUG("[网页终端]", "开始发送数据")
 		for {
-			screen.Publish()
-			time.Sleep(100)
+			select {
+			case <-time.After(100 * time.Millisecond):
+				screen.Publish()
+			}
 		}
 	}()
 
@@ -71,6 +67,9 @@ func ScreenWs(c *gin.Context) {
 			if conn != nil {
 				_, message, err := conn.ReadMessage()
 				if err != nil {
+					PanelLog.ERROR("[网页终端] 读取消息失败: ", err)
+					// 关闭连接
+					conn.Close()
 					return
 				}
 				input <- message
@@ -82,8 +81,11 @@ func ScreenWs(c *gin.Context) {
 		if conn != nil {
 			select {
 			case o := <-output:
-				err := conn.WriteMessage(1, o)
+				err := conn.WriteMessage(websocket.TextMessage, o)
 				if err != nil {
+					PanelLog.ERROR("[网页终端] 发送数据失败: ", err)
+					// 关闭连接
+					conn.Close()
 					return
 				}
 			case i := <-input:

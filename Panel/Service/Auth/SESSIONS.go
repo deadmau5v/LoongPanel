@@ -39,15 +39,12 @@ type SESSION struct {
 }
 
 func UserAuth() gin.HandlerFunc {
-
 	return func(c *gin.Context) {
-
 		// 放行静态资源
 		skipPaths := []string{
 			"/assets/*",
 		}
 		for _, path := range skipPaths {
-			// 使用正则匹配
 			if match, _ := regexp.MatchString(path, c.Request.URL.Path); match {
 				c.Next()
 				return
@@ -76,29 +73,18 @@ func UserAuth() gin.HandlerFunc {
 		}
 
 		Authorization := c.GetHeader("Authorization")
-		if Authorization != "" {
-			PanelLog.DEBUG("[权限管理] Authorization", Authorization)
-		} else {
+		if Authorization == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
 				"msg":  "未授权",
 			})
 			return
 		}
-		var SESSIONS []SESSION
-		Database.DB.Find(&SESSIONS)
-		var userSession SESSION
-		var flag = false
-		for _, session := range SESSIONS {
-			if session.KEY == Authorization {
-				userSession = session
-				Database.DB.Preload("User").Find(&userSession)
+		PanelLog.DEBUG("[权限管理] Authorization", Authorization)
 
-				flag = true
-				break
-			}
-		}
-		if !flag {
+		// 使用数据库查询来查找会话
+		var userSession SESSION
+		if err := Database.DB.Where("key = ?", Authorization).Preload("User").First(&userSession).Error; err != nil {
 			PanelLog.DEBUG("[权限管理] 未授权 code: 1")
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,
@@ -107,6 +93,18 @@ func UserAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		// 检查会话是否过期
+		if time.Now().Unix()-userSession.TimeUnix > 86400 { // 假设会话有效期为24小时
+			PanelLog.DEBUG("[权限管理] 会话过期")
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "会话已过期",
+			})
+			c.Abort()
+			return
+		}
+
 		path := PathParse(c.Request.URL.Path)
 		ok, err := Authenticator.Enforce(userSession.User.Role, path, c.Request.Method)
 		status := "未通过"
@@ -117,21 +115,17 @@ func UserAuth() gin.HandlerFunc {
 		if ok && err == nil {
 			c.Next()
 			return
-		} else if err != nil || !ok {
-			PanelLog.DEBUG("[权限管理] 未授权 code: 2")
-
-			if err != nil {
-				PanelLog.ERROR("[权限管理]", err.Error())
-			}
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "未授权",
-			})
-			c.Abort()
-			return
-
 		}
 
+		PanelLog.DEBUG("[权限管理] 未授权 code: 2")
+		if err != nil {
+			PanelLog.ERROR("[权限管理]", err.Error())
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code": 401,
+			"msg":  "未授权",
+		})
+		c.Abort()
 	}
 }
 
