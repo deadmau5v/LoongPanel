@@ -123,7 +123,7 @@ func init() {
 
 // parseLog 解析日志
 func parseLog(logLine string) (*LogEntry, error) {
-	pattern := `^(\w{3}) (\d{1,2}) (\d{2}:\d{2}:\d{2}) (\S+) (\S+)\[(\d+)\]: <(\w+)> \[(\d+)\] (.*)$`
+	pattern := `(\w+ \d+) (\d{2}:\d{2}:\d{2}) (\w+) (\w+)\[(\d+)\]: <(\w+)> \[(\d+\.\d+)\] (.+)`
 	checkLogLine := strings.Replace(logLine, " ", "", -1)
 	checkLogLine = strings.Replace(checkLogLine, "\t", "", -1)
 	checkLogLine = strings.Replace(checkLogLine, "\n", "", -1)
@@ -138,19 +138,19 @@ func parseLog(logLine string) (*LogEntry, error) {
 		Log2.DEBUG("[日志管理] 无法解析日志行", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
-	pid, err := strconv.Atoi(matches[6])
+	pid, err := strconv.Atoi(matches[5])
 	if err != nil {
 		return nil, errors.New("无法解析PID")
 	}
 	entry := LogEntry{
-		Level:     matches[7],                    // <level>
-		Date:      matches[1] + " " + matches[2], // 月 日
-		Time:      matches[3],                    // HH:MM:SS
-		Hostname:  matches[4],                    // hostname
-		Process:   matches[5],                    // process name
+		Date:      matches[1],
+		Time:      matches[2],
+		Hostname:  matches[3],
+		Process:   matches[4],
 		PID:       pid,
-		Timestamp: matches[8], // timestamp
-		Message:   matches[9], // message
+		Level:     matches[6],
+		Timestamp: matches[7],
+		Message:   matches[8],
 	}
 	return &entry, nil
 }
