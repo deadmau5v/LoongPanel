@@ -90,21 +90,17 @@ func createLog(path, name string) *Log.Log_ {
 	return &log
 }
 
-// GetYumLog 获取yum日志
-func GetYumLog() *Log.Log_ {
-	return createLog("/var/log/yum.log", "yum")
-}
+//// GetYumLog 获取yum日志
+//func GetYumLog() *Log.Log_ {
+//	return createLog("/var/log/yum.log", "yum")
+//}
 
 // GetDnfLog 获取dnf日志
 func GetDnfLog() *Log.Log_ {
 	return createLog("/var/log/dnf.log", "dnf")
 }
 
-// GetAptLog 获取apt日志
-func GetAptLog() *Log.Log_ {
-	return createLog("/var/log/apt/history.log", "apt")
-}
-
-func init() {
-
-}
+//// GetAptLog 获取apt日志
+//func GetAptLog() *Log.Log_ {
+//	return createLog("/var/log/apt/history.log", "apt")
+//}

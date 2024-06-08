@@ -113,11 +113,6 @@ func GetBootLog() *Log.Log_ {
 	return createLog("/var/log/boot.log", "系统启动日志", nil)
 }
 
-// GetKDumpLog 获取KDump日志
-func GetKDumpLog() *Log.Log_ {
-	return createLog("/var/log/kdump.log", "内核崩溃日志", nil)
-}
-
 // GetCronLog 获取定时任务日志
 func GetCronLog() *Log.Log_ {
 	return createLog("/var/log/cron", "定时任务日志", nil)
@@ -161,7 +156,11 @@ func GetWtmpLog() *Log.Log_ {
 
 // GetKernelLog 获取内核日志
 func GetKernelLog() *Log.Log_ {
-	log := createLog("", "内核日志", func(log *Log.Log_, line int) []byte {
+	log := Log.Log_{
+		Name: "系统日志",
+		Ok:   true,
+	}
+	log.GetLog = func(line int) interface{} {
 		output, err := exec.Command("journalctl", "-k").Output()
 		if err != nil {
 			log.Ok = false
@@ -177,11 +176,8 @@ func GetKernelLog() *Log.Log_ {
 			outputStrSplit = outputStrSplit[len(outputStrSplit)-line:]
 		}
 		return []byte(strings.Join(outputStrSplit, "\n"))
-	})
-
-	if log == nil {
-		return nil
 	}
+
 	log.ClearLog = func() {
 		err := exec.Command("journalctl", "--rotate").Run()
 		if err != nil {
@@ -190,7 +186,7 @@ func GetKernelLog() *Log.Log_ {
 		}
 		return
 	}
-	return log
+	return &log
 }
 
 func init() {
