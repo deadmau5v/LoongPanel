@@ -342,7 +342,7 @@ type MessagesLog struct {
 }
 
 func (c MessagesLog) ProcessLogLine(logLine string) (any, error) {
-	pattern := `^(\w+\s+\d+)\s+(\d{2}:\d{2}:\d{2})\s+(\S+)\s+(\S+)\[(\d+)\]:\s+(.*)$`
+	pattern := `(\w+ \d+ \d{2}:\d{2}:\d{2}) (\w+) (\w+)\[(\d+)\]: (.+)`
 	checkLogLine := strings.ReplaceAll(logLine, " ", "")
 	checkLogLine = strings.ReplaceAll(checkLogLine, "\t", "")
 	checkLogLine = strings.ReplaceAll(checkLogLine, "\n", "")
@@ -358,12 +358,19 @@ func (c MessagesLog) ProcessLogLine(logLine string) (any, error) {
 		return nil, errors.New("无法解析日志行")
 	}
 
-	entry := &MessagesLog{
-		Date:    matches[1],
-		Time:    matches[2],
-		Host:    matches[3],
-		Module:  matches[4],
-		Content: matches[5],
+	// 提取日期和时间部分
+	dateTime := matches[1]
+	// 日期和时间分开
+	date := dateTime[:6]
+	time := dateTime[7:]
+
+	// 创建MessagesLog实例
+	entry := MessagesLog{
+		Date:    date,
+		Time:    time,
+		Host:    matches[2],
+		Module:  matches[3],
+		Content: matches[4],
 	}
 
 	return entry, nil
