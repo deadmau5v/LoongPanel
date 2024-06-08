@@ -34,7 +34,7 @@ func GetNetWorkLog() *Log.Log_ {
 	}
 
 	log.GetLog = func(line int) interface{} {
-		output, err := exec.Command("journalctl", "-u", "NetworkManager", "-n", strconv.Itoa(line)).Output()
+		output, err := exec.Command("journalctl", "-u", "NetworkManager", "-n", strconv.Itoa(line), "--no-pager").Output()
 		if err != nil {
 			log.Ok = false
 			Log2.ERROR("[日志管理] 获取网络日志失败：" + err.Error())

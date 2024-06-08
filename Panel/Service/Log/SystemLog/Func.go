@@ -294,7 +294,7 @@ func (c FirewalldLog) ProcessLogLine(logLine string) (any, error) {
 		Time:    matches[2],
 		Level:   matches[3],
 		Module:  "systemd",
-		Content: matches[5],
+		Content: matches[4],
 	}
 
 	return entry, nil
@@ -658,7 +658,7 @@ func GetKernelLog() *Log.Log_ {
 		},
 	})
 	log.GetLog = func(line int) interface{} {
-		output, err := exec.Command("journalctl", "-k").Output()
+		output, err := exec.Command("journalctl", "-k", "--no-pager").Output()
 		if err != nil {
 			log.Ok = false
 			Log2.ERROR("执行 journalctl 命令失败", log.Name)
