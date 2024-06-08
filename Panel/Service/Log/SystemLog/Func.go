@@ -512,7 +512,7 @@ func (c WtmpLog) ProcessLogLine(logLine string) (any, error) {
 
 // GetWtmpLog 获取登录日志
 func GetWtmpLog() *Log.Log_ {
-	return createLog("/var/log/wtmp", "登录日志", func(log *Log.Log_, line int) interface{} {
+	log := createLog("/var/log/wtmp", "登录日志", func(log *Log.Log_, line int) interface{} {
 		output, err := exec.Command("utmpdump", log.Path).Output()
 		if err != nil {
 			log.Ok = false
@@ -541,6 +541,50 @@ func GetWtmpLog() *Log.Log_ {
 		}
 		return res
 	}, WtmpLog{})
+
+	log.Struct = append(log.Struct, []map[string]string{
+		{
+			"title":     "级别",
+			"dataIndex": "level",
+			"key":       "1",
+		},
+		{
+			"title":     "进程ID",
+			"dataIndex": "pid",
+			"key":       "2",
+		},
+		{
+			"title":     "类型",
+			"dataIndex": "type",
+			"key":       "3",
+		},
+		{
+			"title":     "用户",
+			"dataIndex": "user",
+			"key":       "4",
+		},
+		{
+			"title":     "终端",
+			"dataIndex": "terminal",
+			"key":       "5",
+		},
+		{
+			"title":     "源IP",
+			"dataIndex": "src_ip",
+			"key":       "6",
+		},
+		{
+			"title":     "目的IP",
+			"dataIndex": "dest_ip",
+			"key":       "7",
+		},
+		{
+			"title":     "时间戳",
+			"dataIndex": "timestamp",
+			"key":       "8",
+		},
+	})
+	return log
 }
 
 type KernelLog struct {
