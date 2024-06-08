@@ -12,6 +12,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 )
@@ -107,21 +108,9 @@ func GetDnfLog() *Log.Log_ {
 			Log2.DEBUG("[包管理日志] 错误跳过清除")
 			return
 		}
-		file, err := os.Open(log.Path)
+		err := exec.Command("echo", ">", log.Path).Run()
 		if err != nil {
-			Log2.ERROR("[包管理日志] 打开日志文件失败: ", err.Error())
-			return
-		}
-		defer func(file *os.File) {
-			err := file.Close()
-			if err != nil {
-				Log2.ERROR("[包管理日志] 关闭日志文件失败: ", err.Error())
-			}
-		}(file)
-
-		err = file.Truncate(0)
-		if err != nil {
-			Log2.ERROR("[包管理日志] 截断日志文件失败: ", err.Error())
+			Log2.ERROR("[包管理日志] 清除日志失败: ", err.Error())
 			return
 		}
 		Log2.INFO("[包管理日志] 清除日志成功")

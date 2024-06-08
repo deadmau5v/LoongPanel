@@ -77,27 +77,11 @@ func ClearLog(log *Log.Log_) {
 	if !log.Ok {
 		return
 	}
+	err := exec.Command("echo", ">", log.Path).Run()
+	if err != nil {
+		Log2.ERROR("[日志管理] 清空日志失败", log.Name, log.Path)
+	}
 
-	file, err := os.Open(log.Path)
-	if err != nil {
-		log.Ok = false
-		Log2.ERROR("[系统日志] 打开日志文件错误", err.Error())
-		return
-	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			log.Ok = false
-			Log2.ERROR("[系统日志] 关闭日志文件错误", err.Error())
-		}
-	}(file)
-	// 截断文件
-	err = file.Truncate(0)
-	if err != nil {
-		log.Ok = false
-		Log2.ERROR("[系统日志] 清空日志文件错误", err.Error())
-		return
-	}
 }
 
 // creatLog 创建日志对象 简化流程
@@ -126,16 +110,10 @@ func createLog(path, name string, customGetLog func(log *Log.Log_, line int) int
 }
 
 type BootLog struct {
-	Level   string `json:"level"`
-	Date    string `json:"date"`
-	Time    string `json:"time"`
-	Module  string `json:"module"`
 	Content string `json:"content"`
 }
 
 func (b BootLog) ProcessLogLine(logLine string) (any, error) {
-	pattern := `^\[(.*?)\] (.*?) - (.*?) \[(.*?)\] (.*)$`
-
 	checkLogLine := strings.Replace(logLine, " ", "", -1)
 	checkLogLine = strings.Replace(checkLogLine, "\t", "", -1)
 	checkLogLine = strings.Replace(checkLogLine, "\n", "", -1)
@@ -143,20 +121,9 @@ func (b BootLog) ProcessLogLine(logLine string) (any, error) {
 	if strings.Trim(checkLogLine, " ") == "" {
 		return nil, errors.New("空行")
 	}
-	re := regexp.MustCompile(pattern)
-
-	matches := re.FindStringSubmatch(logLine)
-	if matches == nil {
-		fmt.Println("[日志管理] 无法解析日志行", logLine)
-		return nil, errors.New("无法解析日志行")
-	}
 
 	entry := BootLog{
-		Level:   matches[1],
-		Date:    matches[2],
-		Time:    matches[3],
-		Module:  matches[4],
-		Content: matches[5],
+		Content: logLine,
 	}
 
 	return &entry, nil
@@ -167,29 +134,9 @@ func GetBootLog() *Log.Log_ {
 	log := createLog("/var/log/boot.log", "系统启动日志", nil, BootLog{})
 	log.Struct = append(log.Struct, []map[string]string{
 		{
-			"title":     "日志等级",
-			"dataIndex": "level",
-			"key":       "1",
-		},
-		{
-			"title":     "日期",
-			"dataIndex": "date",
-			"key":       "2",
-		},
-		{
-			"title":     "时间",
-			"dataIndex": "time",
-			"key":       "3",
-		},
-		{
-			"title":     "模块",
-			"dataIndex": "module",
-			"key":       "4",
-		},
-		{
 			"title":     "内容",
 			"dataIndex": "content",
-			"key":       "5",
+			"key":       "1",
 		},
 	})
 	return log
@@ -698,10 +645,11 @@ func GetKernelLog() *Log.Log_ {
 	}
 
 	log.ClearLog = func() {
-		err := exec.Command("journalctl", "--rotate").Run()
+		// 删除 /run/log/journal/
+		err := exec.Command("rm", "-rf", "/run/log/journal/").Run()
 		if err != nil {
 			log.Ok = false
-			Log2.ERROR("执行 journalctl --rotate 命令失败", log.Name)
+			Log2.ERROR("删除 /run/log/journal/ 失败", log.Name)
 		}
 		return
 	}
