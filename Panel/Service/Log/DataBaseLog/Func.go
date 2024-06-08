@@ -119,7 +119,7 @@ func GetDataBaseLog() *Log.Log_ {
 
 // parseDataBaseLog 解析数据库日志
 func parseDataBaseLog(logLine string) (*LogEntry, error) {
-	pattern := `^\[(.*?) (.*?) (.*?)\] \[(.*?)\] (.*)$`
+	pattern := `^\[(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \+\d{2}:\d{2})\] \[([A-Z]+)\] \[([\w\.]+:\d+)\] \[(.*?)\]`
 
 	checkLogLine := strings.Replace(logLine, " ", "", -1)
 	checkLogLine = strings.Replace(checkLogLine, "\t", "", -1)
@@ -137,11 +137,11 @@ func parseDataBaseLog(logLine string) (*LogEntry, error) {
 	}
 
 	entry := LogEntry{
-		Date:    matches[1],
-		Time:    matches[2],
-		Level:   matches[4],
+		Date:    matches[1][:10],
+		Time:    matches[1][11:],
+		Level:   matches[2],
 		Module:  matches[3],
-		Content: matches[5],
+		Content: matches[4],
 	}
 
 	return &entry, nil

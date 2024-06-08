@@ -10,6 +10,7 @@ import (
 	"LoongPanel/Panel/Service/Log"
 	Log2 "LoongPanel/Panel/Service/PanelLog"
 	"errors"
+	"fmt"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -123,7 +124,7 @@ func init() {
 
 // parseLog 解析日志
 func parseLog(logLine string) (*LogEntry, error) {
-	pattern := `(\w+ \d+) (\d{2}:\d{2}:\d{2}) (\w+) (\w+)\[(\d+)\]: <(\w+)> \[(\d+\.\d+)\] (.+)`
+	pattern := `(\d+)月 (\d+) (\d{2}):(\d{2}):(\d{2}) (\S+) (\S+)\[(\d+)\]: <(\S+)>  \[(\d+\.\d+)\] (.+)`
 	checkLogLine := strings.Replace(logLine, " ", "", -1)
 	checkLogLine = strings.Replace(checkLogLine, "\t", "", -1)
 	checkLogLine = strings.Replace(checkLogLine, "\n", "", -1)
@@ -138,19 +139,19 @@ func parseLog(logLine string) (*LogEntry, error) {
 		Log2.DEBUG("[日志管理] 无法解析日志行", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
-	pid, err := strconv.Atoi(matches[5])
+	pid, err := strconv.Atoi(matches[8])
 	if err != nil {
 		return nil, errors.New("无法解析PID")
 	}
 	entry := LogEntry{
-		Date:      matches[1],
-		Time:      matches[2],
-		Hostname:  matches[3],
-		Process:   matches[4],
+		Level:     matches[9],
+		Date:      fmt.Sprintf("2024-%02s-%02s", matches[1], matches[2]),
+		Time:      fmt.Sprintf("%s:%s:%s", matches[3], matches[4], matches[5]),
+		Hostname:  matches[6],
+		Process:   matches[7],
 		PID:       pid,
-		Level:     matches[6],
-		Timestamp: matches[7],
-		Message:   matches[8],
+		Timestamp: matches[10],
+		Message:   matches[11],
 	}
 	return &entry, nil
 }

@@ -18,18 +18,13 @@ import (
 
 type LogEntry struct {
 	Level     string `json:"level"`
-	Date      string `json:"date"`
-	Time      string `json:"time"`
-	Hostname  string `json:"hostname"`
-	Process   string `json:"process"`
-	PID       int    `json:"pid"`
 	Timestamp string `json:"timestamp"`
 	Message   string `json:"message"`
 }
 
 func GetDnfLog() *Log.Log_ {
 	path := "/var/log/dnf.log"
-	name := "dnf"
+	name := "包管理工具"
 	log := Log.Log_{
 		Path: path,
 		Name: name,
@@ -94,31 +89,6 @@ func GetDnfLog() *Log.Log_ {
 			"title":     "日志等级",
 			"dataIndex": "level",
 			"key":       "1",
-		},
-		{
-			"title":     "日期",
-			"dataIndex": "date",
-			"key":       "2",
-		},
-		{
-			"title":     "时间",
-			"dataIndex": "time",
-			"key":       "3",
-		},
-		{
-			"title":     "主机",
-			"dataIndex": "hostname",
-			"key":       "4",
-		},
-		{
-			"title":     "进程",
-			"dataIndex": "process",
-			"key":       "5",
-		},
-		{
-			"title":     "PID",
-			"dataIndex": "pid",
-			"key":       "6",
 		},
 		{
 			"title":     "时间戳",

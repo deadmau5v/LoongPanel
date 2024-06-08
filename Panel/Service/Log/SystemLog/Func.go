@@ -204,7 +204,7 @@ type CronLog struct {
 }
 
 func (c CronLog) ProcessLogLine(logLine string) (any, error) {
-	pattern := `^(\w+\s+\d+\s+\d+:\d+:\d+)\s+(\S+)\s+(\S+)\[(\d+)\]:\s+(.*)$`
+	pattern := `(?P<date>\w+\s+\d+)\s+(?P<time>\d{2}:\d{2}:\d{2})\s+(?P<host>\S+)\s+(?P<module>[\w\[\]\d]+):\s+(?P<content>.*)`
 
 	checkLogLine := strings.ReplaceAll(logLine, " ", "")
 	checkLogLine = strings.ReplaceAll(checkLogLine, "\t", "")
@@ -221,11 +221,19 @@ func (c CronLog) ProcessLogLine(logLine string) (any, error) {
 		return nil, errors.New("无法解析日志行")
 	}
 
+	md := make(map[string]string)
+	for i, name := range re.SubexpNames() {
+		if i != 0 && name != "" {
+			md[name] = matches[i]
+		}
+	}
+
 	entry := &CronLog{
-		Date:    matches[1],
-		Host:    matches[2],
-		Module:  matches[3],
-		Content: matches[5],
+		Date:    md["date"],
+		Time:    md["time"],
+		Host:    md["host"],
+		Module:  md["module"],
+		Content: md["content"],
 	}
 
 	return entry, nil
@@ -342,7 +350,7 @@ type MessagesLog struct {
 }
 
 func (c MessagesLog) ProcessLogLine(logLine string) (any, error) {
-	pattern := `(\w+ \d+ \d{2}:\d{2}:\d{2}) (\w+) (\w+)\[(\d+)\]: (.+)`
+	pattern := `(?P<date>\w+\s+\d+)\s+(?P<time>\d{2}:\d{2}:\d{2})\s+(?P<host>[^\s]+)\s+(?P<module>[^\s]+):\s+(?P<content>.*)`
 	checkLogLine := strings.ReplaceAll(logLine, " ", "")
 	checkLogLine = strings.ReplaceAll(checkLogLine, "\t", "")
 	checkLogLine = strings.ReplaceAll(checkLogLine, "\n", "")
@@ -358,19 +366,12 @@ func (c MessagesLog) ProcessLogLine(logLine string) (any, error) {
 		return nil, errors.New("无法解析日志行")
 	}
 
-	// 提取日期和时间部分
-	dateTime := matches[1]
-	// 日期和时间分开
-	date := dateTime[:6]
-	time := dateTime[7:]
-
-	// 创建MessagesLog实例
 	entry := MessagesLog{
-		Date:    date,
-		Time:    time,
-		Host:    matches[2],
-		Module:  matches[3],
-		Content: matches[4],
+		Date:    matches[re.SubexpIndex("date")],
+		Time:    matches[re.SubexpIndex("time")],
+		Host:    matches[re.SubexpIndex("host")],
+		Module:  matches[re.SubexpIndex("module")],
+		Content: matches[re.SubexpIndex("content")],
 	}
 
 	return entry, nil
@@ -418,7 +419,7 @@ type SecureLog struct {
 }
 
 func (c SecureLog) ProcessLogLine(logLine string) (any, error) {
-	pattern := `^(\w+\s+\d+)\s+(\d{2}:\d{2}:\d{2})\s+(\S+)\s+(\S+)\[(\d+)\]:\s+(.*)$`
+	pattern := `(?P<date>\w+\s+\d+)\s+(?P<time>\d{2}:\d{2}:\d{2})\s+(?P<host>[^\s]+)\s+(?P<module>[^\s]+):\s+(?P<content>.*)`
 	checkLogLine := strings.ReplaceAll(logLine, " ", "")
 	checkLogLine = strings.ReplaceAll(checkLogLine, "\t", "")
 	checkLogLine = strings.ReplaceAll(checkLogLine, "\n", "")
@@ -435,11 +436,11 @@ func (c SecureLog) ProcessLogLine(logLine string) (any, error) {
 	}
 
 	entry := &SecureLog{
-		Date:    matches[1],
-		Time:    matches[2],
-		Host:    matches[3],
-		Module:  matches[4],
-		Content: matches[5],
+		Date:    matches[re.SubexpIndex("date")],
+		Time:    matches[re.SubexpIndex("time")],
+		Host:    matches[re.SubexpIndex("host")],
+		Module:  matches[re.SubexpIndex("module")],
+		Content: matches[re.SubexpIndex("content")],
 	}
 
 	return entry, nil
@@ -506,12 +507,15 @@ func (c WtmpLog) ProcessLogLine(logLine string) (any, error) {
 		return nil, errors.New("无法解析日志行")
 	}
 
-	entry := &SecureLog{
-		Date:    matches[1],
-		Time:    matches[2],
-		Host:    matches[3],
-		Module:  matches[4],
-		Content: matches[5],
+	entry := &WtmpLog{
+		Level:     matches[1],
+		PID:       matches[2],
+		Type:      matches[3],
+		User:      matches[4],
+		Terminal:  matches[5],
+		SrcIP:     matches[6],
+		DestIP:    matches[7],
+		Timestamp: matches[8],
 	}
 
 	return entry, nil
