@@ -9,9 +9,23 @@ package NetWorkLog
 import (
 	"LoongPanel/Panel/Service/Log"
 	Log2 "LoongPanel/Panel/Service/PanelLog"
+	"errors"
 	"os/exec"
+	"regexp"
 	"strconv"
+	"strings"
 )
+
+type LogEntry struct {
+	Level     string `json:"level"`
+	Date      string `json:"date"`
+	Time      string `json:"time"`
+	Hostname  string `json:"hostname"`
+	Process   string `json:"process"`
+	PID       int    `json:"pid"`
+	Timestamp string `json:"timestamp"`
+	Message   string `json:"message"`
+}
 
 func GetNetWorkLog() *Log.Log_ {
 	log := Log.Log_{
@@ -26,7 +40,18 @@ func GetNetWorkLog() *Log.Log_ {
 			Log2.ERROR("[日志管理] 获取网络日志失败：" + err.Error())
 			return nil
 		}
-		return output
+
+		logs := strings.Split(string(output), "\n")
+		var logEntries []LogEntry
+		for _, logLine := range logs {
+			entry, err := parseLog(logLine)
+			if err != nil {
+				continue
+			}
+			logEntries = append(logEntries, *entry)
+		}
+
+		return logEntries
 	}
 
 	log.ClearLog = func() {
@@ -47,8 +72,85 @@ func GetNetWorkLog() *Log.Log_ {
 		return nil
 	}
 
+	log.Struct = append(log.Struct, []map[string]string{
+		{
+			"title":     "日志等级",
+			"dataIndex": "level",
+			"key":       "1",
+		},
+		{
+			"title":     "日期",
+			"dataIndex": "date",
+			"key":       "2",
+		},
+		{
+			"title":     "时间",
+			"dataIndex": "time",
+			"key":       "3",
+		},
+		{
+			"title":     "主机",
+			"dataIndex": "hostname",
+			"key":       "4",
+		},
+		{
+			"title":     "进程",
+			"dataIndex": "process",
+			"key":       "5",
+		},
+		{
+			"title":     "PID",
+			"dataIndex": "pid",
+			"key":       "6",
+		},
+		{
+			"title":     "时间戳",
+			"dataIndex": "timestamp",
+			"key":       "7",
+		},
+		{
+			"title":     "内容",
+			"dataIndex": "message",
+			"key":       "8",
+		},
+	})
+
 	return &log
 }
 
 func init() {
+}
+
+// parseLog 解析日志
+func parseLog(logLine string) (*LogEntry, error) {
+	pattern := `^(\w{3}) (\d{1,2}) (\d{2}:\d{2}:\d{2}) (\S+) (\S+)\[(\d+)\]: <(\w+)> \[(\d+)\] (.*)$`
+	checkLogLine := strings.Replace(logLine, " ", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\t", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\n", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\r", "", -1)
+	if strings.Trim(checkLogLine, " ") == "" {
+		return nil, errors.New("空行")
+	}
+
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(logLine)
+	if matches == nil {
+		Log2.DEBUG("[日志管理] 无法解析日志行", logLine)
+		return nil, errors.New("无法解析日志行")
+	}
+	pid, err := strconv.Atoi(matches[6])
+	if err != nil {
+		return nil, errors.New("无法解析PID")
+	}
+	entry := LogEntry{
+		Level:     matches[7],                    // <level>
+		Date:      matches[1] + " " + matches[2], // 月 日
+		Time:      matches[3],                    // HH:MM:SS
+		Hostname:  matches[4],                    // hostname
+		Process:   matches[5],                    // process name
+		PID:       pid,
+		Timestamp: matches[8], // timestamp
+		Message:   matches[9], // message
+	}
+	return &entry, nil
 }

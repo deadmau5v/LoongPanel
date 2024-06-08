@@ -9,12 +9,27 @@ package PkgLog
 import (
 	"LoongPanel/Panel/Service/Log"
 	Log2 "LoongPanel/Panel/Service/PanelLog"
+	"errors"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 )
 
-func createLog(path, name string) *Log.Log_ {
+type LogEntry struct {
+	Level     string `json:"level"`
+	Date      string `json:"date"`
+	Time      string `json:"time"`
+	Hostname  string `json:"hostname"`
+	Process   string `json:"process"`
+	PID       int    `json:"pid"`
+	Timestamp string `json:"timestamp"`
+	Message   string `json:"message"`
+}
+
+func GetDnfLog() *Log.Log_ {
+	path := "/var/log/dnf.log"
+	name := "dnf"
 	log := Log.Log_{
 		Path: path,
 		Name: name,
@@ -58,9 +73,64 @@ func createLog(path, name string) *Log.Log_ {
 			all = []byte(strings.Join(allStrSplite, "\n"))
 		}
 
+		var res []LogEntry
+		for _, line := range allStrSplite {
+			entry, err := parseLog(line)
+			if err != nil {
+				continue
+			}
+			if entry != nil {
+				res = append(res, *entry)
+			}
+		}
+
 		Log2.INFO("[包管理日志] 读取日志成功")
-		return all
+
+		return res
 	}
+
+	log.Struct = append(log.Struct, []map[string]string{
+		{
+			"title":     "日志等级",
+			"dataIndex": "level",
+			"key":       "1",
+		},
+		{
+			"title":     "日期",
+			"dataIndex": "date",
+			"key":       "2",
+		},
+		{
+			"title":     "时间",
+			"dataIndex": "time",
+			"key":       "3",
+		},
+		{
+			"title":     "主机",
+			"dataIndex": "hostname",
+			"key":       "4",
+		},
+		{
+			"title":     "进程",
+			"dataIndex": "process",
+			"key":       "5",
+		},
+		{
+			"title":     "PID",
+			"dataIndex": "pid",
+			"key":       "6",
+		},
+		{
+			"title":     "时间戳",
+			"dataIndex": "timestamp",
+			"key":       "7",
+		},
+		{
+			"title":     "内容",
+			"dataIndex": "message",
+			"key":       "8",
+		},
+	})
 
 	log.ClearLog = func() {
 		if !log.Ok {
@@ -90,15 +160,33 @@ func createLog(path, name string) *Log.Log_ {
 	return &log
 }
 
+// parseLog 解析日志
+func parseLog(logLine string) (*LogEntry, error) {
+	pattern := `^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+\d{4}) (\w+) (.+)$`
+	checkLogLine := strings.TrimSpace(logLine)
+	if checkLogLine == "" {
+		return nil, errors.New("空行")
+	}
+
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(logLine)
+	if matches == nil {
+		return nil, errors.New("无法解析日志行")
+	}
+
+	entry := LogEntry{
+		Timestamp: matches[1], // timestamp
+		Level:     matches[2], // level
+		Message:   matches[3], // message
+	}
+
+	return &entry, nil
+}
+
 //// GetYumLog 获取yum日志
 //func GetYumLog() *Log.Log_ {
 //	return createLog("/var/log/yum.log", "yum")
 //}
-
-// GetDnfLog 获取dnf日志
-func GetDnfLog() *Log.Log_ {
-	return createLog("/var/log/dnf.log", "dnf")
-}
 
 //// GetAptLog 获取apt日志
 //func GetAptLog() *Log.Log_ {

@@ -9,10 +9,20 @@ package DataBaseLog
 import (
 	"LoongPanel/Panel/Service/Log"
 	Log2 "LoongPanel/Panel/Service/PanelLog"
+	"errors"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 )
+
+type LogEntry struct {
+	Date    string `json:"date"`
+	Time    string `json:"time"`
+	Level   string `json:"level"`
+	Module  string `json:"module"`
+	Content string `json:"content"`
+}
 
 func GetDataBaseLog() *Log.Log_ {
 
@@ -53,8 +63,46 @@ func GetDataBaseLog() *Log.Log_ {
 			all = []byte(strings.Join(allStrSplite, "\n"))
 		}
 
-		return all
+		var res []LogEntry
+		for _, line := range allStrSplite {
+			entry, err := parseDataBaseLog(line)
+			if err != nil {
+				continue
+			}
+			if entry != nil {
+				res = append(res, *entry)
+			}
+		}
+
+		return res
 	}
+
+	log.Struct = append(log.Struct, []map[string]string{
+		{
+			"title":     "日期",
+			"dataIndex": "time",
+			"key":       "1",
+		}, {
+			"title":     "时间",
+			"dataIndex": "date",
+			"key":       "1",
+		},
+		{
+			"title":     "日志等级",
+			"dataIndex": "level",
+			"key":       "2",
+		},
+		{
+			"title":     "模块",
+			"dataIndex": "module",
+			"key":       "3",
+		},
+		{
+			"title":     "内容",
+			"dataIndex": "content",
+			"key":       "4",
+		},
+	})
 
 	log.ClearLog = func() {
 		if !log.Ok {
@@ -67,4 +115,34 @@ func GetDataBaseLog() *Log.Log_ {
 	}
 
 	return log
+}
+
+// parseDataBaseLog 解析数据库日志
+func parseDataBaseLog(logLine string) (*LogEntry, error) {
+	pattern := `^\[(.*?) (.*?) (.*?)\] \[(.*?)\] (.*)$`
+
+	checkLogLine := strings.Replace(logLine, " ", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\t", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\n", "", -1)
+	checkLogLine = strings.Replace(checkLogLine, "\r", "", -1)
+	if strings.Trim(checkLogLine, " ") == "" {
+		return nil, errors.New("空行")
+	}
+	re := regexp.MustCompile(pattern)
+
+	matches := re.FindStringSubmatch(logLine)
+	if matches == nil {
+		Log2.DEBUG("[日志管理] 无法解析日志行", logLine)
+		return nil, errors.New("无法解析日志行")
+	}
+
+	entry := LogEntry{
+		Date:    matches[1],
+		Time:    matches[2],
+		Level:   matches[4],
+		Module:  matches[3],
+		Content: matches[5],
+	}
+
+	return &entry, nil
 }

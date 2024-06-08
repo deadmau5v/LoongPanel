@@ -64,7 +64,7 @@ func GetPanelLog() *Log.Log_ {
 
 		var res []LogEntry
 		for _, line := range allStrSplite {
-			entry, err := parsePanelLog(line)
+			entry, err := parseLog(line)
 			if err != nil {
 				continue
 			}
@@ -86,37 +86,37 @@ func GetPanelLog() *Log.Log_ {
 		}
 	}
 
-	log.Struct = append(log.Struct, map[string]string{
-		"title":     "日志等级",
-		"dataIndex": "level",
-		"key":       "1",
-	})
-	log.Struct = append(log.Struct, map[string]string{
-		"title":     "日期",
-		"dataIndex": "date",
-		"key":       "2",
-	})
-	log.Struct = append(log.Struct, map[string]string{
-		"title":     "时间",
-		"dataIndex": "time",
-		"key":       "3",
-	})
-	log.Struct = append(log.Struct, map[string]string{
-		"title":     "模块",
-		"dataIndex": "module",
-		"key":       "4",
-	})
-	log.Struct = append(log.Struct, map[string]string{
-		"title":     "内容",
-		"dataIndex": "content",
-		"key":       "5",
+	log.Struct = append(log.Struct, []map[string]string{
+		{
+			"title":     "日志等级",
+			"dataIndex": "level",
+			"key":       "1",
+		},
+		{
+			"title":     "日期",
+			"dataIndex": "date",
+			"key":       "2",
+		},
+		{
+			"title":     "时间",
+			"dataIndex": "time",
+			"key":       "3",
+		}, {
+			"title":     "模块",
+			"dataIndex": "module",
+			"key":       "4",
+		}, {
+			"title":     "内容",
+			"dataIndex": "content",
+			"key":       "5",
+		},
 	})
 
 	return log
 }
 
-// ParsePanelLog 解析面板日志
-func parsePanelLog(logLine string) (*LogEntry, error) {
+// ParseLog 解析日志
+func parseLog(logLine string) (*LogEntry, error) {
 	pattern := `^\[(.*?)\] (.*?) - (.*?) \[(.*?)\] (.*)$`
 
 	checkLogLine := strings.Replace(logLine, " ", "", -1)
