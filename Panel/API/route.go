@@ -67,6 +67,7 @@ func initRoute(app *gin.Engine) {
 	SetRoute("POST", "/shutdown", home.Reboot, GroupPower, "关机操作", false)
 	SetRoute("POST", "/reboot", home.Shutdown, GroupPower, "重启操作", false)
 	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "获取文件列表", true)
+	SetRoute("GET", "/read", files.FileRead, GroupFiles, "读取文件", true)
 	SetRoute("POST", "/screen", terminal.ScreenCreate, GroupScreen, "终端创建", false)
 	SetRoute("DELETE", "/screen", terminal.ScreenClose, GroupScreen, "终端关闭", false)
 	SetRoute("GET", "/screen", terminal.GetScreens, GroupScreen, "获取终端列表", false)

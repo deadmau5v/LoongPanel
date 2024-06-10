@@ -59,7 +59,7 @@ func Dir(path string) ([]File, error) {
 		// 文件类型
 		if !file.IsDir && strings.Contains(file.Name[1:], ".") {
 			runeName := []rune(file.Name)
-			file.Ext = string(runeName[RuneIndex(runeName, "."):])
+			file.Ext = string(runeName[RuneIndex(runeName, ".")+1:])
 		} else {
 			file.Ext = ""
 		}
@@ -67,4 +67,20 @@ func Dir(path string) ([]File, error) {
 	}
 
 	return files, err
+}
+
+func Content(path string) (string, error) {
+	path, err := filepath.Abs(path)
+	if err != nil {
+		PanelLog.ERROR("[文件管理]", err.Error())
+		return "", err
+	}
+
+	file, err := os.ReadFile(path)
+	if err != nil {
+		PanelLog.ERROR("[文件管理]", err.Error())
+		return "", err
+	}
+	fileStr := string(file)
+	return fileStr, err
 }

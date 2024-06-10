@@ -32,3 +32,28 @@ func FileDir(ctx *gin.Context) {
 		})
 	}
 }
+
+func FileRead(ctx *gin.Context) {
+	path := ctx.Query("path")
+	if path == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg":    "path is empty",
+			"status": -1,
+		})
+		return
+	}
+
+	content, err := FileService.Content(path)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg":    err.Error(),
+			"status": -1,
+		})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{
+			"data":   content,
+			"status": 0,
+			"msg":    "ok",
+		})
+	}
+}
