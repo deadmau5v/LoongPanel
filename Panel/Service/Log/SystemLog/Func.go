@@ -28,7 +28,7 @@ func GetLog(log *Log.Log_, line int, entry LogEntry) interface{} {
 		return nil
 	}
 
-	Log2.DEBUG("获取日志", log.Name, log.Path)
+	Log2.DEBUG("[日志管理] 获取日志", log.Name, log.Path)
 	file, err := os.Open(log.Path)
 	if err != nil {
 		log.Ok = false

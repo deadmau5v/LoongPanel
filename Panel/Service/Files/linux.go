@@ -8,8 +8,11 @@
 
 package Files
 
-import "syscall"
+import (
+	"os"
+	"syscall"
+)
 
-func getUidGid(fileStat any) (uint32, uint32) {
-	return fileStat.(*syscall.Stat_t).Uid, fileStat.(*syscall.Stat_t).Gid
+func getUidGid(fileStat os.FileInfo) (uint32, uint32) {
+	return fileStat.Sys().(*syscall.Stat_t).Uid, fileStat.Sys().(*syscall.Stat_t).Gid
 }
