@@ -21,21 +21,7 @@ func Dir(path string) ([]File, error) {
 		return nil, err
 	}
 
-	back := NewObj()
-	// 上一级
-	back.Name = ".."
-	back.IsDir = true
-	back.IsLink = false
-	back.Path = filepath.Join(path, "..")
-	back.ShowEdit = false
-	back.ShowSize = false
-	back.ShowTime = false
-
 	files := make([]File, 0)
-	if path != "/" && path != "" {
-		files = append(files, *back)
-	}
-
 	readDir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
