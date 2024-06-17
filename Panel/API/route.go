@@ -7,6 +7,7 @@
 package API
 
 import (
+	"LoongPanel/Panel/API/v1/appstore"
 	AuthAPI "LoongPanel/Panel/API/v1/auth"
 	"LoongPanel/Panel/API/v1/clean"
 	"LoongPanel/Panel/API/v1/files"
@@ -58,6 +59,7 @@ func initRoute(app *gin.Engine) {
 	GroupFiles := v1.Group("/files")
 	GroupScreen := v1.Group("/screen")
 	GroupLog := v1.Group("/log")
+	GroupAppStore := v1.Group("/appstore")
 
 	SetRoute("GET", "/system_status", home.SystemStatus, GroupStatus, "系统状态", true)
 	SetRoute("GET", "/system_info", home.SystemInfo, GroupStatus, "系统信息", true)
@@ -89,6 +91,7 @@ func initRoute(app *gin.Engine) {
 	SetRoute("GET", "/log", log.GetLog, GroupLog, "获取日志", false)
 	SetRoute("GET", "/options", log.GetLogStruct, GroupLog, "获取日志结构", false)
 	SetRoute("DELETE", "/log", log.ClearLog, GroupLog, "清理日志", false)
+	SetRoute("GET", "/apps", appstore.AppList, GroupAppStore, "获取应用列表", false)
 
 	// 增加参数记得检查Auth匹配 Service.Auth.SESSIONS.PathParse
 
