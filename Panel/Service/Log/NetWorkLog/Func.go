@@ -57,7 +57,6 @@ func GetNetWorkLog() *Log.Log_ {
 
 	log.ClearLog = func() {
 		_, err := exec.Command("journalctl", "-u", "NetworkManager", "--rotate").Output()
-		// Todo 未测试
 		if err != nil {
 			log.Ok = false
 			Log2.ERROR("[日志管理] 清空网络日志失败：" + err.Error())

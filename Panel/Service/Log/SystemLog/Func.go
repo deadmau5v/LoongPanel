@@ -132,6 +132,9 @@ func (b BootLog) ProcessLogLine(logLine string) (any, error) {
 // GetBootLog 获取启动日志
 func GetBootLog() *Log.Log_ {
 	log := createLog("/var/log/boot.log", "系统启动日志", nil, BootLog{})
+	if log == nil {
+		return nil
+	}
 	log.Struct = append(log.Struct, []map[string]string{
 		{
 			"title":     "内容",
@@ -189,6 +192,9 @@ func (c CronLog) ProcessLogLine(logLine string) (any, error) {
 // GetCronLog 获取定时任务日志
 func GetCronLog() *Log.Log_ {
 	log := createLog("/var/log/cron", "计划任务日志", nil, CronLog{})
+	if log == nil {
+		return nil
+	}
 	log.Struct = append(log.Struct, []map[string]string{
 		{
 			"title":     "日志等级",
@@ -258,6 +264,9 @@ func (c FirewalldLog) ProcessLogLine(logLine string) (any, error) {
 // GetFirewalldLog 获取Firewalld日志
 func GetFirewalldLog() *Log.Log_ {
 	log := createLog("/var/log/firewalld", "防火墙日志", nil, FirewalldLog{})
+	if log == nil {
+		return nil
+	}
 	log.Struct = append(log.Struct, []map[string]string{
 		{
 			"title":     "日志等级",
@@ -327,6 +336,9 @@ func (c MessagesLog) ProcessLogLine(logLine string) (any, error) {
 // GetMessagesLog 获取系统消息日志
 func GetMessagesLog() *Log.Log_ {
 	log := createLog("/var/log/messages", "系统消息日志", nil, MessagesLog{})
+	if log == nil {
+		return nil
+	}
 	log.Struct = append(log.Struct, []map[string]string{
 		{
 			"title":     "日期",
@@ -396,6 +408,9 @@ func (c SecureLog) ProcessLogLine(logLine string) (any, error) {
 // GetSecureLog 获取安全日志
 func GetSecureLog() *Log.Log_ {
 	log := createLog("/var/log/secure", "安全日志", nil, SecureLog{})
+	if log == nil {
+		return nil
+	}
 	log.Struct = append(log.Struct, []map[string]string{
 		{
 			"title":     "日期",
@@ -499,6 +514,10 @@ func GetWtmpLog() *Log.Log_ {
 		}
 		return res
 	}, WtmpLog{})
+
+	if log == nil {
+		return nil
+	}
 
 	log.Struct = append(log.Struct, []map[string]string{
 		{

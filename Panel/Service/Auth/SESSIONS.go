@@ -9,11 +9,12 @@ package Auth
 import (
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 	"regexp"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func NewSESSION(user Database.User) string {
@@ -84,7 +85,7 @@ func UserAuth() gin.HandlerFunc {
 
 		// 使用数据库查询来查找会话
 		var userSession SESSION
-		if err := Database.DB.Where("key = ?", Authorization).Preload("User").First(&userSession).Error; err != nil {
+		if err := Database.DB.Where("`key` = ?", Authorization).Preload("User").First(&userSession).Error; err != nil {
 			PanelLog.DEBUG("[权限管理] 未授权 code: 1")
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code": 401,

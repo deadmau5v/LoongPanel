@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # 创建人： deadmau5v
 # 创建时间： 2024-6-8

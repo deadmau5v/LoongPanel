@@ -28,3 +28,4 @@ resource
 /dist
 /.idea
 dist
+/release.py

@@ -18,9 +18,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime/trace"
 )
 
 //region 下载前端文件
@@ -74,8 +76,23 @@ func downloadDist() {
 //endregion
 
 func main() {
-	//region 初始化日志
+	f, err := os.Create("trace.out")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(f)
 
+	if err := trace.Start(f); err != nil {
+		log.Fatal(err)
+	}
+	defer trace.Stop()
+
+	//region 初始化日志
 	Log.AllLog = make(map[string]Log.Log_)
 	Log.Add("系统启动日志", SystemLog.GetBootLog)
 	Log.Add("计划任务日志", SystemLog.GetCronLog)
@@ -88,12 +105,12 @@ func main() {
 	Log.Add("面板日志", PanelLog2.GetPanelLog)
 	Log.Add("网络日志", NetWorkLog.GetNetWorkLog)
 	Log.Add("数据库日志", DataBaseLog.GetDataBaseLog)
-	for _, log := range Log.AllLog {
+	for _, log_ := range Log.AllLog {
 		status := "初始化失败"
-		if log.Ok {
+		if log_.Ok {
 			status = "初始化成功"
 		}
-		PanelLog.DEBUG("[日志管理]", log.Name, status)
+		PanelLog.DEBUG("[日志管理]", log_.Name, status)
 	}
 
 	//endregion
@@ -106,10 +123,10 @@ func main() {
 	}
 
 	port := flag.String("port", "8080", "端口")
-	host := flag.String("host", "0.0.0.0", "监控主机地址, 0.0.0.0监控全部访问 127.0.0.1 监控本机访问")
+	host := flag.String("host", "127.0.0.1", "监控主机地址, 0.0.0.0监控全部访问 127.0.0.1 监控本机访问")
 	flag.Parse()
-	PanelLog.INFO(fmt.Sprintf("[LoongPanel] http://%s:%s", *host, *port))
-	err := API.App.Run(*host + ":" + *port)
+	PanelLog.INFO(fmt.Sprintf("[LoongPanel] %s://%s:%s", "http", *host, *port))
+	err = API.App.Run(*host + ":" + *port)
 	if err != nil {
 		return
 	}
