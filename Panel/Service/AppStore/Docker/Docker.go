@@ -10,6 +10,7 @@ import (
 	"LoongPanel/Panel/Service/AppStore"
 	"errors"
 	"os/exec"
+	"strings"
 )
 
 var App = AppStore.App{}
@@ -42,8 +43,8 @@ func isRunning() bool {
 		return false
 	}
 
-	cmd := exec.Command("docker", "info")
-	if err := cmd.Run(); err != nil {
+	output, err := exec.Command("docker", "info").Output()
+	if err != nil || !strings.Contains(string(output), "Server Version") {
 		return false
 	}
 	return true

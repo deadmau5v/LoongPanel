@@ -29,7 +29,7 @@ func AppList(c *gin.Context) {
 	for _, app := range AppStore.Apps {
 		version, err := app.Version()
 		if err != nil {
-			PanelLog.ERROR("获取应用版本失败", err)
+			PanelLog.ERROR("[应用商店]", "获取应用版本失败", err)
 			version = "未知"
 		}
 		res = append(res, Res{
@@ -41,7 +41,7 @@ func AppList(c *gin.Context) {
 			IsRunning: app.IsRunning(),
 		})
 	}
-
+	PanelLog.INFO("[应用商店]", "获取应用列表")
 	c.JSON(200, gin.H{
 		"status": 0,
 		"data":   res,
@@ -76,6 +76,7 @@ func StartApp(c *gin.Context) {
 		return
 	}
 	// 启动成功
+	PanelLog.INFO("[应用商店]", "启动应用", name)
 	c.JSON(http.StatusOK, gin.H{
 		"status": 0,
 		"msg":    "启动成功",
@@ -111,6 +112,7 @@ func StopApp(c *gin.Context) {
 		return
 	}
 	// 停止成功
+	PanelLog.INFO("[应用商店]", "停止应用", name)
 	c.JSON(http.StatusOK, gin.H{
 		"status": 0,
 		"msg":    "停止成功",
@@ -146,6 +148,7 @@ func InstallApp(c *gin.Context) {
 		return
 	}
 	// 安装成功
+	PanelLog.INFO("[应用商店]", "安装应用", name)
 	c.JSON(http.StatusOK, gin.H{
 		"status": 0,
 		"msg":    "安装成功",
@@ -181,6 +184,7 @@ func UninstallApp(c *gin.Context) {
 		return
 	}
 	// 卸载成功
+	PanelLog.INFO("[应用商店]", "卸载应用", name)
 	c.JSON(http.StatusOK, gin.H{
 		"status": 0,
 		"msg":    "卸载成功",
