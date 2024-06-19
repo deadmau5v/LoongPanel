@@ -9,6 +9,7 @@ package Docker
 import (
 	"LoongPanel/Panel/Service/AppStore"
 	"errors"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -30,8 +31,8 @@ func getVersion() (string, error) {
 
 // isInstall 是否安装
 func isInstall() bool {
-	_, err := exec.LookPath("docker")
-	if err != nil {
+	f, err := os.Stat("/usr/bin/docker")
+	if err != nil || os.IsNotExist(err) || f.IsDir() {
 		return false
 	}
 	return true
