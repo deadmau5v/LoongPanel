@@ -10,6 +10,8 @@ import (
 	"LoongPanel/Panel/Service/AppStore"
 	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strings"
 )
 
 func AppList(c *gin.Context) {
@@ -40,5 +42,147 @@ func AppList(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, res)
+	c.JSON(200, gin.H{
+		"status": 0,
+		"data":   res,
+	})
+}
+
+func StartApp(c *gin.Context) {
+	name := c.Query("name")
+	if strings.Trim(name, " ") == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "参数错误",
+		})
+	}
+
+	app := AppStore.FindApp(name)
+	ok, err := app.Start()
+	// 启动错误
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    err.Error(),
+		})
+		return
+	}
+	if !ok {
+		// 未启动成功
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "启动失败",
+		})
+		return
+	}
+	// 启动成功
+	c.JSON(http.StatusOK, gin.H{
+		"status": 0,
+		"msg":    "启动成功",
+	})
+
+}
+
+func StopApp(c *gin.Context) {
+	name := c.Query("name")
+	if strings.Trim(name, " ") == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "参数错误",
+		})
+	}
+
+	app := AppStore.FindApp(name)
+	ok, err := app.Stop()
+	// 停止错误
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    err.Error(),
+		})
+		return
+	}
+	if !ok {
+		// 未停止成功
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "停止失败",
+		})
+		return
+	}
+	// 停止成功
+	c.JSON(http.StatusOK, gin.H{
+		"status": 0,
+		"msg":    "停止成功",
+	})
+}
+
+func InstallApp(c *gin.Context) {
+	// 长时间阻塞
+	name := c.Query("name")
+	if strings.Trim(name, " ") == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "参数错误",
+		})
+	}
+
+	app := AppStore.FindApp(name)
+	ok, err := app.Install()
+	// 安装错误
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    err.Error(),
+		})
+		return
+	}
+	if !ok {
+		// 未安装成功
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "安装失败",
+		})
+		return
+	}
+	// 安装成功
+	c.JSON(http.StatusOK, gin.H{
+		"status": 0,
+		"msg":    "安装成功",
+	})
+}
+
+func UninstallApp(c *gin.Context) {
+	// 长时间阻塞
+	name := c.Query("name")
+	if strings.Trim(name, " ") == "" {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "参数错误",
+		})
+	}
+
+	app := AppStore.FindApp(name)
+	ok, err := app.Uninstall()
+	// 卸载错误
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    err.Error(),
+		})
+		return
+	}
+	if !ok {
+		// 未卸载成功
+		c.JSON(http.StatusOK, gin.H{
+			"status": 1,
+			"msg":    "卸载失败",
+		})
+		return
+	}
+	// 卸载成功
+	c.JSON(http.StatusOK, gin.H{
+		"status": 0,
+		"msg":    "卸载成功",
+	})
 }

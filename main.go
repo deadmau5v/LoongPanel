@@ -8,6 +8,9 @@ package main
 
 import (
 	"LoongPanel/Panel/API"
+	"LoongPanel/Panel/Service/AppStore/Docker"
+	"LoongPanel/Panel/Service/AppStore/FrpClient"
+	"LoongPanel/Panel/Service/AppStore/FrpServer"
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/Log/DataBaseLog"
 	"LoongPanel/Panel/Service/Log/NetWorkLog"
@@ -18,11 +21,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
-	"runtime/trace"
 )
 
 //region 下载前端文件
@@ -75,23 +76,36 @@ func downloadDist() {
 
 //endregion
 
+func printLOGO() {
+	fmt.Println(
+		"\033[31m__                    _____             _  \n" +
+			"\033[31m|  |   ___ ___ ___ ___|  _  |___ ___ ___| | \n" +
+			"\033[31m|  |__| . | . |   | . |   __| .'|   | -_| | \n" +
+			"\033[91m|_____|___|___|_|_|_  |__|  |__,|_|_|___|_| \n" +
+			"\033[91m                  |___| \n" +
+			"\033[31m        LoongPanel 1.0.0 软件杯作品\n",
+	)
+}
+
 func main() {
-	f, err := os.Create("trace.out")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}(f)
-
-	if err := trace.Start(f); err != nil {
-		log.Fatal(err)
-	}
-	defer trace.Stop()
-
+	// region 调试
+	//f, err := os.Create("trace.out")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//defer func(f *os.File) {
+	//	err := f.Close()
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	//}(f)
+	//
+	//if err := trace.Start(f); err != nil {
+	//	log.Fatal(err)
+	//}
+	//defer trace.Stop()
+	// endregion
+	printLOGO()
 	//region 初始化日志
 	Log.AllLog = make(map[string]Log.Log_)
 	Log.Add("系统启动日志", SystemLog.GetBootLog)
@@ -105,6 +119,7 @@ func main() {
 	Log.Add("面板日志", PanelLog2.GetPanelLog)
 	Log.Add("网络日志", NetWorkLog.GetNetWorkLog)
 	Log.Add("数据库日志", DataBaseLog.GetDataBaseLog)
+
 	for _, log_ := range Log.AllLog {
 		status := "初始化失败"
 		if log_.Ok {
@@ -114,6 +129,12 @@ func main() {
 	}
 
 	//endregion
+
+	// region 初始化应用商店
+
+	Docker.Init()
+	FrpServer.Init()
+	FrpClient.Init()
 
 	//region 入口
 
@@ -126,7 +147,7 @@ func main() {
 	host := flag.String("host", "127.0.0.1", "监控主机地址, 0.0.0.0监控全部访问 127.0.0.1 监控本机访问")
 	flag.Parse()
 	PanelLog.INFO(fmt.Sprintf("[LoongPanel] %s://%s:%s", "http", *host, *port))
-	err = API.App.Run(*host + ":" + *port)
+	err := API.App.Run(*host + ":" + *port)
 	if err != nil {
 		return
 	}

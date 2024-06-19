@@ -5,8 +5,3 @@
  */
 
 package PanelLog
-
-func init() {
-	IsDebug = true
-	IsSaveToFile = true
-}

@@ -6,5 +6,5 @@
 
 package PanelLog
 
-var IsDebug = false
-var IsSaveToFile = false
+var IsDebug = true
+var IsSaveToFile = true

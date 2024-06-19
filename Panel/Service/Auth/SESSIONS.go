@@ -44,6 +44,7 @@ func UserAuth() gin.HandlerFunc {
 		// 放行静态资源
 		skipPaths := []string{
 			"/assets/*",
+			"/script/icons/*",
 		}
 		for _, path := range skipPaths {
 			if match, _ := regexp.MatchString(path, c.Request.URL.Path); match {
@@ -65,6 +66,7 @@ func UserAuth() gin.HandlerFunc {
 			"/auth/role",
 			"/auth/user",
 			"/log",
+			"/appstore",
 		}
 		for _, path := range staticPaths {
 			if c.Request.URL.Path == path {

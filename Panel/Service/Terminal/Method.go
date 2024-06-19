@@ -82,10 +82,10 @@ func (sm *ScreenManager) Create(name string, id uint32) error {
 		log.Fatal(err)
 	}
 
-	err = pty.Setsize(tty, &pty.Winsize{
-		Rows: 16,
-		Cols: 200,
-	})
+	//err = pty.Setsize(tty, &pty.Winsize{
+	//	Rows: 16,
+	//	Cols: 200,
+	//})
 	screen := &Screen{
 		Name:        name,
 		Id:          id,

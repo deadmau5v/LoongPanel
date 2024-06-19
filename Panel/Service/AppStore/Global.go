@@ -6,4 +6,4 @@
 
 package AppStore
 
-var Apps = []App{}
+var Apps []App

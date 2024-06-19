@@ -4,7 +4,7 @@
  * 文件作用：应用程序 Docker支持
  */
 
-package Apps
+package Docker
 
 import (
 	"LoongPanel/Panel/Service/AppStore"
@@ -52,13 +52,59 @@ func isRunning() bool {
 // Install 安装
 func Install() (bool, error) {
 	if isInstall := isInstall(); isInstall {
-		return false, errors.New("Docker已安装")
+		return false, errors.New("docker已安装")
+	}
+	err := AppStore.RunScript("install_docker.sh")
+	if err != nil {
+		return false, err
 	}
 
 	return true, nil
 }
 
-func init() {
+// Uninstall 卸载
+func Uninstall() (bool, error) {
+	if isInstall := isInstall(); !isInstall {
+		return false, errors.New("docker未安装")
+	}
+	err := AppStore.RunScript("remove_docker.sh")
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// Start 启动
+func Start() (bool, error) {
+	if isInstall := isInstall(); !isInstall {
+		return false, errors.New("docker未安装")
+	}
+	if isRunning := isRunning(); isRunning {
+		return false, errors.New("docker已启动")
+	}
+	cmd := exec.Command("systemctl", "start", "docker")
+	if err := cmd.Run(); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// Stop 停止
+func Stop() (bool, error) {
+	if isInstall := isInstall(); !isInstall {
+		return false, errors.New("docker未安装")
+	}
+	if isRunning := isRunning(); !isRunning {
+		return false, errors.New("docker未启动")
+	}
+	cmd := exec.Command("systemctl", "stop", "docker")
+	if err := cmd.Run(); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func Init() {
 	App.Name = "Docker"
 	App.Tags = []string{"运行环境"}
 	App.Icon = "Docker.png"
@@ -68,6 +114,9 @@ func init() {
 	App.IsInstall = isInstall
 	App.IsRunning = isRunning
 	App.Install = Install
+	App.Uninstall = Uninstall
+	App.Start = Start
+	App.Stop = Stop
 
 	AppStore.Apps = append(AppStore.Apps, App)
 }

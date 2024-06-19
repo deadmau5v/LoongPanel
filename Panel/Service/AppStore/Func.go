@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 )
 
 func DownloadScripts() (bool, error) {
@@ -61,6 +62,16 @@ func DownloadScripts() (bool, error) {
 	return true, nil
 }
 
+func RunScript(scriptName string) error {
+	// 这个函数会造成阻塞
+	cmd := exec.Command("bash", path.Join("./script", scriptName))
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return err
+}
+
 func init() {
 	stat, err := os.Stat("./script")
 	if err != nil || !stat.IsDir() {
@@ -69,4 +80,13 @@ func init() {
 			PanelLog.ERROR("[应用商店]", "下载脚本文件失败")
 		}
 	}
+}
+
+func FindApp(name string) *App {
+	for _, app := range Apps {
+		if name == app.Name {
+			return &app
+		}
+	}
+	return nil
 }

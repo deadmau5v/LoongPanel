@@ -18,6 +18,7 @@ import (
 	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/System"
 	"github.com/gin-gonic/gin"
+	"path"
 )
 
 func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
@@ -47,11 +48,13 @@ func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gi
 
 func initRoute(app *gin.Engine) {
 	// 其他
-	app.Static("/assets", System.WORKDIR+"/dist/assets")
+	app.Static("/assets", path.Join(System.WORKDIR, "dist", "assets"))
+	app.Static("/script/icons", path.Join(System.WORKDIR, "script", "icons"))
 	// 路由组 v1 ws
 	v1 := app.Group("/api/v1")
 	ws := app.Group("/api/ws")
 
+	// 模块路由
 	GroupAuth := v1.Group("/auth")
 	GroupStatus := v1.Group("/status")
 	GroupClean := v1.Group("/clean")
@@ -91,7 +94,11 @@ func initRoute(app *gin.Engine) {
 	SetRoute("GET", "/log", log.GetLog, GroupLog, "获取日志", false)
 	SetRoute("GET", "/options", log.GetLogStruct, GroupLog, "获取日志结构", false)
 	SetRoute("DELETE", "/log", log.ClearLog, GroupLog, "清理日志", false)
-	SetRoute("GET", "/apps", appstore.AppList, GroupAppStore, "获取应用列表", false)
+	SetRoute("GET", "/apps", appstore.AppList, GroupAppStore, "获取应用列表", true)
+	SetRoute("POST", "/app", appstore.InstallApp, GroupAppStore, "安装应用", false)
+	SetRoute("DELETE", "/app", appstore.UninstallApp, GroupAppStore, "卸载应用", false)
+	SetRoute("POST", "/app/start", appstore.StartApp, GroupAppStore, "启动应用", false)
+	SetRoute("POST", "/app/stop", appstore.StopApp, GroupAppStore, "停止应用", false)
 
 	// 增加参数记得检查Auth匹配 Service.Auth.SESSIONS.PathParse
 
@@ -105,7 +112,6 @@ func initRoute(app *gin.Engine) {
 		PanelLog.DEBUG("[权限管理] 设置信任代理失败", err)
 		return
 	}
-
 }
 
 func ping(c *gin.Context) {
