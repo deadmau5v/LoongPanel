@@ -26,6 +26,7 @@ func getVersion() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	output = []byte(strings.Replace(string(output), "'", "", -1))
 	return string(output), nil
 }
 
@@ -51,8 +52,8 @@ func isRunning() bool {
 	return true
 }
 
-// Install 安装
-func Install() (bool, error) {
+// install 安装
+func install() (bool, error) {
 	if isInstall := isInstall(); isInstall {
 		return false, errors.New("docker已安装")
 	}
@@ -64,8 +65,8 @@ func Install() (bool, error) {
 	return true, nil
 }
 
-// Uninstall 卸载
-func Uninstall() (bool, error) {
+// uninstall 卸载
+func uninstall() (bool, error) {
 	if isInstall := isInstall(); !isInstall {
 		return false, errors.New("docker未安装")
 	}
@@ -76,8 +77,8 @@ func Uninstall() (bool, error) {
 	return true, nil
 }
 
-// Start 启动
-func Start() (bool, error) {
+// start 启动
+func start() (bool, error) {
 	if isInstall := isInstall(); !isInstall {
 		return false, errors.New("docker未安装")
 	}
@@ -91,8 +92,8 @@ func Start() (bool, error) {
 	return true, nil
 }
 
-// Stop 停止
-func Stop() (bool, error) {
+// stop 停止
+func stop() (bool, error) {
 	if isInstall := isInstall(); !isInstall {
 		return false, errors.New("docker未安装")
 	}
@@ -115,10 +116,10 @@ func Init() {
 	App.Version = getVersion
 	App.IsInstall = isInstall
 	App.IsRunning = isRunning
-	App.Install = Install
-	App.Uninstall = Uninstall
-	App.Start = Start
-	App.Stop = Stop
+	App.Install = install
+	App.Uninstall = uninstall
+	App.Start = start
+	App.Stop = stop
 
 	AppStore.Apps = append(AppStore.Apps, App)
 }

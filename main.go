@@ -100,10 +100,10 @@ func main() {
 	//	}
 	//}(f)
 	//
-	//if err := trace.Start(f); err != nil {
+	//if err := trace.start(f); err != nil {
 	//	log.Fatal(err)
 	//}
-	//defer trace.Stop()
+	//defer trace.stop()
 	// endregion
 	printLOGO()
 	//region 初始化日志
@@ -133,8 +133,8 @@ func main() {
 	// region 初始化应用商店
 
 	Docker.Init()
-	FrpServer.Init()
-	FrpClient.Init()
+	FRPClient.Init()
+	FRPServer.Init()
 
 	//region 入口
 
