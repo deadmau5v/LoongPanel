@@ -24,10 +24,10 @@ fi
 # 移除frps文件
 rm -f /opt/frp/frps
 rm -f /usr/bin/frps
-rm -rf /opt/frp
+rm -rf /opt/frps
 
 # 清理环境变量
-sed -i '/\/opt\/frp/d' ~/.bashrc
+sed -i '/\/opt\/frps/d' ~/.bashrc
 source ~/.bashrc
 
 # 完成

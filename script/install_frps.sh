@@ -25,23 +25,23 @@ fi
 wget https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/frps
 
 # 安装
-mkdir "/opt/frp" -p
-mv frps /opt/frp/frps
-chmod +x /opt/frp/frps
+mkdir "/opt/frps" -p
+mv frps /opt/frps/frps
+chmod +x /opt/frps/frps
 # 检查是否存在配置文件
 if [ ! -f "/opt/frp/frps.toml" ]; then
-  echo "bindPort = 7000" > /opt/frp/frps.toml
+  echo "bindPort = 7000" > /opt/frps/frps.toml
 fi
 
 
 # 添加环境变量
-echo "export PATH=\$PATH:/opt/frp" >> ~/.bashrc
+echo "export PATH=\$PATH:/opt/frps" >> ~/.bashrc
 source ~/.bashrc
-ln -s /opt/frp/frps /usr/bin/frps
+ln -s /opt/frps/frps /usr/bin/frps
 
 # 配置
-echo "请手动配置frp /opt/frps.toml"
+echo "请手动配置frp /opt/frps/frps.toml"
 
 # 完成
 echo "安装完成"
-echo "启动请输入：frps -c /opt/frp/frps.toml"
+echo "启动请输入：frps -c /opt/frps/frps.toml"

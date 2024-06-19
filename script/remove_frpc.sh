@@ -12,11 +12,11 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # 删除frpc目录
-if [ -d "/opt/frp" ]; then
-    rm -rf /opt/frp
-    echo "/opt/frp 目录已删除"
+if [ -d "/opt/frpc" ]; then
+    rm -rf /opt/frpc
+    echo "/opt/frpc 目录已删除"
 else
-    echo "/opt/frp 目录不存在"
+    echo "/opt/frpc 目录不存在"
 fi
 
 # 删除符号链接
@@ -28,7 +28,7 @@ else
 fi
 
 # 移除环境变量
-sed -i '/\/opt\/frp/d' ~/.bashrc
+sed -i '/\/opt\/frpc/d' ~/.bashrc
 source ~/.bashrc
 echo "环境变量已移除"
 

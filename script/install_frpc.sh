@@ -25,11 +25,11 @@ fi
 wget https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/frpc
 
 # 安装
-mkdir "/opt/frp" -p
-mv frpc /opt/frp/frpc
-chmod +x /opt/frp/frpc
+mkdir "/opt/frpc" -p
+mv frpc /opt/frpc/frpc
+chmod +x /opt/frpc/frpc
 # 检查是否存在配置文件
-if [ ! -f "/opt/frp/frpc.toml" ]; then
+if [ ! -f "/opt/frpc/frpc.toml" ]; then
   echo "serverAddr = \"localhost\"
 serverPort = 7000
 auth.token = \"\"
@@ -40,18 +40,18 @@ type = \"\"
 localIP = \"localhost\"
 localPort = 22
 remotePort = 1029
-" > /opt/frp/frpc.toml
+" > /opt/frpc/frpc.toml
 fi
 
 
 # 添加环境变量
-echo "export PATH=\$PATH:/opt/frp" >> ~/.bashrc
+echo "export PATH=\$PATH:/opt/frpc" >> ~/.bashrc
 source ~/.bashrc
-ln -s /opt/frp/frpc /usr/bin/frpc
+ln -s /opt/frpc/frpc /usr/bin/frpc
 
 # 配置
-echo "请手动配置frp /opt/frpc.toml"
+echo "请手动配置frp /opt/frpc/frpc.toml"
 
 # 完成
 echo "安装完成"
-echo "启动请输入：frpc -c /opt/frp/frpc.toml"
+echo "启动请输入：frpc -c /opt/frpc/frpc.toml"
