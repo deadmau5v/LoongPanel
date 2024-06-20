@@ -110,7 +110,7 @@ func stop() (bool, error) {
 func Init() {
 	App.Name = "FRP Client"
 	App.Tags = []string{"网络工具"}
-	App.Icon = "frp.png"
+	App.Icon = "frpc.png"
 	App.Path = "/usr/bin/frpc"
 
 	App.Version = getVersion

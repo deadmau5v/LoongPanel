@@ -10,6 +10,7 @@ import (
 	"LoongPanel/Panel/API/v1/appstore"
 	AuthAPI "LoongPanel/Panel/API/v1/auth"
 	"LoongPanel/Panel/API/v1/clean"
+	"LoongPanel/Panel/API/v1/docker"
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
 	"LoongPanel/Panel/API/v1/log"
@@ -63,6 +64,7 @@ func initRoute(app *gin.Engine) {
 	GroupScreen := v1.Group("/screen")
 	GroupLog := v1.Group("/log")
 	GroupAppStore := v1.Group("/appstore")
+	GroupDocker := v1.Group("/docker")
 
 	SetRoute("GET", "/system_status", home.SystemStatus, GroupStatus, "系统状态", true)
 	SetRoute("GET", "/system_info", home.SystemInfo, GroupStatus, "系统信息", true)
@@ -99,6 +101,8 @@ func initRoute(app *gin.Engine) {
 	SetRoute("DELETE", "/app", appstore.UninstallApp, GroupAppStore, "卸载应用", false)
 	SetRoute("POST", "/app/start", appstore.StartApp, GroupAppStore, "启动应用", false)
 	SetRoute("POST", "/app/stop", appstore.StopApp, GroupAppStore, "停止应用", false)
+	SetRoute("GET", "/containers", docker.GetContainerList, GroupDocker, "获取容器列表", false)
+	SetRoute("GET", "/images", docker.GetImageList, GroupDocker, "获取镜像列表", false)
 
 	// 增加参数记得检查Auth匹配 Service.Auth.SESSIONS.PathParse
 

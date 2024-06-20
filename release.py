@@ -19,14 +19,14 @@ def Clean():
 def BuildBackend():
     print("构建后端中...", end="")
     os.chdir(BackendPath)
-    os.system(os.path.join(BackendPath, "build.bat"))
+    os.system(os.path.join(BackendPath, "build.sh"))
     print("OK")
 
 
 def BuildFrontend():
     print("构建前端中...", end="")
     os.chdir(FrontendPath)
-    os.system(os.path.join(FrontendPath, "build.bat"))
+    os.system(os.path.join(FrontendPath, "build.sh"))
     os.system(f"7z a -tzip {os.path.join(FrontendPath, 'dist.zip')} {os.path.join(FrontendPath, 'dist', '*')}")
     os.rename(os.path.join(FrontendPath, "dist.zip"), os.path.join(BackendPath, "bin", "dist.zip"))
     print("OK")
@@ -52,14 +52,18 @@ def UploadWebDav():
                        local_path=os.path.join(BackendPath, "bin", "dist.zip"))
     webdav.upload_sync(remote_path="/CDN/Project/LoongPanel/bin/scripts.zip",
                        local_path=os.path.join(BackendPath, "bin", "scripts.zip"))
+    webdav.upload_sync(remote_path="/CDN/Project/LoongPanel/bin/LoongPanel-linux-amd64",
+                       local_path=os.path.join(BackendPath, "bin", "LoongPanel-linux-amd64"))
+    webdav.upload_sync(remote_path="/CDN/Project/LoongPanel/bin/LoongPanel-linux-loong64",
+                       local_path=os.path.join(BackendPath, "bin", "LoongPanel-linux-loong64"))
     print("上传完成")
 
 
 if __name__ == '__main__':
-    Clean()
-    BuildBackend()
-    BuildFrontend()
-    PackScript()
+    # Clean()
+    # BuildBackend()
+    # BuildFrontend()
+    # PackScript()
     UploadWebDav()
     print("发布完成")
     print("https://cdn1.d5v.cc/CDN/Project/LoongPanel/bin/dist.zip")

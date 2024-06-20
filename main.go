@@ -77,7 +77,7 @@ func downloadDist() {
 //endregion
 
 func printLOGO() {
-	fmt.Println(
+	fmt.Print(
 		"\033[31m__                    _____             _  \n" +
 			"\033[31m|  |   ___ ___ ___ ___|  _  |___ ___ ___| | \n" +
 			"\033[31m|  |__| . | . |   | . |   __| .'|   | -_| | \n" +
@@ -88,22 +88,6 @@ func printLOGO() {
 }
 
 func main() {
-	// region 调试
-	//f, err := os.Create("trace.out")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer func(f *os.File) {
-	//	err := f.Close()
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//}(f)
-	//
-	//if err := trace.start(f); err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer trace.stop()
 	// endregion
 	printLOGO()
 	//region 初始化日志

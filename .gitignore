@@ -30,3 +30,4 @@ resource
 dist
 /release.py
 /scripts.zip
+/.compose-dev.yaml
