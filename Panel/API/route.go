@@ -18,8 +18,9 @@ import (
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/System"
-	"github.com/gin-gonic/gin"
 	"path"
+
+	"github.com/gin-gonic/gin"
 )
 
 func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
@@ -61,7 +62,6 @@ func initRoute(app *gin.Engine) {
 	GroupClean := v1.Group("/clean")
 	GroupPower := v1.Group("/power")
 	GroupFiles := v1.Group("/files")
-	GroupScreen := v1.Group("/screen")
 	GroupLog := v1.Group("/log")
 	GroupAppStore := v1.Group("/appstore")
 	GroupDocker := v1.Group("/docker")
@@ -75,9 +75,6 @@ func initRoute(app *gin.Engine) {
 	SetRoute("POST", "/reboot", home.Shutdown, GroupPower, "重启操作", false)
 	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "获取文件列表", true)
 	SetRoute("GET", "/read", files.FileRead, GroupFiles, "读取文件", true)
-	SetRoute("POST", "/screen", terminal.ScreenCreate, GroupScreen, "终端创建", false)
-	SetRoute("DELETE", "/screen", terminal.ScreenClose, GroupScreen, "终端关闭", false)
-	SetRoute("GET", "/screen", terminal.GetScreens, GroupScreen, "获取终端列表", false)
 	SetRoute("GET", "/screen", terminal.ScreenWs, ws, "使用网页终端", false)
 	SetRoute("GET", "/ping", ping, v1, "权限测试", true)
 	SetRoute("POST", "/login", AuthAPI.Login, GroupAuth, "登录", true)

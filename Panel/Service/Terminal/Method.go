@@ -1,152 +1,73 @@
 /*
  * 创建人： deadmau5v
  * 创建时间： 2024-5-7
- * 文件作用：Terminal模块的方法 操作Screen的输入输出等
+ * 文件作用：Terminal 网页终端实现
  */
 
 package Terminal
 
 import (
-	"LoongPanel/Panel/Service/System"
-	"bytes"
-	"errors"
+	"LoongPanel/Panel/Service/PanelLog"
 	"io"
-	"log"
-	"os/exec"
-	"time"
 
-	"github.com/creack/pty"
+	"github.com/gorilla/websocket"
+	"github.com/helloyi/go-sshclient"
+	"golang.org/x/crypto/ssh"
 )
 
-func (s *Screen) Subscribe() chan []byte {
-	c := make(chan []byte, 1024)
-	s.subscribers = append(s.subscribers, c)
-	return c
+type WsReaderWriter struct {
+	*websocket.Conn
 }
 
-func (s *Screen) Unsubscribe(c chan []byte) {
-	for i, subscriber := range s.subscribers {
-		if subscriber == c {
-			s.subscribers = append(s.subscribers[:i], s.subscribers[i+1:]...)
-			close(c)
-			break
-		}
-	}
-}
-
-func (s *Screen) Publish() {
-	output := s.Output.Bytes()
-	outputLen := len(output)
-	if s.outputLen >= outputLen {
-		s.outputLen = outputLen
-		return
-	}
-	newOutput := output[s.outputLen:outputLen]
-	if string(newOutput) != "" {
-		s.outputLen = len(s.Output.Bytes())
-		for _, subscriber := range s.subscribers {
-			select {
-			case subscriber <- newOutput:
-			default:
-				// 如果订阅者的通道已满就忽略
-			}
-		}
-	}
-}
-
-func (s *Screen) InputByte(b []byte) {
-	_, _ = s.Tmx.Write(b)
-	s.Publish()
-}
-
-func (sm *ScreenManager) Create(name string, id uint32) error {
-
-	flag := false
-	for _, v := range sm.Screens {
-		if v.Id == id {
-			flag = true
-		}
-	}
-	if flag {
-		return errors.New("已存在ID")
-	}
-
-	var buf bytes.Buffer
-
-	c := getInitShell()
-	if c == nil {
-		return errors.New("无法获取Shell")
-	}
-	tty, err := pty.Start(c)
+func (w *WsReaderWriter) Write(p []byte) (n int, err error) {
+	writer, err := w.Conn.NextWriter(websocket.TextMessage)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
+	defer writer.Close()
+	return writer.Write(p)
+}
 
-	//err = pty.Setsize(tty, &pty.Winsize{
-	//	Rows: 16,
-	//	Cols: 200,
-	//})
-	screen := &Screen{
-		Name:        name,
-		Id:          id,
-		Time:        time.Now(),
-		Tmx:         tty,
-		Output:      &buf,
-		subscribers: make([]chan []byte, 0),
-		outputLen:   0,
-	}
-
-	output := io.MultiWriter(&buf)
-
-	go func() {
-		if _, err := io.Copy(output, screen.Tmx); err != nil {
-			log.Printf("Error reading from pty: %v", err)
+func (w *WsReaderWriter) Read(p []byte) (n int, err error) {
+	var msgType int
+	var reader io.Reader
+	for {
+		msgType, reader, err = w.Conn.NextReader()
+		if err != nil {
+			return 0, err
 		}
-	}()
-
-	sm.Screens[id] = screen
-	return nil
-}
-
-func (sm *ScreenManager) GetScreen(id uint32) *Screen {
-	for _, v := range sm.Screens {
-		if v.Id == id {
-			return v
+		if msgType != websocket.TextMessage {
+			continue
 		}
+		return reader.Read(p)
 	}
+}
+
+func Shell(c *websocket.Conn, host, port, user, password string) error {
+
+	config := &sshclient.TerminalConfig{
+		Term:   "xterm",
+		Height: 40,
+		Weight: 80,
+		Modes: ssh.TerminalModes{
+			ssh.ECHO:          1,
+			ssh.TTY_OP_ISPEED: 14400,
+			ssh.TTY_OP_OSPEED: 14400,
+		},
+	}
+	rw := &WsReaderWriter{c}
+	client, err := sshclient.DialWithPasswd(host+":"+port, user, password)
+	if err != nil {
+		return err
+	}
+	terminal := client.Terminal(config)
+	terminal.SetStdio(rw, rw, rw)
+	err = terminal.Start()
+	if err != nil {
+		PanelLog.DEBUG("[网页终端]", "链接关闭", err.Error())
+		return err
+	}
+
+	defer client.Close()
 	return nil
-}
-
-func (s *Screen) GetOutput() string {
-	return s.Output.String()
-}
-
-func (s *Screen) Input(cmd string) {
-	_, _ = s.Tmx.Write([]byte(cmd + "\n"))
-}
-
-func (s *Screen) Close() {
-	_ = s.Tmx.Close()
-}
-
-func (sm *ScreenManager) Close(id int) {
-	screens := make(map[uint32]*Screen)
-	for i, v := range sm.Screens {
-		if v.Id != uint32(id) {
-			screens[i] = v
-		}
-	}
-	sm.Screens = screens
-}
-
-func getInitShell() *exec.Cmd {
-	switch System.Data.OSName {
-	case "linux":
-		return exec.Command("bash")
-	}
-	return nil
-}
-
-func GetNextId() int {
-	return int(time.Now().Unix())
 }
