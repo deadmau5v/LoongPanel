@@ -8,12 +8,11 @@ package terminal
 
 import (
 	"LoongPanel/Panel/Service/PanelLog"
-	"LoongPanel/Panel/Service/Terminal"
-	"net/http"
-	"strings"
-
+	Terminal2 "LoongPanel/Panel/Service/Terminal"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"net/http"
+	"strings"
 )
 
 var upgrade = websocket.Upgrader{
@@ -22,7 +21,7 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
-func ScreenWs(c *gin.Context) {
+func Terminal(c *gin.Context) {
 	PanelLog.INFO("[网页终端]", "terminal WebSocket 连接")
 	w := c.Writer
 	r := c.Request
@@ -30,7 +29,6 @@ func ScreenWs(c *gin.Context) {
 	port := c.Query("port")
 	user := c.Query("user")
 	pwd := c.Query("pwd")
-	PanelLog.DEBUG("[调试]", host, port, user, pwd)
 	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		PanelLog.ERROR("[网页终端]", "无法打开websocket连接")
@@ -38,8 +36,8 @@ func ScreenWs(c *gin.Context) {
 		return
 	}
 	defer conn.Close()
-	PanelLog.DEBUG("[调试]", "链接中")
-	err = Terminal.Shell(conn, host, port, user, pwd)
+
+	err = Terminal2.Shell(conn, host, port, user, pwd)
 	if err != nil {
 		if strings.Contains(err.Error(), "connection refused") {
 			PanelLog.ERROR("[网页终端]", "连接SSH失败")

@@ -45,6 +45,7 @@ func UserAuth() gin.HandlerFunc {
 		skipPaths := []string{
 			"/assets/*",
 			"/script/icons/*",
+			"/api/ws/*",
 		}
 		for _, path := range skipPaths {
 			if match, _ := regexp.MatchString(path, c.Request.URL.Path); match {
@@ -81,6 +82,7 @@ func UserAuth() gin.HandlerFunc {
 				"code": 401,
 				"msg":  "未授权",
 			})
+			c.Abort()
 			return
 		}
 		PanelLog.DEBUG("[权限管理] Authorization", Authorization)
@@ -129,6 +131,7 @@ func UserAuth() gin.HandlerFunc {
 			"msg":  "未授权",
 		})
 		c.Abort()
+		return
 	}
 }
 

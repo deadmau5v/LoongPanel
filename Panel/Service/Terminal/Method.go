@@ -44,7 +44,6 @@ func (w *WsReaderWriter) Read(p []byte) (n int, err error) {
 }
 
 func Shell(c *websocket.Conn, host, port, user, password string) error {
-
 	config := &sshclient.TerminalConfig{
 		Term:   "xterm",
 		Height: 40,
@@ -55,14 +54,19 @@ func Shell(c *websocket.Conn, host, port, user, password string) error {
 			ssh.TTY_OP_OSPEED: 14400,
 		},
 	}
+
 	rw := &WsReaderWriter{c}
+
 	client, err := sshclient.DialWithPasswd(host+":"+port, user, password)
 	if err != nil {
 		return err
 	}
 	terminal := client.Terminal(config)
+
 	terminal.SetStdio(rw, rw, rw)
+
 	err = terminal.Start()
+
 	if err != nil {
 		PanelLog.DEBUG("[网页终端]", "链接关闭", err.Error())
 		return err

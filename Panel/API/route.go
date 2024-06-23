@@ -75,7 +75,7 @@ func initRoute(app *gin.Engine) {
 	SetRoute("POST", "/reboot", home.Shutdown, GroupPower, "重启操作", false)
 	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "获取文件列表", true)
 	SetRoute("GET", "/read", files.FileRead, GroupFiles, "读取文件", true)
-	SetRoute("GET", "/screen", terminal.ScreenWs, ws, "使用网页终端", false)
+	SetRoute("GET", "/screen", terminal.Terminal, ws, "使用网页终端", false)
 	SetRoute("GET", "/ping", ping, v1, "权限测试", true)
 	SetRoute("POST", "/login", AuthAPI.Login, GroupAuth, "登录", true)
 	SetRoute("POST", "/logout", AuthAPI.Logout, GroupAuth, "登出", true)
