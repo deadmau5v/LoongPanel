@@ -31,3 +31,4 @@ dist
 /release.py
 /scripts.zip
 /.compose-dev.yaml
+/dist.zip
