@@ -10,7 +10,6 @@ import (
 	"LoongPanel/Panel/Service/Log"
 	Log2 "LoongPanel/Panel/Service/PanelLog"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -167,7 +166,7 @@ func (c CronLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		fmt.Println("[日志管理] 无法解析日志行:", logLine)
+		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -246,7 +245,7 @@ func (c FirewalldLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		fmt.Println("[日志管理] 无法解析日志行:", logLine)
+		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -318,7 +317,7 @@ func (c MessagesLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		fmt.Println("[日志管理] 无法解析日志行:", logLine)
+		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -390,7 +389,7 @@ func (c SecureLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		fmt.Println("[日志管理] 无法解析日志行:", logLine)
+		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -465,7 +464,7 @@ func (c WtmpLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		fmt.Println("[日志管理] 无法解析日志行:", logLine)
+		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -585,7 +584,7 @@ func (c KernelLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		fmt.Println("[日志管理] 无法解析日志行:", logLine)
+		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
