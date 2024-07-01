@@ -58,7 +58,10 @@ func GetUser(ctx *gin.Context) {
 	var user Database.User
 	Database.DB.Model(&Database.User{}).Where("id = ?", id).First(&user)
 	PanelLog.INFO("[权限管理] 获取用户: ", user.Name)
-	ctx.JSON(200, user)
+	ctx.JSON(200, gin.H{
+		"status": 0,
+		"data":   user,
+	})
 }
 
 // CheckUserExist 检查用户是否存在

@@ -19,6 +19,7 @@ import (
 
 // ContainerList 获取容器列表
 func ContainerList() ([]types.Container, error) {
+	PanelLog.INFO("[Docker管理]", "获取容器列表")
 	app := AppStore.FindApp("Docker")
 	if !app.IsRunning() || !app.IsInstall() {
 		return nil, errors.New("请先安装Docker并启动")
@@ -40,6 +41,7 @@ func ContainerList() ([]types.Container, error) {
 
 // GetImageList 获取镜像列表
 func GetImageList() ([]image.Summary, error) {
+	PanelLog.INFO("[Docker管理]", "获取镜像列表")
 	app := AppStore.FindApp("Docker")
 	if !app.IsRunning() || !app.IsInstall() {
 		return nil, errors.New("请先安装Docker并启动")

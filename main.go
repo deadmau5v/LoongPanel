@@ -9,8 +9,8 @@ package main
 import (
 	"LoongPanel/Panel/API"
 	"LoongPanel/Panel/Service/AppStore/Docker"
-	"LoongPanel/Panel/Service/AppStore/FrpClient"
-	"LoongPanel/Panel/Service/AppStore/FrpServer"
+	FRPClient "LoongPanel/Panel/Service/AppStore/FrpClient"
+	FRPServer "LoongPanel/Panel/Service/AppStore/FrpServer"
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/Log/DataBaseLog"
 	"LoongPanel/Panel/Service/Log/NetWorkLog"
@@ -119,6 +119,8 @@ func main() {
 	Docker.Init()
 	FRPClient.Init()
 	FRPServer.Init()
+
+	// endregion
 
 	//region 入口
 
