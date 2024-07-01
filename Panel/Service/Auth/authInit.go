@@ -1,9 +1,3 @@
-/*
- * 创建人： deadmau5v
- * 创建时间： 2024-5-16
- * 文件作用：初始化casbin权限管理
- */
-
 package Auth
 
 import (
@@ -67,7 +61,6 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 	}
 	// 如果没有权限策略，添加默认策略
 	if len(policy) != 0 {
-
 		for _, v := range policy {
 			msg := strings.Join(v, " ")
 			PanelLog.DEBUG("[权限管理] 策略 ", msg, " 已加载")
@@ -75,4 +68,30 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 		PanelLog.INFO("[权限管理] 策略已加载完成")
 	}
 
+	// 生成默认用户
+	haveAdmin := Database.DB.Where("name = ?", "admin").Find(&Database.User{}).RowsAffected
+
+	if haveAdmin == 0 {
+		admin := Database.User{
+			Name:     "admin",
+			Password: "12345678",
+		}
+		user := Database.User{
+			Name:     "user",
+			Password: "12345678",
+		}
+
+		err := CreateUser(admin)
+		if err != nil {
+			PanelLog.ERROR("[权限管理]", "默认用户创建失败", err.Error())
+			return
+		}
+		err = CreateUser(user)
+		if err != nil {
+			PanelLog.ERROR("[权限管理]", "默认用户创建失败", err.Error())
+			return
+		}
+
+		PanelLog.INFO("[权限管理] 默认用户 admin 创建成功")
+	}
 }

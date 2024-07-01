@@ -1,46 +1,115 @@
-/*
- * 创建人： deadmau5v
- * 创建时间： 2024-5-16
- * 文件作用：储存登陆会话ID
- */
-
 package Auth
 
 import (
-	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"regexp"
+	"sync"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
-func NewSESSION(user Database.User) string {
-	uuid_ := uuid.New().String()
-	session := SESSION{
-		KEY:      uuid_,
-		User:     user,
-		TimeUnix: time.Now().Unix(),
-	}
-	err := Database.DB.Create(&session).Error
+const (
+	sessionIDLength = 32
+	CookieName      = "session_token"
+	CookieMaxAge    = 86400 * 30 // 30 days
+)
+
+var (
+	sessions     = make(map[string]*Session)
+	sessionMutex sync.RWMutex
+)
+
+// Session 表示用户会话
+type Session struct {
+	Username string
+	Expiry   time.Time
+}
+
+// IsExpired 检查会话是否已过期
+func (s Session) IsExpired() bool {
+	return s.Expiry.Before(time.Now())
+}
+
+// CreateSession 创建新的会话并返回会话ID
+func CreateSession(username string) (string, error) {
+	sessionID, err := generateSessionID()
 	if err != nil {
-		PanelLog.ERROR("[权限管理]", err)
-		return ""
+		PanelLog.ERROR("[权限管理]", "创建会话失败: "+err.Error())
+		return "", err
 	}
-	return uuid_
+
+	expiryTime := time.Now().Add(30 * 24 * time.Hour)
+
+	sessionMutex.Lock()
+	sessions[sessionID] = &Session{
+		Username: username,
+		Expiry:   expiryTime,
+	}
+	sessionMutex.Unlock()
+
+	return sessionID, nil
 }
 
-type SESSION struct {
-	KEY      string        `json:"key"`
-	UserID   uint          `json:"user_id"`
-	User     Database.User `json:"user" gorm:"foreignKey:UserID"`
-	TimeUnix int64         `json:"create_time"`
+// GetSession 根据会话ID获取会话信息
+func GetSession(sessionID string) (*Session, bool) {
+	sessionMutex.RLock()
+	defer sessionMutex.RUnlock()
+	session, exists := sessions[sessionID]
+	return session, exists
 }
 
+// DeleteSession 删除指定的会话
+func DeleteSession(sessionID string) {
+	sessionMutex.Lock()
+	delete(sessions, sessionID)
+	sessionMutex.Unlock()
+}
+
+// SetSessionCookie 设置会话cookie
+func SetSessionCookie(c *gin.Context, sessionID string) {
+	c.SetCookie(
+		CookieName,
+		sessionID,
+		CookieMaxAge,
+		"/",
+		"",
+		false,
+		true,
+	)
+}
+
+// ClearSessionCookie 清除会话cookie
+func ClearSessionCookie(c *gin.Context) {
+	c.SetCookie(
+		CookieName,
+		"",
+		-1,
+		"/",
+		"",
+		false,
+		true,
+	)
+}
+
+// generateSessionID 生成随机的会话ID
+func generateSessionID() (string, error) {
+	b := make([]byte, sessionIDLength)
+	_, err := rand.Read(b)
+	if err != nil {
+		PanelLog.ERROR("[权限管理]", "生成会话ID失败: "+err.Error())
+		return "", errors.New("failed to generate session ID")
+	}
+	return base64.URLEncoding.EncodeToString(b), nil
+}
+
+// UserAuth 用户认证 Gin 中间件
 func UserAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		// 放行静态资源
 		skipPaths := []string{
 			"/assets/*",
@@ -76,89 +145,26 @@ func UserAuth() gin.HandlerFunc {
 			}
 		}
 
-		Authorization := c.GetHeader("Authorization")
-		if Authorization == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "未授权",
-			})
-			c.Abort()
-			return
-		}
-		PanelLog.DEBUG("[权限管理] Authorization", Authorization)
-
-		// 使用数据库查询来查找会话
-		var userSession SESSION
-		if err := Database.DB.Where("`key` = ?", Authorization).Preload("User").First(&userSession).Error; err != nil {
-			PanelLog.DEBUG("[权限管理] 未授权 code: 1")
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "未授权",
-			})
-			c.Abort()
-			return
-		}
-
-		// 检查会话是否过期
-		if time.Now().Unix()-userSession.TimeUnix > 86400 { // 假设会话有效期为24小时
-			PanelLog.DEBUG("[权限管理] 会话过期")
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "会话已过期",
-			})
-			c.Abort()
-			return
-		}
-
-		path := PathParse(c.Request.URL.Path)
-		ok, err := Authenticator.Enforce(userSession.User.Role, path, c.Request.Method)
-		status := "未通过"
-		if ok {
-			status = "通过"
-		}
-		PanelLog.DEBUG("[权限管理] 权限验证", userSession.User.Name, c.Request.URL.Path, c.Request.Method, status)
-		if ok && err == nil {
-			c.Next()
-			return
-		}
-
-		PanelLog.DEBUG("[权限管理] 未授权 code: 2")
+		// 从请求中获取session token
+		sessionToken, err := c.Cookie("session_token")
 		if err != nil {
-			PanelLog.ERROR("[权限管理]", err.Error())
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "未授权访问"})
+			c.Abort()
+			return
 		}
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code": 401,
-			"msg":  "未授权",
-		})
-		c.Abort()
-		return
-	}
-}
 
-// PathParse 路径解析
-func PathParse(path string) string {
-	for k, v := range map[string]string{
-		`/api/v1/auth/user/(\d+)$`: "/api/v1/auth/user/:id",
-	} {
-		if match, _ := regexp.MatchString(k, path); match {
-			return v
+		// 验证session
+		session, exists := GetSession(sessionToken)
+		if !exists || session.IsExpired() {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "会话已过期或无效"})
+			c.Abort()
+			return
 		}
-	}
-	return path
-}
 
-func GetSessionByKey(key string) (*SESSION, error) {
-	var Session SESSION
-	Database.DB.Model(&SESSION{}).Where("`key` = ?", key).Find(&Session)
-	// 获取关联的用户
-	Database.DB.Model(&Session).Preload("User").Find(&Session)
-	return &Session, nil
-}
+		// 将用户信息存储到上下文中
+		c.Set("username", session.Username)
 
-func init() {
-	err := Database.DB.AutoMigrate(&SESSION{})
-	if err != nil {
-		PanelLog.DEBUG("[数据库] SESSIONS表创建失败")
-		return
+		// 继续处理请求
+		c.Next()
 	}
 }

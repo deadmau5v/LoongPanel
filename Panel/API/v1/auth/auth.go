@@ -10,90 +10,91 @@ import (
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
+	"errors"
 	"github.com/gin-gonic/gin"
 )
 
-var filed = map[string]interface{}{
-	"code": 401,
-	"msg":  "用户名或密码错误",
-}
+const (
+	successCode      = 200
+	errorCode        = 400
+	unauthorizedCode = 401
+)
 
 func Login(c *gin.Context) {
-	// 读取请求的Json参数
 	var req struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 		Email    string `json:"email"`
 	}
 
-	err := c.BindJSON(&req)
-
-	if err != nil {
-		c.JSON(400, gin.H{
-			"code": 400,
-			"msg":  "参数错误",
-		})
-		c.Abort()
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(errorCode, gin.H{"code": errorCode, "msg": "参数错误"})
 		return
 	}
 
-	// 验证用户名和密码
-	for _, user := range Database.UserFind() {
-		// 使用邮箱登录
-		if req.Email != "" {
-			if user.Mail == req.Email && user.Password == req.Password {
-				// 登录成功
-				PanelLog.DEBUG("[权限管理]", req.Email+": 登录成功")
-				c.JSON(200, gin.H{
-					"code":    200,
-					"msg":     "登录成功",
-					"session": Auth.NewSESSION(user),
-				})
-				return
-			} else {
-				PanelLog.DEBUG("[权限管理]", "尝试登录"+user.Name+"失败")
-				continue
-			}
+	user, err := authenticateUser(req.Username, req.Email, req.Password)
+	if err != nil || user == nil {
+		if err != nil {
+			PanelLog.DEBUG("[权限管理]", "登录失败: "+err.Error())
+		} else {
+			PanelLog.DEBUG("[权限管理]", "登录失败: 用户不存在")
 		}
-		// 使用用户名登录
-		if req.Username != "" {
-			if user.Name == req.Username && user.Password == req.Password {
-				// 登录成功
-				PanelLog.DEBUG("[权限管理]", req.Username+": 登录成功")
-				c.JSON(200, gin.H{
-					"code":    200,
-					"msg":     "登录成功",
-					"session": Auth.NewSESSION(user),
-				})
-				return
-			} else {
-				continue
-			}
-		}
+		c.JSON(unauthorizedCode, gin.H{"code": unauthorizedCode, "msg": "用户名或密码错误"})
+		return
 	}
 
-	// 登录失败
-	PanelLog.DEBUG("[权限管理]", req.Username+": 登录失败")
-	c.JSON(401, filed)
-	return
+	session, err := Auth.CreateSession(user.Name)
+	if err != nil {
+		PanelLog.DEBUG("[权限管理]", "登录失败: "+err.Error())
+		c.JSON(errorCode, gin.H{"code": errorCode, "msg": "登录失败"})
+		return
+	}
+	PanelLog.DEBUG("[权限管理]", user.Name+": 登录成功")
+	Auth.SetSessionCookie(c, session)
 
+	c.JSON(successCode, gin.H{
+		"code": successCode,
+		"msg":  "登录成功",
+	})
 }
 
 func Logout(c *gin.Context) {
-	// 读取请求的Json参数
-	var req struct {
-		Session string `json:"session"`
-	}
-
-	err := c.BindJSON(&req)
-
+	session, err := c.Cookie(Auth.CookieName)
 	if err != nil {
-		c.JSON(400, gin.H{
-			"code": 400,
-			"msg":  "参数错误",
-		})
+		c.JSON(errorCode, gin.H{"code": errorCode, "msg": "参数错误"})
 		return
 	}
 
-	return
+	Auth.DeleteSession(session)
+	PanelLog.DEBUG("[权限管理]", "用户注销成功")
+	Auth.ClearSessionCookie(c)
+	c.JSON(successCode, gin.H{"code": successCode, "msg": "注销成功"})
+}
+
+func authenticateUser(username, email, password string) (*Database.User, error) {
+	users := Database.UserFind()
+	for _, user := range users {
+		if user.Name == username {
+			// 通过用户名
+			ok, err := Auth.AuthenticateUser(user.Name, password)
+			if ok && err == nil {
+				return &user, nil
+			} else if !ok && err == nil {
+				return nil, errors.New("密码错误")
+			} else {
+				return nil, err
+			}
+		} else if user.Mail == email {
+			// 通过邮箱
+			ok, err := Auth.AuthenticateUserByEmail(user.Mail, password)
+			if ok && err == nil {
+				return &user, nil
+			} else if !ok && err == nil {
+				return nil, errors.New("密码错误")
+			} else {
+				return nil, err
+			}
+		}
+	}
+	return nil, errors.New("用户名或密码错误")
 }
