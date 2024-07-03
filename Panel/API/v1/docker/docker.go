@@ -16,14 +16,14 @@ func GetContainerList(c *gin.Context) {
 	list, err := Docker.ContainerList()
 	if err != nil {
 		c.JSON(200, gin.H{
-			"code": 1,
-			"msg":  err.Error(),
+			"status": 1,
+			"msg":    err.Error(),
 		})
 		return
 	}
 	c.JSON(200, gin.H{
-		"code": 0,
-		"data": list,
+		"status": 0,
+		"data":   list,
 	})
 
 }
@@ -33,13 +33,13 @@ func GetImageList(c *gin.Context) {
 	list, err := Docker.GetImageList()
 	if err != nil {
 		c.JSON(200, gin.H{
-			"code": 1,
-			"msg":  err.Error(),
+			"status": 1,
+			"msg":    err.Error(),
 		})
 		return
 	}
 	c.JSON(200, gin.H{
-		"code": 0,
-		"data": list,
+		"status": 0,
+		"data":   list,
 	})
 }

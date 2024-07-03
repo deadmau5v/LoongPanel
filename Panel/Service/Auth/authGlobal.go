@@ -8,7 +8,6 @@ package Auth
 
 import (
 	"LoongPanel/Panel/Service/Database"
-	"LoongPanel/Panel/Service/PanelLog"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
@@ -98,7 +97,6 @@ func AuthenticateUser(username, password string) (bool, error) {
 		return false, err
 	}
 
-	PanelLog.DEBUG("[调试]", hashedPassword, storedPassword)
 	return storedPassword == hashedPassword, nil
 }
 

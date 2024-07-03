@@ -80,6 +80,7 @@ func SetSessionCookie(c *gin.Context, sessionID string) {
 		false,
 		true,
 	)
+	c.Next()
 }
 
 // ClearSessionCookie 清除会话cookie
@@ -93,6 +94,7 @@ func ClearSessionCookie(c *gin.Context) {
 		false,
 		true,
 	)
+	c.Next()
 }
 
 // generateSessionID 生成随机的会话ID

@@ -28,7 +28,7 @@ func Login(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(errorCode, gin.H{"code": errorCode, "msg": "参数错误"})
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
 		return
 	}
 
@@ -39,36 +39,36 @@ func Login(c *gin.Context) {
 		} else {
 			PanelLog.DEBUG("[权限管理]", "登录失败: 用户不存在")
 		}
-		c.JSON(unauthorizedCode, gin.H{"code": unauthorizedCode, "msg": "用户名或密码错误"})
+		c.JSON(unauthorizedCode, gin.H{"status": 401, "msg": "用户名或密码错误"})
 		return
 	}
 
 	session, err := Auth.CreateSession(user.Name)
 	if err != nil {
 		PanelLog.DEBUG("[权限管理]", "登录失败: "+err.Error())
-		c.JSON(errorCode, gin.H{"code": errorCode, "msg": "登录失败"})
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "登录失败"})
 		return
 	}
 	PanelLog.DEBUG("[权限管理]", user.Name+": 登录成功")
 	Auth.SetSessionCookie(c, session)
 
 	c.JSON(successCode, gin.H{
-		"code": successCode,
-		"msg":  "登录成功",
+		"status": 0,
+		"msg":    "登录成功",
 	})
 }
 
 func Logout(c *gin.Context) {
 	session, err := c.Cookie(Auth.CookieName)
 	if err != nil {
-		c.JSON(errorCode, gin.H{"code": errorCode, "msg": "参数错误"})
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
 		return
 	}
 
 	Auth.DeleteSession(session)
 	PanelLog.DEBUG("[权限管理]", "用户注销成功")
 	Auth.ClearSessionCookie(c)
-	c.JSON(successCode, gin.H{"code": successCode, "msg": "注销成功"})
+	c.JSON(successCode, gin.H{"status": 0, "msg": "注销成功"})
 }
 
 func authenticateUser(username, email, password string) (*Database.User, error) {

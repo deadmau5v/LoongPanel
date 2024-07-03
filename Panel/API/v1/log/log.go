@@ -33,12 +33,12 @@ func GetLog(c *gin.Context) {
 	name := c.Query("name")
 	line := c.Query("line")
 	if name == "" || line == "" {
-		c.JSON(400, gin.H{"msg": "缺少参数"})
+		c.JSON(400, gin.H{"msg": "缺少参数", "status": 1})
 		return
 	}
 	lineInt, err := strconv.Atoi(line)
 	if err != nil {
-		c.JSON(400, gin.H{"msg": "行数参数错误"})
+		c.JSON(400, gin.H{"msg": "行数参数错误", "status": 1})
 		return
 	}
 
@@ -80,7 +80,7 @@ func GetLogStruct(c *gin.Context) {
 func ClearLog(c *gin.Context) {
 	name := c.Query("name")
 	if name == "" {
-		c.JSON(400, gin.H{"msg": "缺少参数"})
+		c.JSON(400, gin.H{"msg": "缺少参数", "status": 1})
 		return
 	}
 

@@ -159,16 +159,14 @@ func DeleteUser(ctx *gin.Context) {
 // 辅助函数
 
 func getUserID(ctx *gin.Context) (int, error) {
-	cookie, err := ctx.Cookie("session_token")
-	if err != nil {
-		return 0, errors.New("无效的会话")
-	}
-	session, exists := Auth.GetSession(cookie)
+
+	username, exists := ctx.Get("username")
 	if !exists {
-		return 0, errors.New("无效的用户ID或会话")
+		return 0, errors.New("无效的用户ID")
 	}
+
 	user := Database.User{}
-	result := Database.DB.Model(&Database.User{}).Where("name = ?", session.Username).First(&user)
+	result := Database.DB.Model(&Database.User{}).Where("name = ?", username).First(&user)
 	if result.Error != nil {
 		return 0, errors.New("无效的用户ID")
 	}
@@ -342,4 +340,55 @@ func getPolicy(role string) []policy {
 
 	PanelLog.INFO("[权限管理] 获取权限列表")
 	return policyList
+}
+
+// AddPolicy 添加策略
+func AddPolicy(c *gin.Context) {
+	req := policy{}
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
+		return
+	}
+
+	if req.Role == "" || req.Path == "" || req.Method == "" {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
+		return
+	}
+
+	exists, err := Auth.Authenticator.AddPolicy(req.Role, req.Path, req.Method)
+	if err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "添加失败"})
+		return
+	}
+	if exists {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "已存在"})
+		return
+	} else {
+		PanelLog.DEBUG("[权限管理]", "添加权限: "+req.Role+" "+req.Path+" "+req.Method)
+	}
+
+	c.JSON(successCode, gin.H{"status": 0, "msg": "添加成功"})
+}
+
+// DeletePolicy 删除策略
+func DeletePolicy(c *gin.Context) {
+	req := policy{}
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
+		return
+	}
+
+	ok, err := Auth.Authenticator.RemovePolicy(req.Role, req.Path, req.Method)
+	if err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "删除失败"})
+		return
+	}
+	if ok {
+		PanelLog.DEBUG("[权限管理]", "删除权限: "+req.Role+" "+req.Path+" "+req.Method)
+		c.JSON(successCode, gin.H{"status": 0, "msg": "删除成功"})
+	} else {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "删除失败"})
+	}
 }
