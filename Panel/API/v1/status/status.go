@@ -1,0 +1,39 @@
+/*
+ * 创建人： deadmau5v
+ * 创建时间： 2024-7-4
+ * 文件作用：状态监控 API
+ */
+
+package status
+
+import (
+	"LoongPanel/Panel/Service/Status"
+	"github.com/gin-gonic/gin"
+	"strconv"
+	"time"
+)
+
+// SetStatusStepTime 设置状态监控时间间隔
+func SetStatusStepTime(ctx *gin.Context) {
+	stepTime := ctx.Query("time")
+
+	if stepTime == "" {
+		ctx.JSON(200, gin.H{
+			"status": 1,
+			"msg":    "time 不能为空",
+		})
+		return
+	}
+
+	number, err := strconv.Atoi(stepTime)
+	if err != nil && number < 0 {
+		ctx.JSON(200, gin.H{
+			"status": 1,
+			"msg":    "time 必须是大于等于0的数字",
+		})
+		return
+	}
+
+	// 修改时间间隔
+	Status.SetStepTime(time.Duration(number) * time.Second)
+}

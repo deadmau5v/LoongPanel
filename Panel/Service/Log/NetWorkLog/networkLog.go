@@ -8,7 +8,7 @@ package NetWorkLog
 
 import (
 	"LoongPanel/Panel/Service/Log"
-	Log2 "LoongPanel/Panel/Service/PanelLog"
+	PanelLog "LoongPanel/Panel/Service/PanelLog"
 	"errors"
 	"fmt"
 	"os/exec"
@@ -38,7 +38,7 @@ func GetNetWorkLog() *Log.Log_ {
 		output, err := exec.Command("journalctl", "-u", "NetworkManager", "-n", strconv.Itoa(line), "--no-pager").Output()
 		if err != nil {
 			log.Ok = false
-			Log2.ERROR("[日志管理] 获取网络日志失败：" + err.Error())
+			PanelLog.ERROR("[日志管理] 获取网络日志失败：" + err.Error())
 			return nil
 		}
 
@@ -59,7 +59,7 @@ func GetNetWorkLog() *Log.Log_ {
 		_, err := exec.Command("journalctl", "-u", "NetworkManager", "--rotate").Output()
 		if err != nil {
 			log.Ok = false
-			Log2.ERROR("[日志管理] 清空网络日志失败：" + err.Error())
+			PanelLog.ERROR("[日志管理] 清空网络日志失败：" + err.Error())
 			return
 		}
 		return
@@ -135,7 +135,6 @@ func parseLog(logLine string) (*LogEntry, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		Log2.DEBUG("[日志管理] 无法解析日志行", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 	pid, err := strconv.Atoi(matches[8])
