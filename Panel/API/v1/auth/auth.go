@@ -12,6 +12,7 @@ import (
 	"LoongPanel/Panel/Service/PanelLog"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"time"
 )
 
 const (
@@ -50,6 +51,9 @@ func Login(c *gin.Context) {
 		return
 	}
 	PanelLog.DEBUG("[权限管理]", user.Name+": 登录成功")
+	user.LastLoginTime = time.Now().Format("2006-01-01 11:22:33")
+	user.LastLoginIP = c.ClientIP()
+	user.Update()
 	Auth.SetSessionCookie(c, session)
 
 	c.JSON(successCode, gin.H{

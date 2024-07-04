@@ -77,14 +77,14 @@ func GetCpuUsage() float32 {
 	return float32(CPUPercent)
 }
 
-// DiskReadIO 磁盘IO监控
-func DiskReadIO() (map[string]uint64, error) {
+// diskReadIO 磁盘IO监控
+func diskReadIO() (map[string]uint64, error) {
 	res := make(map[string]uint64)
 	io, _ := disk.IOCounters()
 	for key := range io {
 		res[key] = io[key].ReadCount
 	}
-	time.Sleep(1*time.Second + 100*time.Millisecond)
+	time.Sleep(1 * time.Second)
 	io, _ = disk.IOCounters()
 	for key := range io {
 		res[key] = io[key].ReadCount - res[key]
@@ -92,14 +92,14 @@ func DiskReadIO() (map[string]uint64, error) {
 	return res, nil
 }
 
-// DiskWriteIO 磁盘IO监控
-func DiskWriteIO() (map[string]uint64, error) {
+// diskWriteIO 磁盘IO监控
+func diskWriteIO() (map[string]uint64, error) {
 	res := make(map[string]uint64)
 	io, _ := disk.IOCounters()
 	for key := range io {
 		res[key] = io[key].WriteCount
 	}
-	time.Sleep(1*time.Second + 100*time.Millisecond)
+	time.Sleep(1 * time.Second)
 	io, _ = disk.IOCounters()
 	for key := range io {
 		res[key] = io[key].WriteCount - res[key]
@@ -107,11 +107,11 @@ func DiskWriteIO() (map[string]uint64, error) {
 	return res, nil
 }
 
-// NetworkIO 网络IO监控
-func NetworkIO() ([]NetworkIOStat, error) {
+// networkIO 网络IO监控
+func networkIO() error {
 	counters, err := net.IOCounters(true)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var stats []NetworkIOStat
@@ -124,10 +124,10 @@ func NetworkIO() ([]NetworkIOStat, error) {
 			PacketsRecv:   counter.PacketsRecv,
 		})
 	}
-
+	time.Sleep(1 * time.Second)
 	counters, err = net.IOCounters(true)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	for idx, counter := range counters {
@@ -140,7 +140,13 @@ func NetworkIO() ([]NetworkIOStat, error) {
 		}
 	}
 
-	return stats, nil
+	for _, counter := range stats {
+		NetworkIOSend += counter.BytesSent
+		NetworkIORecv += counter.BytesRecv
+		NetworkIOPacketsSent += counter.PacketsSent
+		NetworkIOPacketsRecv += counter.PacketsRecv
+	}
+	return nil
 }
 
 // MonitorCPUPerCore 监控每个CPU核心的使用率

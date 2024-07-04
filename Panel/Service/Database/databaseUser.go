@@ -18,6 +18,10 @@ func (user *User) Delete() {
 	DB.Delete(&user)
 }
 
+func (user *User) Update() {
+	DB.Save(&user)
+}
+
 func UserFind() []User {
 	var Users []User
 	DB.Find(&Users)

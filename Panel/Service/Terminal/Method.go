@@ -56,7 +56,6 @@ func Shell(c *websocket.Conn, host, port, user, password string) error {
 	}
 
 	rw := &WsReaderWriter{c}
-
 	client, err := sshclient.DialWithPasswd(host+":"+port, user, password)
 	if err != nil {
 		return err
@@ -66,7 +65,6 @@ func Shell(c *websocket.Conn, host, port, user, password string) error {
 	terminal.SetStdio(rw, rw, rw)
 
 	err = terminal.Start()
-
 	if err != nil {
 		PanelLog.DEBUG("[网页终端]", "链接关闭", err.Error())
 		return err

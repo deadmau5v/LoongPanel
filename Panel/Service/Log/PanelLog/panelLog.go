@@ -8,7 +8,7 @@ package PanelLog
 
 import (
 	"LoongPanel/Panel/Service/Log"
-	Log2 "LoongPanel/Panel/Service/PanelLog"
+	PanelLog "LoongPanel/Panel/Service/PanelLog"
 	"errors"
 	"io"
 	"os"
@@ -40,19 +40,19 @@ func GetPanelLog() *Log.Log_ {
 	log.GetLog = func(line int) interface{} {
 		file, err := os.Open(log.Path)
 		if err != nil {
-			Log2.ERROR("[面板日志] 打开日志文件失败: ", err.Error())
+			PanelLog.ERROR("[面板日志] 打开日志文件失败: ", err.Error())
 			return nil
 		}
 		defer func(file *os.File) {
 			err := file.Close()
 			if err != nil {
-				Log2.ERROR("[面板日志] 关闭日志文件失败: ", err.Error())
+				PanelLog.ERROR("[面板日志] 关闭日志文件失败: ", err.Error())
 			}
 		}(file)
 
 		all, err := io.ReadAll(file)
 		if err != nil {
-			Log2.ERROR("[面板日志] 读取日志文件失败: ", err.Error())
+			PanelLog.ERROR("[面板日志] 读取日志文件失败: ", err.Error())
 			return nil
 		}
 
@@ -82,7 +82,7 @@ func GetPanelLog() *Log.Log_ {
 		}
 		err := os.Truncate(log.Path, 0)
 		if err != nil {
-			Log2.ERROR("[面板日志] 清空日志文件失败: ", err.Error())
+			PanelLog.ERROR("[面板日志] 清空日志文件失败: ", err.Error())
 		}
 	}
 
@@ -130,7 +130,6 @@ func parseLog(logLine string) (*LogEntry, error) {
 
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		Log2.DEBUG("[日志管理] 无法解析日志行", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 

@@ -8,7 +8,7 @@ package SystemLog
 
 import (
 	"LoongPanel/Panel/Service/Log"
-	Log2 "LoongPanel/Panel/Service/PanelLog"
+	"LoongPanel/Panel/Service/PanelLog"
 	"errors"
 	"io"
 	"os"
@@ -27,24 +27,24 @@ func GetLog(log *Log.Log_, line int, entry LogEntry) interface{} {
 		return nil
 	}
 
-	Log2.DEBUG("[日志管理] 获取日志", log.Name, log.Path)
+	PanelLog.DEBUG("[日志管理] 获取日志", log.Name, log.Path)
 	file, err := os.Open(log.Path)
 	if err != nil {
 		log.Ok = false
-		Log2.ERROR("打开日志文件失败", log.Name, log.Path)
+		PanelLog.ERROR("打开日志文件失败", log.Name, log.Path)
 		return nil
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
 			log.Ok = false
-			Log2.ERROR("关闭日志文件失败", log.Name, log.Path)
+			PanelLog.ERROR("关闭日志文件失败", log.Name, log.Path)
 		}
 	}(file)
 	all, err := io.ReadAll(file)
 	if err != nil {
 		log.Ok = false
-		Log2.ERROR("读取日志文件失败", log.Name, log.Path)
+		PanelLog.ERROR("读取日志文件失败", log.Name, log.Path)
 		return nil
 	}
 
@@ -78,7 +78,7 @@ func ClearLog(log *Log.Log_) {
 	}
 	err := exec.Command("echo", ">", log.Path).Run()
 	if err != nil {
-		Log2.ERROR("[日志管理] 清空日志失败", log.Name, log.Path)
+		PanelLog.ERROR("[日志管理] 清空日志失败", log.Name, log.Path)
 	}
 
 }
@@ -166,7 +166,6 @@ func (c CronLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -245,7 +244,6 @@ func (c FirewalldLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -317,7 +315,6 @@ func (c MessagesLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -389,7 +386,6 @@ func (c SecureLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -464,7 +460,6 @@ func (c WtmpLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -488,7 +483,7 @@ func GetWtmpLog() *Log.Log_ {
 		output, err := exec.Command("utmpdump", log.Path).Output()
 		if err != nil {
 			log.Ok = false
-			Log2.ERROR("执行 utmpdump 命令失败", log.Name, log.Path)
+			PanelLog.ERROR("执行 utmpdump 命令失败", log.Name, log.Path)
 			return nil
 		}
 
@@ -584,7 +579,6 @@ func (c KernelLog) ProcessLogLine(logLine string) (any, error) {
 	re := regexp.MustCompile(pattern)
 	matches := re.FindStringSubmatch(logLine)
 	if matches == nil {
-		//fmt.Println("[日志管理] 无法解析日志行:", logLine)
 		return nil, errors.New("无法解析日志行")
 	}
 
@@ -637,7 +631,7 @@ func GetKernelLog() *Log.Log_ {
 		output, err := exec.Command("journalctl", "-k", "--no-pager").Output()
 		if err != nil {
 			log.Ok = false
-			Log2.ERROR("执行 journalctl 命令失败", log.Name)
+			PanelLog.ERROR("执行 journalctl 命令失败", log.Name)
 			return nil
 		}
 
@@ -667,7 +661,7 @@ func GetKernelLog() *Log.Log_ {
 		err := exec.Command("rm", "-rf", "/run/log/journal/").Run()
 		if err != nil {
 			log.Ok = false
-			Log2.ERROR("删除 /run/log/journal/ 失败", log.Name)
+			PanelLog.ERROR("删除 /run/log/journal/ 失败", log.Name)
 		}
 		return
 	}

@@ -75,10 +75,12 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 		admin := Database.User{
 			Name:     "admin",
 			Password: "12345678",
+			Role:     "admin",
 		}
 		user := Database.User{
 			Name:     "user",
 			Password: "12345678",
+			Role:     "user",
 		}
 
 		err := CreateUser(admin)

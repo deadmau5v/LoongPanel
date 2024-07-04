@@ -1,6 +1,7 @@
 package Auth
 
 import (
+	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
 	"crypto/rand"
 	"encoding/base64"
@@ -150,7 +151,7 @@ func UserAuth() gin.HandlerFunc {
 		// 从请求中获取session token
 		sessionToken, err := c.Cookie("session_token")
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "未授权访问"})
+			c.JSON(http.StatusUnauthorized, gin.H{"msg": "未授权访问", "status": 401})
 			c.Abort()
 			return
 		}
@@ -158,7 +159,7 @@ func UserAuth() gin.HandlerFunc {
 		// 验证session
 		session, exists := GetSession(sessionToken)
 		if !exists || session.IsExpired() {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "会话已过期或无效"})
+			c.JSON(http.StatusUnauthorized, gin.H{"msg": "会话已过期或无效", "status": 401})
 			c.Abort()
 			return
 		}
@@ -166,7 +167,35 @@ func UserAuth() gin.HandlerFunc {
 		// 将用户信息存储到上下文中
 		c.Set("username", session.Username)
 
+		// 检查用户权限
+		if !CheckUserPolicy(c) {
+			c.JSON(http.StatusForbidden, gin.H{"msg": "没有权限访问", "status": 403})
+			c.Abort()
+			return
+		}
 		// 继续处理请求
 		c.Next()
 	}
+}
+
+func CheckUserPolicy(ctx *gin.Context) bool {
+	username, exists := ctx.Get("username")
+	if !exists {
+		return false
+	}
+
+	user := Database.User{}
+	result := Database.DB.Model(&Database.User{}).Where("name = ?", username).First(&user)
+	if result.Error != nil {
+		return false
+	}
+
+	enforce, err := Authenticator.Enforce(user.Role, ctx.Request.URL.Path, ctx.Request.Method)
+	//PanelLog.DEBUG("[调试]", enforce, err, user.Role, ctx.Request.URL.Path, ctx.Request.Method)
+	if err != nil {
+		PanelLog.ERROR("[权限管理] 验证权限失败", err.Error())
+		return false
+	}
+
+	return enforce
 }

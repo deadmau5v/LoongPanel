@@ -392,3 +392,37 @@ func DeletePolicy(c *gin.Context) {
 		c.JSON(errorCode, gin.H{"status": 1, "msg": "删除失败"})
 	}
 }
+
+// ChangePassword 修改密码
+func ChangePassword(c *gin.Context) {
+	req := struct {
+		Password string `json:"password"`
+	}{}
+
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
+		return
+	}
+
+	username, exists := c.Get("username")
+	if !exists {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "无效的用户ID"})
+		return
+	}
+	user := Database.User{}
+	result := Database.DB.Model(&Database.User{}).Where("name = ?", username).First(&user)
+	if result.Error != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "无效的用户ID"})
+		return
+	}
+
+	user.Password = Auth.HashPassword(req.Password)
+	err := Auth.ValidateCredentials(user.Name, req.Password)
+	if err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "密码格式错误" + err.Error()})
+		return
+	}
+	user.Update()
+	PanelLog.INFO("[权限管理]", user.Name, "用户修改密码")
+	c.JSON(successCode, gin.H{"status": 0, "msg": "修改成功"})
+}

@@ -14,6 +14,7 @@ import (
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
 	"LoongPanel/Panel/API/v1/log"
+	"LoongPanel/Panel/API/v1/status"
 	"LoongPanel/Panel/API/v1/terminal"
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/PanelLog"
@@ -78,12 +79,14 @@ func initRoute(app *gin.Engine) {
 	SetRoute("DELETE", "/role", AuthAPI.DeleteRole, GroupAuth, "删除角色", false)
 	SetRoute("POST", "/policy", AuthAPI.AddPolicy, GroupAuth, "获取策略", false)
 	SetRoute("DELETE", "/policy", AuthAPI.DeletePolicy, GroupAuth, "删除策略", false)
+	SetRoute("POST", "/password", AuthAPI.ChangePassword, GroupAuth, "修改密码", false)
 
 	// 系统状态
 	GroupStatus := v1.Group("/status")
 	SetRoute("GET", "/system_status", home.SystemStatus, GroupStatus, "系统状态", true)
 	SetRoute("GET", "/system_info", home.SystemInfo, GroupStatus, "系统信息", true)
 	SetRoute("GET", "/disks", home.Disks, GroupStatus, "磁盘信息", true)
+	SetRoute("POST", "/time_step", status.SetStatusStepTime, GroupStatus, "设置状态保存间隔 0为关闭", false)
 
 	// 清理
 	GroupClean := v1.Group("/clean")
