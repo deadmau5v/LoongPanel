@@ -32,4 +32,4 @@ dist
 /scripts.zip
 /.compose-dev.yaml
 /dist.zip
-/.run.sh
+run.sh
