@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/casbin/casbin/v2 v2.97.0
 	github.com/casbin/gorm-adapter/v3 v3.25.0
-	github.com/docker/docker v27.0.0+incompatible
+	github.com/docker/docker v27.0.3+incompatible
 	github.com/gin-gonic/gin v1.10.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/helloyi/go-sshclient v1.2.0
@@ -80,17 +80,17 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.52.0 // indirect
-	go.opentelemetry.io/otel v1.27.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
+	go.opentelemetry.io/otel v1.28.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.27.0 // indirect
-	go.opentelemetry.io/otel/metric v1.27.0 // indirect
+	go.opentelemetry.io/otel/metric v1.28.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.27.0 // indirect
-	go.opentelemetry.io/otel/trace v1.27.0 // indirect
+	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/mod v0.18.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
@@ -99,7 +99,7 @@ require (
 	gorm.io/driver/sqlserver v1.5.3 // indirect
 	gorm.io/plugin/dbresolver v1.5.2 // indirect
 	gotest.tools/v3 v3.5.1 // indirect
-	modernc.org/libc v1.53.3 // indirect
+	modernc.org/libc v1.54.2 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.8.0 // indirect
 	modernc.org/sqlite v1.30.1 // indirect
