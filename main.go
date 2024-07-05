@@ -14,7 +14,7 @@ import (
 	"LoongPanel/Panel/Service/Log"
 	"LoongPanel/Panel/Service/Log/DataBaseLog"
 	"LoongPanel/Panel/Service/Log/NetWorkLog"
-	PanelLog2 "LoongPanel/Panel/Service/Log/PanelLog"
+	PanelAppLog "LoongPanel/Panel/Service/Log/PanelLog"
 	"LoongPanel/Panel/Service/Log/PkgLog"
 	"LoongPanel/Panel/Service/Log/SystemLog"
 	"LoongPanel/Panel/Service/PanelLog"
@@ -100,7 +100,7 @@ func main() {
 	Log.Add("登录日志", SystemLog.GetWtmpLog)
 	Log.Add("系统日志", SystemLog.GetKernelLog)
 	Log.Add("包管理工具", PkgLog.GetDnfLog)
-	Log.Add("面板日志", PanelLog2.GetPanelLog)
+	Log.Add("面板日志", PanelAppLog.GetPanelLog)
 	Log.Add("网络日志", NetWorkLog.GetNetWorkLog)
 	Log.Add("数据库日志", DataBaseLog.GetDataBaseLog)
 

@@ -13,23 +13,34 @@ import (
 )
 
 func init() {
-	var err = error(nil)
+	var err error
+	// 获取系统信息
 	Data, err = GetOSData()
-	temp, err := getPublicIP()
+	if err != nil {
+		PanelLog.ERROR("[系统管理] GetOSData() Error: ", err.Error())
+	}
+	// 获取公网IP
+	PublicIP, err = getPublicIP()
 	if err != nil {
 		PanelLog.ERROR("[系统管理] GetPublicIP() Error: ", err.Error())
 	}
-	PublicIP = temp
+	// 获取工作路径
 	WORKDIR, err = os.Getwd()
-	// 开启线程 实时监控CPU占用 防止调用时阻塞
+	if err != nil {
+		PanelLog.ERROR("[系统管理] Getwd() Error: ", err.Error())
+	}
+	// 多线程任务
 	go func() {
 		for {
 			var wg sync.WaitGroup
 			wg.Add(4)
-			var err error
+			// 获取CPU使用率
 			go func() { defer wg.Done(); CPUPercent = getCPUPercent() }()
-			go func() { defer wg.Done(); DiskReadIO, err = diskReadIO() }()
-			go func() { defer wg.Done(); DiskWriteIO, err = diskWriteIO() }()
+			// 获取磁盘读取IO
+			go func() { defer wg.Done(); diskReadIO() }()
+			// 获取磁盘写入IO
+			go func() { defer wg.Done(); diskWriteIO() }()
+			// 获取网络IO
 			go func() {
 				defer wg.Done()
 				err := networkIO()
@@ -40,9 +51,6 @@ func init() {
 			}()
 
 			wg.Wait()
-			if err != nil {
-				PanelLog.ERROR("[系统管理] Error: ", err.Error())
-			}
 		}
 	}()
 }

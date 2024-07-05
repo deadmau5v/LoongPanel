@@ -8,16 +8,17 @@ package System
 
 import (
 	"LoongPanel/Panel/Service/PanelLog"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/mem"
-	"github.com/shirou/gopsutil/net"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/net"
 )
 
 // LoadAverage 负荷监控
@@ -78,33 +79,25 @@ func GetCpuUsage() float32 {
 }
 
 // diskReadIO 磁盘IO监控
-func diskReadIO() (map[string]uint64, error) {
+func diskReadIO() {
 	res := make(map[string]uint64)
 	io, _ := disk.IOCounters()
 	for key := range io {
 		res[key] = io[key].ReadCount
 	}
+	DiskReadIO = res
 	time.Sleep(1 * time.Second)
-	io, _ = disk.IOCounters()
-	for key := range io {
-		res[key] = io[key].ReadCount - res[key]
-	}
-	return res, nil
 }
 
 // diskWriteIO 磁盘IO监控
-func diskWriteIO() (map[string]uint64, error) {
+func diskWriteIO() {
 	res := make(map[string]uint64)
 	io, _ := disk.IOCounters()
 	for key := range io {
 		res[key] = io[key].WriteCount
 	}
+	DiskWriteIO = res
 	time.Sleep(1 * time.Second)
-	io, _ = disk.IOCounters()
-	for key := range io {
-		res[key] = io[key].WriteCount - res[key]
-	}
-	return res, nil
 }
 
 // networkIO 网络IO监控
