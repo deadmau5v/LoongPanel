@@ -61,6 +61,7 @@ func initRoute(app *gin.Engine) {
 	// websocket
 	ws := app.Group("/api/ws")
 	SetRoute("GET", "/screen", terminal.Terminal, ws, "使用网页终端", false)
+	SetRoute("GET", "/status", status.GetStatus, ws, "获取状态", false)
 
 	// 权限管理
 	GroupAuth := v1.Group("/auth")

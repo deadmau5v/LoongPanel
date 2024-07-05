@@ -20,8 +20,8 @@ import (
 )
 
 var (
-	StepTime time.Duration = 5 * time.Second // 默认五秒
-	SaveTime time.Duration = 1 * time.Hour   // 保存一小时
+	StepTime time.Duration = 5 * time.Second // 默认5秒
+	SaveTime time.Duration = 5 * time.Minute // 5分钟
 	CronID   cron.EntryID
 	// 初次运行时 磁盘IO归零
 	DiskIOReadInit  uint64
@@ -167,6 +167,13 @@ func SetSaveTime(t time.Duration) {
 	SaveTime = t
 }
 
+func GetStatus(start uint64) []Status {
+	status := []Status{}
+	Database.DB.Where("time >= ?", start).Find(&status)
+	return status
+}
+
+// 初始化
 func init() {
 	err := Database.DB.AutoMigrate(&Status{})
 	if err != nil {

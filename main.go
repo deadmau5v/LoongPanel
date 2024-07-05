@@ -76,20 +76,7 @@ func downloadDist() {
 
 //endregion
 
-func printLOGO() {
-	fmt.Print(
-		"\033[31m__                    _____             _  \n" +
-			"\033[31m|  |   ___ ___ ___ ___|  _  |___ ___ ___| | \n" +
-			"\033[31m|  |__| . | . |   | . |   __| .'|   | -_| | \n" +
-			"\033[91m|_____|___|___|_|_|_  |__|  |__,|_|_|___|_| \n" +
-			"\033[91m                  |___| \n" +
-			"\033[31m        LoongPanel 1.0.0 软件杯作品\n",
-	)
-}
-
 func main() {
-	// endregion
-	printLOGO()
 	//region 初始化日志
 	Log.AllLog = make(map[string]Log.Log_)
 	Log.Add("系统启动日志", SystemLog.GetBootLog)
