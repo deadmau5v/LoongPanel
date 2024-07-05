@@ -24,27 +24,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetRoute(Method string, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
+func SetRoute(Method, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
 	PanelLog.DEBUG("[添加路由]", Method, Path, comment)
-	if group != nil {
-		_, err := Auth.Authenticator.AddPolicy("admin", group.BasePath()+Path, Method)
-		if Public {
-			_, err = Auth.Authenticator.AddPolicy("user", group.BasePath()+Path, Method)
-		}
-		if err != nil {
+
+	addPolicy := func(role, path, method string) {
+		if _, err := Auth.Authenticator.AddPolicy(role, path, method); err != nil {
 			PanelLog.ERROR("[权限管理]", "添加权限策略失败", err)
 			panic(err)
-			return
+		}
+	}
+
+	if group != nil {
+		basePath := group.BasePath() + Path
+		addPolicy("admin", basePath, Method)
+		if Public {
+			addPolicy("user", basePath, Method)
 		}
 		group.Handle(Method, Path, HandlerFunc)
 	} else {
-		_, err := Auth.Authenticator.AddPolicy("admin", Path, Method)
-		_, err = Auth.Authenticator.AddPolicy("user", Path, Method)
-		if err != nil {
-			PanelLog.ERROR("[权限管理]", "添加权限策略失败", err)
-			panic(err)
-			return
-		}
+		addPolicy("admin", Path, Method)
+		addPolicy("user", Path, Method)
 		App.Handle(Method, Path, HandlerFunc)
 	}
 }
