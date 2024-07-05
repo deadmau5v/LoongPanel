@@ -87,6 +87,7 @@ func initRoute(app *gin.Engine) {
 	SetRoute("GET", "/system_info", home.SystemInfo, GroupStatus, "系统信息", true)
 	SetRoute("GET", "/disks", home.Disks, GroupStatus, "磁盘信息", true)
 	SetRoute("POST", "/time_step", status.SetStatusStepTime, GroupStatus, "设置状态保存间隔 0为关闭", false)
+	SetRoute("POST", "/save_time", status.SetSaveTime, GroupStatus, "设置状态保存时间", false)
 
 	// 清理
 	GroupClean := v1.Group("/clean")

@@ -14,6 +14,7 @@ import (
 
 var (
 	StepTime time.Duration = 5 * time.Second // 默认五秒
+	SaveTime time.Duration = 1 * time.Hour   // 保存一小时
 	CronID   cron.EntryID
 )
 
@@ -74,6 +75,7 @@ func (n NetworkIO) Value() (driver.Value, error) {
 }
 
 type Status struct {
+	Time        uint64      `json:"time"`
 	LoadAverage LoadAverage `json:"load_average"`
 	CPU         float32     `json:"cpu"`
 	RAM         RAM         `json:"ram"`
@@ -84,8 +86,13 @@ type Status struct {
 func Job() {
 	//PanelLog.DEBUG("[状态监控]", "保存服务器状态...")
 
-	status := Status{}
+	// 删除过期状态
+	err := Database.DB.Where("time < ?", time.Now().Unix()-int64(SaveTime.Seconds())).Delete(&Status{}).Error
+	if err != nil {
+		PanelLog.ERROR("[状态监控]", err.Error())
+	}
 
+	status := Status{}
 	// 负载
 	average, err := System.LoadAverage()
 	if err != nil {
@@ -109,6 +116,9 @@ func Job() {
 	status.NetworkIO = networkIO
 	System.NetworkIOSend, System.NetworkIORecv, System.NetworkIOPacketsSent, System.NetworkIOPacketsRecv = 0, 0, 0, 0
 
+	// 时间
+	status.Time = uint64(time.Now().Unix())
+
 	// 保存状态
 	err = Database.DB.Create(&status).Error
 	if err != nil {
@@ -122,6 +132,10 @@ func SetStepTime(t time.Duration) {
 	if t != 0 {
 		CronID, _ = Cron.Cron.AddFunc(Cron.DurationToCron(StepTime), Job)
 	}
+}
+
+func SetSaveTime(t time.Duration) {
+	SaveTime = t
 }
 
 func init() {

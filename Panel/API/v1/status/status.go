@@ -37,3 +37,28 @@ func SetStatusStepTime(ctx *gin.Context) {
 	// 修改时间间隔
 	Status.SetStepTime(time.Duration(number) * time.Second)
 }
+
+// SetSaveTime 设置状态监控保存时间
+func SetSaveTime(ctx *gin.Context) {
+	saveTime := ctx.Query("time")
+
+	if saveTime == "" {
+		ctx.JSON(200, gin.H{
+			"status": 1,
+			"msg":    "time 不能为空",
+		})
+		return
+	}
+
+	number, err := strconv.Atoi(saveTime)
+	if err != nil && number < 0 {
+		ctx.JSON(200, gin.H{
+			"status": 1,
+			"msg":    "time 必须是大于等于0的数字",
+		})
+		return
+	}
+
+	// 修改保存时间
+	Status.SetSaveTime(time.Duration(number) * time.Hour)
+}
