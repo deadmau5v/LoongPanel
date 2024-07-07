@@ -9,6 +9,7 @@ package API
 import (
 	"LoongPanel/Panel/API/v1/appstore"
 	AuthAPI "LoongPanel/Panel/API/v1/auth"
+	"LoongPanel/Panel/API/v1/clamav"
 	"LoongPanel/Panel/API/v1/clean"
 	"LoongPanel/Panel/API/v1/docker"
 	"LoongPanel/Panel/API/v1/files"
@@ -123,6 +124,13 @@ func initRoute(app *gin.Engine) {
 	GroupDocker := v1.Group("/docker")
 	SetRoute("GET", "/containers", docker.GetContainerList, GroupDocker, "获取容器列表", false)
 	SetRoute("GET", "/images", docker.GetImageList, GroupDocker, "获取镜像列表", false)
+
+	// 病毒扫描
+	GroupClamav := v1.Group("/clamav")
+	SetRoute("GET", "/scan", clamav.ScanFile, GroupClamav, "扫描文件", false)
+	SetRoute("GET", "/clamav/scan", clamav.ScanFile, ws, "快速扫描", false)
+	SetRoute("GET", "/scan_dir", clamav.ScanDir, GroupClamav, "扫描目录", false)
+	SetRoute("GET", "/clamav/scan_dir", clamav.ScanFile, ws, "扫描目录", false)
 
 	// 前端静态文件
 	app.NoRoute(func(c *gin.Context) {
