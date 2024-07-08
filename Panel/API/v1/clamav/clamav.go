@@ -78,8 +78,7 @@ func FastScan(c *gin.Context) {
 	}
 	defer conn.Close() // 确保 WebSocket 连接在函数退出时关闭
 
-	// 使用 WebSocket 连接发送数据
-	err = conn.WriteMessage(websocket.TextMessage, []byte("开始快速扫描"))
+	err = conn.WriteMessage(websocket.TextMessage, []byte(`{"msg":"加载病毒库中..."}`))
 	if err != nil {
 		PanelLog.ERROR("[病毒扫描]", "发送消息失败:", err)
 		return
@@ -89,13 +88,23 @@ func FastScan(c *gin.Context) {
 	// 假设 scan 返回扫描结果
 	result, err := clamav.FastScan(conn)
 	if err != nil {
-		errMsg, _ := json.Marshal(gin.H{"error": err.Error()})
+		errMsg, err := json.Marshal(gin.H{"error": err.Error()})
+		if err != nil {
+			PanelLog.ERROR("[病毒扫描]", "转Json失败:", err)
+		}
 		conn.WriteMessage(websocket.TextMessage, errMsg)
 		return
 	}
 
 	// 发送扫描结果
-	resultMsg, _ := json.Marshal(result)
+	resultMsg, err := json.Marshal(gin.H{
+		"data":   result,
+		"status": 0,
+	})
+	PanelLog.DEBUG("[病毒扫描]", "结果:", string(resultMsg))
+	if err != nil {
+		PanelLog.ERROR("[病毒扫描]", "转Json失败:", err)
+	}
 	conn.WriteMessage(websocket.TextMessage, resultMsg)
 }
 
@@ -108,22 +117,30 @@ func FullScan(c *gin.Context) {
 	}
 	defer conn.Close() // 确保 WebSocket 连接在函数退出时关闭
 
-	// 发送开始扫描的消息
-	err = conn.WriteMessage(websocket.TextMessage, []byte("开始全盘扫描"))
+	err = conn.WriteMessage(websocket.TextMessage, []byte(`{"msg":"加载病毒库中..."}`))
 	if err != nil {
-		PanelLog.ERROR("[病毒扫描]", "发送开始消息失败:", err)
+		PanelLog.ERROR("[病毒扫描]", "发送消息失败:", err)
 		return
 	}
 
 	// 执行全盘扫描
 	result, err := clamav.FullScan(conn)
 	if err != nil {
-		errMsg, _ := json.Marshal(gin.H{"error": err.Error()})
+		errMsg, err := json.Marshal(gin.H{"error": err.Error()})
+		if err != nil {
+			PanelLog.ERROR("[病毒扫描]", "转Json失败:", err)
+		}
 		conn.WriteMessage(websocket.TextMessage, errMsg)
 		return
 	}
 
 	// 发送扫描结果
-	resultMsg, _ := json.Marshal(result)
+	resultMsg, err := json.Marshal(gin.H{
+		"data":   result,
+		"status": 0,
+	})
+	if err != nil {
+		PanelLog.ERROR("[病毒扫描]", "转Json失败:", err)
+	}
 	conn.WriteMessage(websocket.TextMessage, resultMsg)
 }

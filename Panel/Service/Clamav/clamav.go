@@ -27,17 +27,6 @@ type WsReaderWriter struct {
 	*websocket.Conn
 }
 
-func (w *WsReaderWriter) EnsureClose() {
-	if w.Conn != nil {
-		err := w.Conn.Close()
-		if err != nil {
-			PanelLog.DEBUG("[错误]", "关闭WebSocket连接失败:", err)
-		} else {
-			PanelLog.DEBUG("[调试]", "WebSocket连接已成功关闭")
-		}
-	}
-}
-
 type ScanResult struct {
 	DataRead           string `json:"data_read"`
 	DataScanned        string `json:"data_scanned"`
@@ -98,7 +87,7 @@ func (w *WsReaderWriter) Write(p []byte) (n int, err error) {
 		PanelLog.DEBUG("[错误]", "WebSocket写入失败:", err)
 		return n, err // 处理写入错误
 	}
-	PanelLog.DEBUG("[调试]", "WebSocket写入成功:", n, "字节")
+	// PanelLog.DEBUG("[调试]", "WebSocket写入成功:", n, "字节")
 	return n, nil
 }
 
@@ -181,7 +170,6 @@ func Scan(c *websocket.Conn, args []string, scanDir, skipCheck bool) (*ScanResul
 	var conn *WsReaderWriter
 	if c != nil {
 		conn = &WsReaderWriter{Conn: c}
-		defer conn.EnsureClose() // 使用改进的关闭方法
 	}
 
 	PanelLog.DEBUG("[调试]", "创建命令")

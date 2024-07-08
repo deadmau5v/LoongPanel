@@ -10,11 +10,12 @@ import (
 	"LoongPanel/Panel/Service/System"
 	"errors"
 	"fmt"
-	"github.com/spf13/afero"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/spf13/afero"
 )
 
 // Delete 删除当前文件
@@ -163,7 +164,7 @@ func (f *File) Rename(dst *File) error {
 	if f.Path == dst.Path {
 		return errors.New("源文件与目标文件路径相同")
 	} else if strings.Contains(dst.Path, f.Path) {
-		return errors.New(fmt.Sprintf("目标文件路径包含源文件路径 %s -> %s", f.Path, dst.Path))
+		return fmt.Errorf("目标文件路径包含源文件路径 %s -> %s", f.Path, dst.Path)
 	}
 	fs := afero.NewOsFs()
 	err := fs.Rename(f.Path, dst.Path)
