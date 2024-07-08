@@ -9,6 +9,7 @@ package clamav
 import (
 	clamav "LoongPanel/Panel/Service/Clamav"
 	"LoongPanel/Panel/Service/PanelLog"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
@@ -75,14 +76,54 @@ func FastScan(c *gin.Context) {
 		PanelLog.ERROR("[病毒扫描]", err)
 		return
 	}
-	scan(c, true, conn)
+	defer conn.Close() // 确保 WebSocket 连接在函数退出时关闭
+
+	// 使用 WebSocket 连接发送数据
+	err = conn.WriteMessage(websocket.TextMessage, []byte("开始快速扫描"))
+	if err != nil {
+		PanelLog.ERROR("[病毒扫描]", "发送消息失败:", err)
+		return
+	}
+
+	// 执行扫描逻辑...
+	// 假设 scan 返回扫描结果
+	result, err := clamav.FastScan(conn)
+	if err != nil {
+		errMsg, _ := json.Marshal(gin.H{"error": err.Error()})
+		conn.WriteMessage(websocket.TextMessage, errMsg)
+		return
+	}
+
+	// 发送扫描结果
+	resultMsg, _ := json.Marshal(result)
+	conn.WriteMessage(websocket.TextMessage, resultMsg)
 }
 
 func FullScan(c *gin.Context) {
+	// 升级 HTTP 连接到 WebSocket 连接
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		PanelLog.ERROR("[病毒扫描]", err)
+		PanelLog.ERROR("[病毒扫描]", "WebSocket连接升级失败:", err)
 		return
 	}
-	scan(c, true, conn)
+	defer conn.Close() // 确保 WebSocket 连接在函数退出时关闭
+
+	// 发送开始扫描的消息
+	err = conn.WriteMessage(websocket.TextMessage, []byte("开始全盘扫描"))
+	if err != nil {
+		PanelLog.ERROR("[病毒扫描]", "发送开始消息失败:", err)
+		return
+	}
+
+	// 执行全盘扫描
+	result, err := clamav.FullScan(conn)
+	if err != nil {
+		errMsg, _ := json.Marshal(gin.H{"error": err.Error()})
+		conn.WriteMessage(websocket.TextMessage, errMsg)
+		return
+	}
+
+	// 发送扫描结果
+	resultMsg, _ := json.Marshal(result)
+	conn.WriteMessage(websocket.TextMessage, resultMsg)
 }

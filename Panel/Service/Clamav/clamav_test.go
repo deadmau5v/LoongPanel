@@ -2,6 +2,8 @@ package clamav_test
 
 import (
 	clamav "LoongPanel/Panel/Service/Clamav"
+	"LoongPanel/Panel/Service/PanelLog"
+
 	"os"
 	"testing"
 
@@ -45,6 +47,8 @@ func TestScan(t *testing.T) {
 	defer file.Close()
 
 	result, err := clamav.Scan(nil, []string{"/tmp/test.txt"}, false, false)
+	PanelLog.DEBUG("[调试]", "result", result)
+	PanelLog.DEBUG("[调试]", "err", err)
 	require.NoError(t, err)
 	require.NotNil(t, result)
 }
