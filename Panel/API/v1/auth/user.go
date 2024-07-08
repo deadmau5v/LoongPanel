@@ -11,10 +11,12 @@ import (
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
 	"errors"
-	"github.com/gin-gonic/gin"
+	"net/http"
 	"regexp"
 	"strconv"
 	"unicode"
+
+	"github.com/gin-gonic/gin"
 )
 
 // GetUsers 获取用户列表
@@ -425,4 +427,39 @@ func ChangePassword(c *gin.Context) {
 	user.Update()
 	PanelLog.INFO("[权限管理]", user.Name, "用户修改密码")
 	c.JSON(successCode, gin.H{"status": 0, "msg": "修改成功"})
+}
+
+// Register 注册
+func Register(ctx *gin.Context) {
+	req := struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Mail     string `json:"mail"`
+	}{}
+
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": 1, "msg": "参数错误"})
+		return
+	}
+
+	if len(req.Username) < 5 || len(req.Password) < 8 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": 1, "msg": "用户名或密码长度不符合要求"})
+		return
+	}
+
+	hashedPassword := Auth.HashPassword(req.Password)
+	newUser := Database.User{
+		Name:     req.Username,
+		Password: hashedPassword,
+		Mail:     req.Mail,
+	}
+
+	result := Database.DB.Create(&newUser)
+	if result.Error != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"status": 1, "msg": "注册失败"})
+		return
+	}
+
+	PanelLog.INFO("[用户管理]", "注册新用户:", req.Username)
+	ctx.JSON(http.StatusOK, gin.H{"status": 0, "msg": "注册成功"})
 }

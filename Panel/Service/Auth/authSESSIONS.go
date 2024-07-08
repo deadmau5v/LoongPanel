@@ -6,11 +6,12 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"regexp"
 	"sync"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -140,6 +141,10 @@ func UserAuth() gin.HandlerFunc {
 			"/auth/user",
 			"/log",
 			"/appstore",
+			"/docker/container",
+			"/docker/image",
+			"/status",
+			"/clamav",
 		}
 		for _, path := range staticPaths {
 			if c.Request.URL.Path == path {

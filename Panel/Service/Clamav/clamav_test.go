@@ -44,7 +44,7 @@ func TestScan(t *testing.T) {
 	defer os.Remove("/tmp/test.txt")
 	defer file.Close()
 
-	result, err := clamav.Scan(nil, "/tmp/test.txt", false)
+	result, err := clamav.Scan(nil, []string{"/tmp/test.txt"}, false, false)
 	require.NoError(t, err)
 	require.NotNil(t, result)
 }
@@ -55,13 +55,13 @@ func TestCheck(t *testing.T) {
 	defer os.Remove("/tmp/test.txt")
 	defer file.Close()
 
-	err = clamav.Check("/tmp/test.txt", false)
+	err = clamav.Check([]string{"/tmp/test.txt"}, false)
 	require.NoError(t, err)
 
 	os.Mkdir("/tmp/test", 0755)
 	defer os.Remove("/tmp/test")
-	err = clamav.Check("/tmp/test", true)
+	err = clamav.Check([]string{"/tmp/test"}, true)
 	require.NoError(t, err)
-	err = clamav.Check("/tmp/test", false)
+	err = clamav.Check([]string{"/tmp/test"}, false)
 	require.ErrorIs(t, err, clamav.ErrorPath)
 }

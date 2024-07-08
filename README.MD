@@ -57,12 +57,3 @@ https://github.com/deadmau5v/loong_panel_react
 # 运行
 
 需要将前端编译后 dist 目录放到后端目录下
-
-
-# TODO 开发计划
-
-- [ ] 持久化记录
-    - [ ] 开关
-    - [ ] 时长
-    - [ ] 位置
-    - [ ] 清理
