@@ -1,6 +1,8 @@
 package clamav
 
 import (
+	config "LoongPanel/Panel/Service/Config"
+	"LoongPanel/Panel/Service/Cron"
 	"LoongPanel/Panel/Service/PanelLog"
 	"bytes"
 	"errors"
@@ -10,6 +12,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -28,16 +31,16 @@ type WsReaderWriter struct {
 }
 
 type ScanResult struct {
-	DataRead           string `json:"data_read"`
-	DataScanned        string `json:"data_scanned"`
-	EndDate            string `json:"end_date"`
-	EngineVersion      string `json:"engine_version"`
-	InfectedFiles      string `json:"infected_files"`
-	KnownViruses       string `json:"known_viruses"`
-	ScannedDirectories string `json:"scanned_directories"`
-	ScannedFiles       string `json:"scanned_files"`
-	StartDate          string `json:"start_date"`
-	Time               string `json:"time"`
+	DataRead           string `json:"data_read"`           // 扫描读取的数据量
+	DataScanned        string `json:"data_scanned"`        // 扫描扫描的数据量
+	EndDate            string `json:"end_date"`            // 扫描结束时间
+	EngineVersion      string `json:"engine_version"`      // 引擎版本
+	InfectedFiles      string `json:"infected_files"`      // 感染的文件数量
+	KnownViruses       string `json:"known_viruses"`       // 已知病毒数量
+	ScannedDirectories string `json:"scanned_directories"` // 扫描的目录数量
+	ScannedFiles       string `json:"scanned_files"`       // 扫描的文件数量
+	StartDate          string `json:"start_date"`          // 扫描开始时间
+	Time               string `json:"time"`                // 扫描耗时
 }
 
 type WriteOutput struct {
@@ -224,4 +227,27 @@ func FullScan(conn *websocket.Conn) (*ScanResult, error) {
 	}
 
 	return Scan(conn, args, true, true)
+}
+
+func SetCronScan(duration time.Duration) error {
+	Cron.Cron.AddFunc(Cron.DurationToCron(duration), func() {
+		ScanResult, err := FullScan(nil)
+		if err != nil {
+			// Todo 发送扫描结果到邮箱
+			return
+		}
+		PanelLog.INFO("[病毒扫描]", "扫描结果:", ScanResult.InfectedFiles, "个病毒")
+		// Todo 发送扫描结果到邮箱
+	})
+	return nil
+}
+
+func init() {
+	if config.Config.Clamav.CronScan {
+		if config.Config.Clamav.CronScanTime < 4*time.Hour {
+			// 太短的扫描时间太影响性能
+			config.Config.Clamav.CronScanTime = 4 * time.Hour
+		}
+		SetCronScan(config.Config.Clamav.CronScanTime)
+	}
 }

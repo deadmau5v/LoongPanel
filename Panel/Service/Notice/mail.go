@@ -50,6 +50,11 @@ func (c MailConfig) Check() error {
 // 成本太贵，暂时不做
 // }
 
+func (c MailConfig) Set() error {
+	// Todo 实现设置发送配置
+	return nil
+}
+
 func init() {
 	Database.DB.AutoMigrate(&MailConfig{})
 	Database.DB.Last(&mailConfig)

@@ -25,7 +25,7 @@ func (Log_ *Log_) CheckLogExist() bool {
 	file, err := os.Stat(Log_.Path)
 
 	if err != nil {
-		Log2.ERROR("[日志管理] 获取日志文件信息失败", Log_.Path)
+		Log2.DEBUG("[日志管理] 获取日志文件信息失败", Log_.Path)
 		return false
 	}
 	if file != nil && file.IsDir() {
