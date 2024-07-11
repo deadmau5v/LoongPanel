@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/robfig/cron/v3"
 )
 
 var (
@@ -24,6 +25,7 @@ var (
 var (
 	output    []byte
 	scan_over bool = false
+	cronID    cron.EntryID
 )
 
 type WsReaderWriter struct {
@@ -200,7 +202,7 @@ func Scan(c *websocket.Conn, args []string, scanDir, skipCheck bool) (*ScanResul
 	if err != nil {
 		return nil, fmt.Errorf("ScanFile:Parse -> %w", err)
 	}
-
+	// Todo 发送邮件通知
 	return summary, nil
 }
 
@@ -230,15 +232,20 @@ func FullScan(conn *websocket.Conn) (*ScanResult, error) {
 }
 
 func SetCronScan(duration time.Duration) error {
-	Cron.Cron.AddFunc(Cron.DurationToCron(duration), func() {
-		ScanResult, err := FullScan(nil)
+	if cronID != 0 {
+		Cron.Cron.Remove(cronID)
+	}
+	id, err := Cron.Cron.AddFunc(Cron.DurationToCron(duration), func() {
+		ScanResult, err := FastScan(nil)
 		if err != nil {
-			// Todo 发送扫描结果到邮箱
 			return
 		}
 		PanelLog.INFO("[病毒扫描]", "扫描结果:", ScanResult.InfectedFiles, "个病毒")
-		// Todo 发送扫描结果到邮箱
 	})
+	if err != nil {
+		return fmt.Errorf("SetCronScan -> %w", err)
+	}
+	cronID = id
 	return nil
 }
 

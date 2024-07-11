@@ -10,61 +10,83 @@ import (
 	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/Status"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
-// SetStatusStepTime 设置状态监控时间间隔
-func SetStatusStepTime(ctx *gin.Context) {
-	stepTime := ctx.Query("time")
+// SetStatusConfig 设置状态监控时间间隔和保存时间
+func SetStatusConfig(ctx *gin.Context) {
+	var config struct {
+		StepTimeValue int    `json:"stepTimeValue"`
+		StepTimeUnit  string `json:"stepTimeUnit"`
+		SaveTimeValue int    `json:"saveTimeValue"`
+		SaveTimeUnit  string `json:"saveTimeUnit"`
+	}
 
-	if stepTime == "" {
+	if err := ctx.BindJSON(&config); err != nil {
 		ctx.JSON(200, gin.H{
 			"status": 1,
-			"msg":    "time 不能为空",
+			"msg":    "参数绑定失败",
 		})
 		return
 	}
 
-	number, err := strconv.Atoi(stepTime)
-	if err != nil && number < 0 {
+	if config.StepTimeValue < 0 {
 		ctx.JSON(200, gin.H{
 			"status": 1,
-			"msg":    "time 必须是大于等于0的数字",
+			"msg":    "stepTimeValue 必须是大于等于0的数字",
 		})
 		return
 	}
 
-	// 修改时间间隔
-	Status.SetStepTime(time.Duration(number) * time.Second)
-}
-
-// SetSaveTime 设置状态监控保存时间
-func SetSaveTime(ctx *gin.Context) {
-	saveTime := ctx.Query("time")
-
-	if saveTime == "" {
+	if config.SaveTimeValue < 0 {
 		ctx.JSON(200, gin.H{
 			"status": 1,
-			"msg":    "time 不能为空",
+			"msg":    "saveTimeValue 必须是大于等于0的数字",
 		})
 		return
 	}
 
-	number, err := strconv.Atoi(saveTime)
-	if err != nil && number < 0 {
+	// 设置时间间隔
+	var stepTimeDuration time.Duration
+	switch config.StepTimeUnit {
+	case "second":
+		stepTimeDuration = time.Duration(config.StepTimeValue) * time.Second
+	case "minute":
+		stepTimeDuration = time.Duration(config.StepTimeValue) * time.Minute
+	default:
 		ctx.JSON(200, gin.H{
 			"status": 1,
-			"msg":    "time 必须是大于等于0的数字",
+			"msg":    "无效的 stepTimeUnit",
 		})
 		return
 	}
+	Status.SetStepTime(stepTimeDuration)
 
-	// 修改保存时间
-	Status.SetSaveTime(time.Duration(number) * time.Hour)
+	// 设置保存时间
+	var saveTimeDuration time.Duration
+	switch config.SaveTimeUnit {
+	case "second":
+		saveTimeDuration = time.Duration(config.SaveTimeValue) * time.Second
+	case "minute":
+		saveTimeDuration = time.Duration(config.SaveTimeValue) * time.Minute
+	case "hour":
+		saveTimeDuration = time.Duration(config.SaveTimeValue) * time.Hour
+	default:
+		ctx.JSON(200, gin.H{
+			"status": 1,
+			"msg":    "无效的 saveTimeUnit",
+		})
+		return
+	}
+	Status.SetSaveTime(saveTimeDuration)
+
+	ctx.JSON(200, gin.H{
+		"status": 0,
+		"msg":    "设置成功",
+	})
 }
 
 var upgrade = websocket.Upgrader{

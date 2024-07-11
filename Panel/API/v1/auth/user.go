@@ -364,7 +364,7 @@ func AddPolicy(c *gin.Context) {
 		return
 	}
 	if exists {
-		c.JSON(errorCode, gin.H{"status": 1, "msg": "已存在"})
+		c.JSON(errorCode, gin.H{"status": 0, "msg": "已添加成功"})
 		return
 	} else {
 		PanelLog.DEBUG("[权限管理]", "添加权限: "+req.Role+" "+req.Path+" "+req.Method)

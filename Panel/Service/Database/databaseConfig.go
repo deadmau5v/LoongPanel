@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"gorm.io/driver/mysql"
+	"gorm.io/gorm/logger"
 
 	"gorm.io/gorm"
 )
@@ -80,18 +81,16 @@ func GetTIDB() {
 
 	PanelLog.INFO("[数据库] 首次启动需要自动下载TiDB... 请稍等")
 	// 检查架构
-	switch System.Data.OSArch {
-	case "amd64":
-		{
-			Download("https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-amd64")
-			os.Rename(path.Join(System.WORKDIR, "resource", "tidb-server-amd64"), path.Join(System.WORKDIR, "resource", "tidb-server"))
-		}
-	case "loong64":
-		{
-			Download("https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-amd64")
-			os.Rename(path.Join(System.WORKDIR, "resource", "tidb-server-amd64"), path.Join(System.WORKDIR, "resource", "tidb-server"))
-		}
+	if System.Data.OSArch == "amd64" {
+		Download("https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-amd64")
+		os.Rename(path.Join(System.WORKDIR, "resource", "tidb-server-amd64"), path.Join(System.WORKDIR, "resource", "tidb-server"))
+	} else {
+		Download("https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-amd64")
+		os.Rename(path.Join(System.WORKDIR, "resource", "tidb-server-amd64"), path.Join(System.WORKDIR, "resource", "tidb-server"))
 	}
+
+	// 设置运行权限
+	os.Chmod(path.Join(System.WORKDIR, "resource", "tidb-server"), 0755)
 }
 
 func TIDBStatus() bool {
@@ -145,7 +144,9 @@ func LoadConfig() {
 			time.Sleep(2 * time.Second)
 			for {
 				// 等待启动完成
-				DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+				DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+					Logger: logger.Default.LogMode(logger.Silent),
+				})
 				if err != nil {
 					if strings.Contains(err.Error(), "Access denied") {
 						PanelLog.ERROR("[数据库] 用户名或密码错误")
@@ -204,17 +205,20 @@ func Connect() {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		Config.DbUser, Config.DbPassword, Config.DbAddress, Config.DbPort, Config.DbUseDatabase)
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		if strings.Contains(err.Error(), "Unknown database") {
-			PanelLog.ERROR("[数据库] 数据库不存在")
+			PanelLog.DEBUG("[数据库] 数据库不存在")
+			os.RemoveAll(path.Join(System.WORKDIR, "resource", "config.json"))
 		} else if strings.Contains(err.Error(), "Access denied") {
 			PanelLog.DEBUG("[数据库] 用户名或密码错误, 删除配置文件并重新连接...")
+			os.RemoveAll(path.Join(System.WORKDIR, "resource", "config.json"))
 		} else {
-			PanelLog.ERROR("[数据库] 连接数据库失败")
+			PanelLog.DEBUG("[数据库] 数据库启动中... 请稍等")
+			time.Sleep(1 * time.Second)
 		}
-		PanelLog.ERROR("[数据库] 尝试重新初始化...")
-		os.RemoveAll(path.Join(System.WORKDIR, "resource", "config.json"))
 		Connect()
 	} else {
 		PanelLog.INFO("[数据库] 连接成功")

@@ -8,11 +8,13 @@ package clamav
 
 import (
 	clamav "LoongPanel/Panel/Service/Clamav"
+	config "LoongPanel/Panel/Service/Config"
 	"LoongPanel/Panel/Service/PanelLog"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -143,4 +145,24 @@ func FullScan(c *gin.Context) {
 		PanelLog.ERROR("[病毒扫描]", "转Json失败:", err)
 	}
 	conn.WriteMessage(websocket.TextMessage, resultMsg)
+}
+
+// SetScanTime 设置自动扫描时间
+func SetScanTime(c *gin.Context) {
+	timeArg := c.Query("time")
+	if timeArg == "" || timeArg == "0" {
+		config.Config.Clamav.CronScan = false
+		c.JSON(http.StatusOK, gin.H{"msg": "已关闭定时扫描", "status": 0})
+		return
+	}
+	if timeArg == "day" {
+		config.Config.Clamav.CronScanTime = time.Hour * 24
+	} else if timeArg == "week" {
+		config.Config.Clamav.CronScanTime = time.Hour * 24 * 7
+	} else if timeArg == "month" {
+		config.Config.Clamav.CronScanTime = time.Hour * 24 * 30
+	}
+	config.Config.Clamav.CronScan = true
+	clamav.SetCronScan(config.Config.Clamav.CronScanTime)
+	c.JSON(http.StatusOK, gin.H{"msg": "已设置定时扫描", "status": 0})
 }

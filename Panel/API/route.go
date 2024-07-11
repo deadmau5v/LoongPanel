@@ -55,14 +55,10 @@ func initRoute(app *gin.Engine) {
 	app.Static("/script/icons", path.Join(System.WORKDIR, "script", "icons"))
 
 	v1 := app.Group("/api/v1")
+	ws := app.Group("/api/ws")
 
 	// 公共路由
 	SetRoute("GET", "/ping", ping, v1, "权限测试", true)
-
-	// websocket
-	ws := app.Group("/api/ws")
-	SetRoute("GET", "/screen", terminal.Terminal, ws, "使用网页终端", false)
-	SetRoute("GET", "/status", status.GetStatus, ws, "获取状态", false)
 
 	// 权限管理
 	GroupAuth := v1.Group("/auth")
@@ -87,8 +83,9 @@ func initRoute(app *gin.Engine) {
 	SetRoute("GET", "/system_status", home.SystemStatus, GroupStatus, "系统状态", true)
 	SetRoute("GET", "/system_info", home.SystemInfo, GroupStatus, "系统信息", true)
 	SetRoute("GET", "/disks", home.Disks, GroupStatus, "磁盘信息", true)
-	SetRoute("POST", "/time_step", status.SetStatusStepTime, GroupStatus, "设置状态保存间隔 0为关闭", false)
-	SetRoute("POST", "/save_time", status.SetSaveTime, GroupStatus, "设置状态保存时间", false)
+	SetRoute("POST", "/config", status.SetStatusConfig, GroupStatus, "设置状态保存时间和间隔", false)
+
+	SetRoute("GET", "/status", status.GetStatus, ws, "获取状态", false)
 
 	// 清理
 	GroupClean := v1.Group("/clean")
@@ -135,9 +132,14 @@ func initRoute(app *gin.Engine) {
 	// 病毒扫描
 	GroupClamav := v1.Group("/clamav")
 	SetRoute("GET", "/scan", clamav.ScanFile, GroupClamav, "扫描文件", false)
-	SetRoute("GET", "/clamav/scan", clamav.ScanFile, ws, "快速扫描", false)
 	SetRoute("GET", "/scan_dir", clamav.ScanDir, GroupClamav, "扫描目录", false)
+	SetRoute("GET", "/set_scan_time", clamav.SetScanTime, GroupClamav, "设置定时扫描", false)
+
+	SetRoute("GET", "/clamav/scan", clamav.ScanFile, ws, "快速扫描", false)
 	SetRoute("GET", "/clamav/scan_dir", clamav.ScanFile, ws, "扫描目录", false)
+
+	// 网页终端
+	SetRoute("GET", "/screen", terminal.Terminal, ws, "使用网页终端", false)
 
 	// 前端静态文件
 	app.NoRoute(func(c *gin.Context) {
