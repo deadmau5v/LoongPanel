@@ -7,7 +7,6 @@
 package API
 
 import (
-	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/PanelLog"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +41,7 @@ func init() {
 	App.Use(gin.Logger())
 	App.Use(PanelLog.GinLogToFile())
 	App.Use(gin.Recovery())
-	App.Use(Auth.UserAuth())
+	// App.Use(Auth.UserAuth())
 
 	initRoute(App)
 }

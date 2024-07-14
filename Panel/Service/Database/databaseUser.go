@@ -19,7 +19,21 @@ func (user *User) Delete() {
 }
 
 func (user *User) Update() {
-	DB.Save(&user)
+	// 将空字段设置为NULL
+	updateData := map[string]interface{}{
+		"name":  user.Name,
+		"mail":  user.Mail,
+		"phone": user.Phone,
+		"role":  user.Role,
+	}
+
+	for key, value := range updateData {
+		if value == "" {
+			updateData[key] = nil
+		}
+	}
+
+	DB.Model(&User{}).Where("id = ?", user.ID).Updates(updateData)
 }
 
 func UserFind() []User {

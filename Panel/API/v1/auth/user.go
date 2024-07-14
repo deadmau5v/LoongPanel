@@ -7,6 +7,7 @@
 package Auth
 
 import (
+	v1 "LoongPanel/Panel/API/v1"
 	"LoongPanel/Panel/Service/Auth"
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
@@ -82,54 +83,36 @@ func CreateUser(ctx *gin.Context) {
 		return
 	}
 
+	user.Password = Auth.HashPassword(user.Password)
+
 	if msg := CheckUserExist(user); msg != nil {
-		ctx.JSON(400, msg)
+		ctx.JSON(400, gin.H{"status": 1, "msg": msg["msg"]})
 		return
 	}
 
 	err := Auth.CreateUser(user)
 	if err != nil {
+		PanelLog.ERROR("[权限管理] 创建用户失败", err)
+		ctx.JSON(500, gin.H{"status": 1, "msg": "创建用户失败"})
 		return
 	}
 
 	PanelLog.INFO("[权限管理] 创建用户: ", user.Name)
+	ctx.JSON(200, gin.H{"status": 0, "msg": "创建成功"})
 }
 
 // UpdateUser 更新用户
 func UpdateUser(ctx *gin.Context) {
-	id, err := getUserID(ctx)
-	if err != nil {
-		ctx.JSON(400, gin.H{"status": 1, "msg": err.Error()})
-		return
-	}
-
-	var updateUser Database.User
-	if err := ctx.BindJSON(&updateUser); err != nil {
+	user := Database.User{}
+	if err := ctx.BindJSON(&user); err != nil {
 		PanelLog.ERROR("[权限管理] 绑定JSON失败", err)
 		ctx.JSON(400, gin.H{"status": 1, "msg": "无效的请求数据"})
 		return
 	}
 
-	updateUser.ID = id
-	if msg := CheckUserUpdate(updateUser); msg != nil {
-		ctx.JSON(400, msg)
-		return
-	}
+	user.Update()
 
-	result := Database.DB.Model(&Database.User{}).Where("id = ?", id).Updates(Database.User{
-		Name:     updateUser.Name,
-		Mail:     updateUser.Mail,
-		Password: updateUser.Password,
-	})
-
-	if result.Error != nil {
-		PanelLog.ERROR("[权限管理] 更新用户失败", result.Error)
-		ctx.JSON(500, gin.H{"status": 1, "msg": "更新用户失败"})
-		return
-	}
-
-	PanelLog.INFO("[权限管理] 更新用户: ", updateUser.Name)
-	ctx.JSON(200, gin.H{"status": 0, "msg": "更新成功", "data": updateUser})
+	ctx.JSON(200, gin.H{"status": 0, "msg": "更新成功"})
 }
 
 // DeleteUser 删除用户
@@ -180,14 +163,22 @@ func CheckUserExist(user Database.User) gin.H {
 	if err := CheckUserName(user.Name); err != nil {
 		return gin.H{"status": 1, "msg": err.Error()}
 	}
-	if err := CheckMail(user.Mail); err != nil {
-		return gin.H{"status": 1, "msg": err.Error()}
+	if user.Mail != "" {
+		if err := CheckMail(user.Mail); err != nil {
+			return gin.H{"status": 1, "msg": err.Error()}
+		}
 	}
 
 	var count int64
-	Database.DB.Model(&Database.User{}).Where("name = ? OR mail = ?", user.Name, user.Mail).Count(&count)
+	Database.DB.Model(&Database.User{}).Where("name = ?", user.Name).Count(&count)
 	if count > 0 {
-		return gin.H{"status": 1, "msg": "用户名或邮箱已存在"}
+		return gin.H{"status": 1, "msg": "用户名已存在"}
+	}
+	if user.Mail != "" {
+		Database.DB.Model(&Database.User{}).Where("mail = ?", user.Mail).Count(&count)
+		if count > 0 {
+			return gin.H{"status": 1, "msg": "邮箱已存在"}
+		}
 	}
 	return nil
 }
@@ -245,6 +236,10 @@ func GetRoles(ctx *gin.Context) {
 	roles, err := Auth.Authenticator.GetAllRoles()
 	if err != nil {
 		PanelLog.ERROR("[权限管理] 获取角色列表失败", err)
+		ctx.JSON(500, gin.H{
+			"status": 1,
+			"msg":    "获取角色列表失败",
+		})
 		return
 	}
 	PanelLog.INFO("[权限管理] 获取角色列表")
@@ -258,7 +253,10 @@ func GetRoles(ctx *gin.Context) {
 		roles_ = append(roles_, role_)
 	}
 
-	ctx.JSON(200, roles_)
+	ctx.JSON(200, gin.H{
+		"status": 0,
+		"data":   roles_,
+	})
 }
 
 // CreateRole 创建角色
@@ -315,9 +313,10 @@ func DeleteRole(ctx *gin.Context) {
 }
 
 type policy struct {
-	Role   string `json:"role"`
-	Method string `json:"method"`
-	Path   string `json:"path"`
+	Role    string `json:"role"`
+	Method  string `json:"method"`
+	Path    string `json:"path"`
+	Comment string `json:"comment"`
 }
 
 // getPolicy 获取权限列表
@@ -328,9 +327,10 @@ func getPolicy(role string) []policy {
 	for _, policy_ := range allPolicy {
 		if policy_[0] == role {
 			policyList = append(policyList, policy{
-				Role:   policy_[0],
-				Path:   policy_[1],
-				Method: policy_[2],
+				Role:    policy_[0],
+				Path:    policy_[1],
+				Method:  policy_[2],
+				Comment: v1.GetRouteComment(policy_[2], policy_[1]),
 			})
 		}
 	}
@@ -364,7 +364,7 @@ func AddPolicy(c *gin.Context) {
 		return
 	}
 	if exists {
-		c.JSON(errorCode, gin.H{"status": 0, "msg": "已添加成功"})
+		c.JSON(successCode, gin.H{"status": 0, "msg": "已添加成功"})
 		return
 	} else {
 		PanelLog.DEBUG("[权限管理]", "添加权限: "+req.Role+" "+req.Path+" "+req.Method)
