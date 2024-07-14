@@ -18,6 +18,7 @@ import (
 	"LoongPanel/Panel/API/v1/home"
 	"LoongPanel/Panel/API/v1/log"
 	"LoongPanel/Panel/API/v1/notice"
+	"LoongPanel/Panel/API/v1/settings"
 	"LoongPanel/Panel/API/v1/status"
 	"LoongPanel/Panel/API/v1/terminal"
 	"LoongPanel/Panel/Service/Auth"
@@ -155,6 +156,17 @@ func initRoute(app *gin.Engine) {
 	SetRoute("POST", "/notice", notice.AddNotice, GroupNotice, "预警通知(添加通知设置)", false)
 	SetRoute("DELETE", "/notice", notice.DeleteNotice, GroupNotice, "预警通知(删除通知设置)", false)
 	SetRoute("PUT", "/notice", notice.UpdateNotice, GroupNotice, "预警通知(更新通知设置)", false)
+
+	// 面板设置
+	GroupSettings := v1.Group("/settings")
+	SetRoute("GET", "/mail", settings.GetMailConfig, GroupSettings, "面板设置(获取邮件设置)", true)
+	SetRoute("POST", "/mail", settings.SetMailConfig, GroupSettings, "面板设置(设置邮件设置)", false)
+	SetRoute("GET", "/clamav", settings.GetClamavConfig, GroupSettings, "面板设置(获取Clamav设置)", true)
+	SetRoute("POST", "/clamav", settings.SetClamavConfig, GroupSettings, "面板设置(设置Clamav设置)", false)
+	SetRoute("GET", "/log", settings.GetPanelLogConfig, GroupSettings, "面板设置(获取面板日志设置)", true)
+	SetRoute("POST", "/log", settings.SetPanelLogConfig, GroupSettings, "面板设置(设置面板日志设置)", false)
+	SetRoute("GET", "/auth", settings.GetAuthConfig, GroupSettings, "面板设置(获取认证设置)", true)
+	SetRoute("POST", "/auth", settings.SetAuthConfig, GroupSettings, "面板设置(设置认证设置)", false)
 
 	// 前端静态文件
 	app.NoRoute(func(c *gin.Context) {
