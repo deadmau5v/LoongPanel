@@ -7,6 +7,7 @@
 package API
 
 import (
+	inspection "LoongPanel/Panel/API/v1/Inspection"
 	"LoongPanel/Panel/API/v1/appstore"
 	AuthAPI "LoongPanel/Panel/API/v1/auth"
 	"LoongPanel/Panel/API/v1/clamav"
@@ -140,6 +141,9 @@ func initRoute(app *gin.Engine) {
 
 	// 网页终端
 	SetRoute("GET", "/screen", terminal.Terminal, ws, "使用网页终端", false)
+
+	// 巡检
+	SetRoute("GET", "/check", inspection.Check, ws, "巡检", false)
 
 	// 前端静态文件
 	app.NoRoute(func(c *gin.Context) {

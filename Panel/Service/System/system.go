@@ -11,14 +11,14 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/mem"
-	"github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/v3/cpu"
+	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/load"
+	"github.com/shirou/gopsutil/v3/mem"
+	"github.com/shirou/gopsutil/v3/net"
 )
 
 // LoadAverage 负荷监控
@@ -29,32 +29,18 @@ func LoadAverage() ([3]float32, error) {
 		return [3]float32{0, 0, 0}, nil
 	}
 
-	out, err := exec.Command("uptime").Output()
-	out = out[:len(out)-1] // 去除 \n 换行符
-
+	avg, err := load.Avg()
 	if err != nil {
-		PanelLog.ERROR("[系统监控] loadAverage1m() 1 Error: ", err.Error())
-		// 出现问题就返回 0, 0, 0 默认值 不至于崩溃
+		PanelLog.ERROR("[系统监控] loadAverage1m() Error: ", err.Error())
 		return [3]float32{0, 0, 0}, err
 	}
 
-	// 分割出“命令输出”的 Load Average 结果
-	splits := strings.Split(string(out), ": ")
-	out = []byte(splits[len(splits)-1])
-	numbers := strings.Split(string(out), ", ")
-
-	// 转换为 float32 返回
-	res := [3]float32{}
-	for idx := range numbers {
-		number, err := strconv.ParseFloat(numbers[idx], 32)
-		if err != nil {
-			PanelLog.ERROR("[系统监控]", "loadAverage1m() 2 Error: ", err.Error())
-			return [3]float32{0, 0, 0}, err
-		}
-		res[idx] = float32(number)
+	res := [3]float32{
+		float32(avg.Load1),
+		float32(avg.Load5),
+		float32(avg.Load15),
 	}
 	return res, nil
-
 }
 
 func LoadAverage1m() (float32, error) {
@@ -155,7 +141,7 @@ func MonitorCPUPerCore() ([]float64, error) {
 // GetOSData 获取系统信息
 func GetOSData() (*OSData, error) {
 	Data = &OSData{}
-	cpuData, err := cpu.Info()
+	cpuData, _ := cpu.Info()
 
 	// CPU相关信息
 	Data.CPUNumber = len(cpuData)
@@ -165,7 +151,7 @@ func GetOSData() (*OSData, error) {
 	// 系统相关
 	Data.OSArch = runtime.GOARCH
 	Data.OSName = runtime.GOOS
-	Data.HostName, err = os.Hostname()
+	Data.HostName, _ = os.Hostname()
 
 	//Linux 内核版本
 	if SkipWindows() {
@@ -174,13 +160,13 @@ func GetOSData() (*OSData, error) {
 		Data.LinuxVersion = GetLinuxVersion()
 	}
 	// 网络相关
-	Data.HostIP, err = getLocalIP()
+	Data.HostIP, _ = getLocalIP()
 	// 内存
-	Data.RAM, err = getRAM()
-	Data.Swap, err = getSwap()
-	Data.RAMMHz, err = getRAMMHz()
+	Data.RAM, _ = getRAM()
+	Data.Swap, _ = getSwap()
+	Data.RAMMHz, _ = getRAMMHz()
 	// Disk
-	Data.Disks, err = getDisk()
+	Data.Disks, _ = getDisk()
 	for _, d := range Data.Disks {
 		Data.DiskTotal += d.MaxMemory
 	}
@@ -188,7 +174,7 @@ func GetOSData() (*OSData, error) {
 	// 包管理器
 	Data.PkgManager = getPkgManager()
 
-	return Data, err
+	return Data, nil
 }
 
 // GetRunTime 获取系统运行时间
@@ -244,7 +230,7 @@ func Shutdown() {
 	if SkipWindows() {
 		return
 	}
-	err := exec.Command("shutdown -h now").Run()
+	err := exec.Command("shutdown", "-h", "now").Run()
 	if err != nil {
 		PanelLog.ERROR("[电源管理]", "Shutdown Error: ", err.Error())
 		return
