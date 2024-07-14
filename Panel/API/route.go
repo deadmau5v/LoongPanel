@@ -17,6 +17,7 @@ import (
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
 	"LoongPanel/Panel/API/v1/log"
+	"LoongPanel/Panel/API/v1/notice"
 	"LoongPanel/Panel/API/v1/status"
 	"LoongPanel/Panel/API/v1/terminal"
 	"LoongPanel/Panel/Service/Auth"
@@ -147,6 +148,13 @@ func initRoute(app *gin.Engine) {
 
 	// 巡检
 	SetRoute("GET", "/check", inspection.Check, ws, "巡检(一键巡检)", false)
+
+	// 预警通知
+	GroupNotice := v1.Group("/notice")
+	SetRoute("GET", "/notices", notice.GetAllSettings, GroupNotice, "预警通知(获取所有通知设置)", true)
+	SetRoute("POST", "/notice", notice.AddNotice, GroupNotice, "预警通知(添加通知设置)", false)
+	SetRoute("DELETE", "/notice", notice.DeleteNotice, GroupNotice, "预警通知(删除通知设置)", false)
+	SetRoute("PUT", "/notice", notice.UpdateNotice, GroupNotice, "预警通知(更新通知设置)", false)
 
 	// 前端静态文件
 	app.NoRoute(func(c *gin.Context) {

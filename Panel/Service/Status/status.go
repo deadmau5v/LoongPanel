@@ -9,11 +9,13 @@ package Status
 import (
 	"LoongPanel/Panel/Service/Cron"
 	"LoongPanel/Panel/Service/Database"
+	notice "LoongPanel/Panel/Service/Notice"
 	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/System"
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -152,6 +154,27 @@ func Job() {
 	err = Database.DB.Create(&status).Error
 	if err != nil {
 		PanelLog.ERROR("[状态监控]", err.Error())
+	}
+
+	var settings []notice.UserNotificationSetting
+	Database.DB.Preload("User").Find(&settings)
+	for _, v := range settings {
+		if v.NotifyOnCPU && status.CPU > v.MaxCPU {
+			if v.NotifyIntervalLatestCPU == nil || time.Since(*v.NotifyIntervalLatestCPU) > time.Duration(v.NotifyInterval)*time.Minute {
+				notice.SendMail(v.User.Mail, "CPU告警", fmt.Sprintf("警告CPU使用率过高: %f", status.CPU))
+				now := time.Now()
+				v.NotifyIntervalLatestCPU = &now
+				Database.DB.Save(&v)
+			}
+		}
+		if v.NotifyOnRAM && float64(status.RAM[0]+status.RAM[1])/float64(status.RAM[0])*100 > float64(v.MaxRAM) {
+			if v.NotifyIntervalLatestRAM == nil || time.Since(*v.NotifyIntervalLatestRAM) > time.Duration(v.NotifyInterval)*time.Minute {
+				notice.SendMail(v.User.Mail, "内存告警", fmt.Sprintf("警告内存使用率过高: %.2f%%", float64(status.RAM[0]+status.RAM[1])/float64(status.RAM[0])*100))
+				now := time.Now()
+				v.NotifyIntervalLatestRAM = &now
+				Database.DB.Save(&v)
+			}
+		}
 	}
 }
 

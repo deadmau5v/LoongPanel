@@ -3,6 +3,8 @@ package clamav
 import (
 	config "LoongPanel/Panel/Service/Config"
 	"LoongPanel/Panel/Service/Cron"
+	"LoongPanel/Panel/Service/Database"
+	notice "LoongPanel/Panel/Service/Notice"
 	"LoongPanel/Panel/Service/PanelLog"
 	"bytes"
 	"errors"
@@ -202,7 +204,15 @@ func Scan(c *websocket.Conn, args []string, scanDir, skipCheck bool) (*ScanResul
 	if err != nil {
 		return nil, fmt.Errorf("ScanFile:Parse -> %w", err)
 	}
-	// Todo 发送邮件通知
+
+	var settings []notice.UserNotificationSetting
+	Database.DB.Preload("User").Find(&settings)
+	for _, v := range settings {
+		if v.ClamAVScanNotify {
+			notice.SendMail(v.User.Mail, "病毒扫描结果", fmt.Sprintf("扫描结果: %s", summary.InfectedFiles))
+		}
+	}
+
 	return summary, nil
 }
 
