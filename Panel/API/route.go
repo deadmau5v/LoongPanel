@@ -107,13 +107,14 @@ func initRoute(app *gin.Engine) {
 	GroupFiles := v1.Group("/files")
 	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "文件管理(获取文件列表)", true)
 	SetRoute("GET", "/read", files.FileRead, GroupFiles, "文件管理(读取文件)", false)
-	SetRoute("POST", "/upload", files.Upload, GroupFiles, "文件管理(上传文件)", false)
-	SetRoute("POST", "/download", files.Download, GroupFiles, "文件管理(下载文件)", false)
+	SetRoute("GET", "/download", files.Download, GroupFiles, "文件管理(下载文件)", false)
 	SetRoute("POST", "/delete", files.Delete, GroupFiles, "文件管理(删除文件)", false)
 	SetRoute("POST", "/move", files.Move, GroupFiles, "文件管理(移动文件)", false)
 	SetRoute("POST", "/rename", files.Rename, GroupFiles, "文件管理(重命名文件)", false)
 	SetRoute("POST", "/decompress", files.Decompress, GroupFiles, "文件管理(解压文件)", false)
 	SetRoute("POST", "/compress", files.Compress, GroupFiles, "文件管理(压缩文件)", false)
+	SetRoute("POST", "/copy", files.Copy, GroupFiles, "文件管理(复制文件)", false)
+	SetRoute("PUT", "/upload", files.Upload, GroupFiles, "文件管理(上传文件)", false)
 
 	// 日志
 	GroupLog := v1.Group("/log")

@@ -220,23 +220,21 @@ func Copy(path string, dest string) error {
 func Move(path string, dest string) error {
 	// 检查路径
 	if !checkFilePath(path) || !checkFilePath(dest) {
-		PanelLog.ERROR("[文件管理]", "路径不合法")
+		PanelLog.DEBUG("[文件管理]", "路径不合法")
 		return fmt.Errorf("Move:checkFilePath -> %w", errors.New("路径不合法"))
 	}
 
-	if isDir(path) {
-		err := os.Rename(path, dest)
-		if err != nil {
-			PanelLog.ERROR("[文件管理]", "移动文件夹失败", path, "到", dest, err.Error())
-			return fmt.Errorf("Move:os.Rename -> %w", err)
-		}
-	} else {
-		err := os.Rename(path, dest)
-		if err != nil {
-			PanelLog.ERROR("[文件管理]", "移动文件失败", path, "到", dest, err.Error())
-			return fmt.Errorf("Move:os.Rename -> %w", err)
-		}
+	if path == dest {
+		PanelLog.DEBUG("[文件管理]", "移动失败", path, "到", dest, "路径相同")
+		return errors.New("move:args 移动文件失败 路径相同")
 	}
+
+	err := os.Rename(path, dest)
+	if err != nil {
+		PanelLog.DEBUG("[文件管理]", "移动失败", path, "到", dest, err.Error())
+		return fmt.Errorf("Move:os.Rename -> %w", err)
+	}
+
 	PanelLog.INFO("[文件管理]", "文件移动成功", path, "到", dest)
 	return nil
 }
@@ -253,8 +251,7 @@ func Rename(path string, newName string) error {
 	}
 
 	newPath := filepath.Join(getFilePath(path), newName)
-	Move(path, newPath)
-	return nil
+	return Move(path, newPath)
 }
 
 // Compress 压缩
