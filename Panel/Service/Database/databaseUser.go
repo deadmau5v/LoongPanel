@@ -43,6 +43,10 @@ func UserFind() []User {
 	return Users
 }
 
+func UserCount() int {
+	return len(UserFind())
+}
+
 func init() {
 	err := DB.AutoMigrate(&User{})
 	if err != nil {

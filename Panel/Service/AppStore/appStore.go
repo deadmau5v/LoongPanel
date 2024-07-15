@@ -90,3 +90,14 @@ func FindApp(name string) *App {
 	}
 	return nil
 }
+
+// 统计已安装应用数量
+func AppCount() (int, int) {
+	count := 0
+	for _, app := range Apps {
+		if app.IsInstall() {
+			count++
+		}
+	}
+	return len(Apps), count
+}

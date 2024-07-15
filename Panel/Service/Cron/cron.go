@@ -8,8 +8,9 @@ package Cron
 
 import (
 	"fmt"
-	"github.com/robfig/cron/v3"
 	"time"
+
+	"github.com/robfig/cron/v3"
 )
 
 var (
@@ -18,6 +19,11 @@ var (
 
 func DurationToCron(d time.Duration) string {
 	return fmt.Sprintf("@every %s", d.String())
+}
+
+// 统计所有任务数量
+func AllJobCount() int {
+	return len(Cron.Entries())
 }
 
 func init() {

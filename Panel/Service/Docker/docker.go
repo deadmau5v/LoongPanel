@@ -11,6 +11,7 @@ import (
 	"LoongPanel/Panel/Service/PanelLog"
 	"context"
 	"errors"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -39,6 +40,15 @@ func ContainerList() ([]types.Container, error) {
 	return list, nil
 }
 
+// ContainerCount 获取容器数量
+func ContainerCount() int {
+	list, err := ContainerList()
+	if err != nil {
+		return 0
+	}
+	return len(list)
+}
+
 // GetImageList 获取镜像列表
 func GetImageList() ([]image.Summary, error) {
 	PanelLog.INFO("[Docker管理]", "获取镜像列表")
@@ -59,6 +69,15 @@ func GetImageList() ([]image.Summary, error) {
 	}
 
 	return list, nil
+}
+
+// ImageCount 获取镜像数量
+func ImageCount() int {
+	list, err := GetImageList()
+	if err != nil {
+		return 0
+	}
+	return len(list)
 }
 
 // GetClient 获取docker客户端

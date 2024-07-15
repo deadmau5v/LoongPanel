@@ -1,6 +1,6 @@
 /*
  * 创建人： deadmau5v
- * 创建时间： 2024-0-0
+ * 创建时间： 2024-7-1
  * 文件作用：
  */
 
@@ -43,4 +43,9 @@ func KillProcess(pid int32) bool {
 		}
 	}
 	return false
+}
+
+// ProcessCount 获取进程数量
+func ProcessCount() int {
+	return len(GetProcessesList())
 }
