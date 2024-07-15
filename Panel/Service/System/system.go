@@ -110,6 +110,9 @@ func networkIO() error {
 	}
 
 	for idx, counter := range counters {
+		if idx >= len(stats) {
+			break
+		}
 		stats[idx] = NetworkIOStat{
 			InterfaceName: counter.Name,
 			BytesSent:     counter.BytesSent - stats[idx].BytesSent,

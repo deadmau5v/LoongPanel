@@ -5,6 +5,7 @@ package inspection
 import (
 	"LoongPanel/Panel/Service/PanelLog"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
@@ -167,11 +168,15 @@ func CheckTimeSync() (string, string) {
 // CheckSSHService 检查SSH服务是否在运行
 func CheckSSHService() (string, string) {
 	// 执行命令检查SSH服务状态
-	cmd := exec.Command("systemctl", "is-active", "ssh")
+	cmd := exec.Command("systemctl", "is-active", "sshd")
 	output, err := cmd.Output()
 	if err != nil {
-		PanelLog.ERROR("检查SSH服务状态失败: %v", err)
-		return "ERROR", "无法检查SSH服务状态"
+		cmd := exec.Command("systemctl", "is-active", "ssh")
+		output, err = cmd.Output()
+		if err != nil {
+			PanelLog.ERROR("检查SSH服务状态失败: %v", err)
+			return "ERROR", "无法检查SSH服务状态"
+		}
 	}
 
 	// 判断SSH服务是否在运行
@@ -307,14 +312,14 @@ func CheckSSHLoginGraceTime() (string, string) {
 // CheckFirewallStatus 检查防火墙状态
 func CheckFirewallStatus() (string, string) {
 	// 检查防火墙状态
-	out, err := exec.Command("ufw", "status").Output()
+	out, err := exec.Command("firewall-cmd", "--state").Output()
 	if err != nil {
 		PanelLog.ERROR("获取防火墙状态失败: %v", err)
 		return "ERROR", "无法获取防火墙状态"
 	}
 
 	status := string(out)
-	if strings.Contains(status, "inactive") {
+	if strings.Contains(status, "not running") {
 		return "WARN", "防火墙未激活"
 	}
 
@@ -324,7 +329,7 @@ func CheckFirewallStatus() (string, string) {
 // CheckFirewallRules 检查防火墙规则
 func CheckFirewallRules() (string, string) {
 	// 获取防火墙规则
-	out, err := exec.Command("ufw", "status", "numbered").Output()
+	out, err := exec.Command("firewall-cmd", "--list-all").Output()
 	if err != nil {
 		PanelLog.ERROR("获取防火墙规则失败: %v", err)
 		return "ERROR", "无法获取防火墙规则"
@@ -336,4 +341,89 @@ func CheckFirewallRules() (string, string) {
 	}
 
 	return "OK", "防火墙规则正常"
+}
+
+// CheckSELinuxStatus 检查 SELinux 状态
+func CheckSELinuxStatus() (string, string) {
+	// 检查 SELinux 状态
+	out, err := exec.Command("getenforce").Output()
+	if err != nil {
+		PanelLog.ERROR("获取 SELinux 状态失败: %v", err)
+		return "ERROR", "无法获取 SELinux 状态"
+	}
+
+	status := string(out)
+	if strings.Contains(status, "Disabled") {
+		return "WARN", "SELinux 未启用 建议启用SELinux来增强Linux系统安全性"
+	}
+
+	return "OK", "SELinux 状态正常"
+}
+
+// checkUserPassword 检查用户是否有密码
+func checkUserPassword(user string) (string, string) {
+	// 检查用户是否有密码
+	out, err := exec.Command("passwd", "-S", user).Output()
+	if err != nil {
+		PanelLog.ERROR("获取用户密码状态失败: %v", err)
+		return "ERROR", "无法获取用户密码状态"
+	}
+
+	status := string(out)
+	if strings.Contains(status, "NP") {
+		return "WARN", "用户没有密码"
+	}
+
+	return "OK", "用户密码状态正常"
+}
+
+// CheckAllUserPasswords 检查所有用户是否有密码
+func CheckAllUserPasswords() (string, string) {
+	// 获取所有用户
+	out, err := exec.Command("getent", "passwd").Output()
+	if err != nil {
+		PanelLog.ERROR("获取用户列表失败: %v", err)
+		return "ERROR", "无法获取用户列表"
+	}
+
+	users := strings.Split(string(out), "\n")
+	// 没有密码的用户
+	passwordStatuses := []string{}
+
+	// 检查每个用户的密码状态
+	for _, userLine := range users {
+		if userLine == "" {
+			continue
+		}
+
+		user := strings.Split(userLine, ":")[0]
+		status, _ := checkUserPassword(user)
+		if status == "WARN" {
+			passwordStatuses = append(passwordStatuses, user)
+		}
+	}
+
+	if len(passwordStatuses) > 0 {
+		return "WARN", "以下用户没有设置密码: " + strings.Join(passwordStatuses, ", ")
+	}
+
+	return "OK", "用户密码状态正常"
+}
+
+// CheckYumUpdates 检查有多少个 yum 包可以更新
+func CheckYumUpdates() (string, string) {
+	out, err := exec.Command("yum", "check-update").Output()
+	if err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			if exitError.ExitCode() == 100 {
+				lines := strings.Split(string(out), "\n")
+				numUpdates := len(lines) - 2
+				return "WARN", fmt.Sprintf("有 %d 个包可以更新", numUpdates)
+			}
+		}
+
+		return "ERROR", "无法检查 yum 更新"
+	}
+
+	return "OK", "所有的包都是最新的"
 }

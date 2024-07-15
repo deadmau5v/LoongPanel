@@ -85,8 +85,8 @@ func GetTIDB() {
 		Download("https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-amd64")
 		os.Rename(path.Join(System.WORKDIR, "resource", "tidb-server-amd64"), path.Join(System.WORKDIR, "resource", "tidb-server"))
 	} else {
-		Download("https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-amd64")
-		os.Rename(path.Join(System.WORKDIR, "resource", "tidb-server-amd64"), path.Join(System.WORKDIR, "resource", "tidb-server"))
+		Download("https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-loong64")
+		os.Rename(path.Join(System.WORKDIR, "resource", "tidb-server-loong64"), path.Join(System.WORKDIR, "resource", "tidb-server"))
 	}
 
 	// 设置运行权限

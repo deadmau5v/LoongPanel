@@ -80,6 +80,9 @@ func GetAllItems() []Item {
 		{Name: "检查SSH登录宽限时间", check_func: CheckSSHLoginGraceTime},
 		{Name: "检查防火墙状态", check_func: CheckFirewallStatus},
 		{Name: "检查防火墙规则", check_func: CheckFirewallRules},
+		{Name: "检查SELinux状态", check_func: CheckSELinuxStatus},
+		{Name: "检查空密码用户", check_func: CheckAllUserPasswords},
+		{Name: "检查yum更新", check_func: CheckYumUpdates},
 	}
 }
 
