@@ -89,3 +89,40 @@ func GetClient() *client.Client {
 	}
 	return docker
 }
+
+// DeleteContainer 删除容器
+func DeleteContainer(id string) error {
+	app := AppStore.FindApp("Docker")
+	if !app.IsRunning() || !app.IsInstall() {
+		return errors.New("请先安装Docker并启动")
+	}
+
+	docker := GetClient()
+	err := docker.ContainerRemove(context.Background(), id, container.RemoveOptions{
+		Force: true,
+	})
+	if err != nil {
+		return err
+	}
+
+	PanelLog.INFO("[Docker管理]", "删除容器")
+	return nil
+}
+
+// DeleteImage 删除镜像
+func DeleteImage(id string) error {
+	PanelLog.INFO("[Docker管理]", "删除镜像")
+	app := AppStore.FindApp("Docker")
+	if !app.IsRunning() || !app.IsInstall() {
+		return errors.New("请先安装Docker并启动")
+	}
+
+	docker := GetClient()
+	_, err := docker.ImageRemove(context.Background(), id, image.RemoveOptions{
+		Force: true,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

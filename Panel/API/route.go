@@ -134,6 +134,8 @@ func initRoute(app *gin.Engine) {
 	GroupDocker := v1.Group("/docker")
 	SetRoute("GET", "/containers", docker.GetContainerList, GroupDocker, "Docker(获取容器列表)", false)
 	SetRoute("GET", "/images", docker.GetImageList, GroupDocker, "Docker(获取镜像列表)", false)
+	SetRoute("DELETE", "/container", docker.DeleteContainer, GroupDocker, "Docker(删除容器)", false)
+	SetRoute("DELETE", "/image", docker.DeleteImage, GroupDocker, "Docker(删除镜像)", false)
 
 	// 病毒扫描
 	GroupClamav := v1.Group("/clamav")
