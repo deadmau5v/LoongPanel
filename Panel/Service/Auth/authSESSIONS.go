@@ -145,6 +145,9 @@ func UserAuth() gin.HandlerFunc {
 			"/docker/image",
 			"/status",
 			"/clamav",
+			"/settings",
+			"/notice",
+			"/inspection",
 		}
 		for _, path := range staticPaths {
 			if c.Request.URL.Path == path {
