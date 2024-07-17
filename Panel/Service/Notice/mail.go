@@ -2,11 +2,12 @@ package notice
 
 import (
 	config "LoongPanel/Panel/Service/Config"
+	"crypto/tls"
 	"errors"
 	"fmt"
-	"net/smtp"
 
 	"github.com/asaskevich/govalidator"
+	"gopkg.in/gomail.v2"
 )
 
 // SendMail 发送邮件
@@ -24,14 +25,19 @@ func SendMail(to, title, body string) error {
 		return fmt.Errorf("SendMail -> %w", errors.New("邮件配置错误"))
 	}
 
-	auth := smtp.PlainAuth("", mailConfig.MailUser, mailConfig.MailPass, mailConfig.MailHost)
-	toList := []string{mailConfig.MailTo}
-	msg := []byte("To: " + mailConfig.MailTo + "\r\n" +
-		"Subject: " + mailConfig.MailTitle + "\r\n" +
-		"\r\n" +
-		mailConfig.MailBody + "\r\n")
-	err = smtp.SendMail(fmt.Sprintf("%s:%d", mailConfig.MailHost, mailConfig.MailPort), auth, mailConfig.MailFrom, toList, msg)
-	if err != nil {
+	d := gomail.NewDialer(mailConfig.MailHost, mailConfig.MailPort, mailConfig.MailUser, mailConfig.MailPass)
+	d.TLSConfig = &tls.Config{
+		InsecureSkipVerify: !mailConfig.MailSSL,
+		ServerName:         mailConfig.MailHost,
+	}
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", mailConfig.MailFrom)
+	m.SetHeader("To", mailConfig.MailTo)
+	m.SetHeader("Subject", mailConfig.MailTitle)
+	m.SetBody("text/plain", mailConfig.MailBody)
+
+	if err := d.DialAndSend(m); err != nil {
 		return fmt.Errorf("SendMail -> %w", err)
 	}
 

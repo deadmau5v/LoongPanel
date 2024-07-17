@@ -111,11 +111,14 @@ func Check() chan string {
 		var settings []notice.UserNotificationSetting
 		Database.DB.Preload("User").Find(&settings)
 		for _, v := range settings {
-			if v.InspectionNotify {
+			if v.InspectionNotify && v.User.Mail != "" {
+				PanelLog.INFO("[巡检通知]", "发送通知给", v.User.Mail)
 				err := notice.SendMail(v.User.Mail, "巡检结果", mailBody)
 				if err != nil {
 					PanelLog.ERROR("[巡检通知]", err.Error())
 				}
+			} else if v.InspectionNotify && v.User.Mail == "" {
+				PanelLog.ERROR("[巡检通知]", "用户邮件未配置")
 			}
 		}
 	}()
