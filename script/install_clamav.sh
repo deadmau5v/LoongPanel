@@ -11,14 +11,11 @@ install_dir="/opt/clamav"
 mkdir -p $install_dir
 cd $install_dir
 
-wget https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/clamav-1.4.0-rc.linux.loongarch64.sh
+wget https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/clamav-1.4.0-rc.linux.loongarch64.tar.gz
 
-chmod +x clamav-1.4.0-rc.linux.loongarch64.sh
+tar -zxvf clamav-1.4.0-rc.linux.loongarch64.tar.gz
 
-# 跳过license 防止阻塞
-./clamav-1.4.0-rc.linux.loongarch64.sh -s
-
-echo "$install_dir/clamav-1.4.0-rc.linux.loongarch64/lib64" > /etc/ld.so.conf.d/clamav.conf
+echo "$install_dir/clamav-1.4.0-rc.linux.loongarch64/lib64" >/etc/ld.so.conf.d/clamav.conf
 
 # 刷新ldconfig
 ldconfig
@@ -50,3 +47,6 @@ touch $log_file
 chown clamav:clamav $log_file
 chmod 0640 $log_file
 
+# 环境变量
+echo "export PATH=$install_dir/clamav-1.4.0-rc.linux.loongarch64/bin:\$PATH" >>/etc/profile
+source /etc/profile

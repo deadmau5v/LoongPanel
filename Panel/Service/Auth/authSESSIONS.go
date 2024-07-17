@@ -131,6 +131,7 @@ func UserAuth() gin.HandlerFunc {
 			"/index.html",
 			"/favicon.ico",
 			"/api/v1/auth/login",
+			"/api/v1/auth/register",
 			"/index",
 			"/login",
 			"/user",

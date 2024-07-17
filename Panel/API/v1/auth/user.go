@@ -435,6 +435,7 @@ func Register(ctx *gin.Context) {
 		Username string `json:"username"`
 		Password string `json:"password"`
 		Mail     string `json:"mail"`
+		Phone    string `json:"phone"`
 	}{}
 
 	if err := ctx.BindJSON(&req); err != nil {
@@ -452,6 +453,8 @@ func Register(ctx *gin.Context) {
 		Name:     req.Username,
 		Password: hashedPassword,
 		Mail:     req.Mail,
+		Phone:    req.Phone,
+		Role:     "user",
 	}
 
 	result := Database.DB.Create(&newUser)

@@ -47,6 +47,9 @@ func GetItemsRes(res []Res) string {
 检查SSH登录宽限时间: %s
 检查防火墙状态: %s
 检查防火墙规则: %s
+检查SELinux状态: %s
+检查空密码用户: %s
+检查yum更新: %s
 `
 	resStr := []interface{}{}
 	for _, v := range res {

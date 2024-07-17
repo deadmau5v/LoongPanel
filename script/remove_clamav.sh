@@ -7,7 +7,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # 停止ClamAV服务
-service clamav-daemon stop
+systemctl stop clamav-daemon
 
 # 删除ClamAV文件
 install_dir="/opt/clamav"
@@ -21,7 +21,7 @@ ldconfig
 
 # 删除ClamAV用户和组
 if id -u clamav >/dev/null 2>&1; then
-    userdel clamav
+    userdel -r clamav
     groupdel clamav
 fi
 
@@ -30,4 +30,3 @@ log_file="/var/log/freshclam.log"
 rm -f $log_file
 
 echo "ClamAV已成功卸载"
-

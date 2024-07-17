@@ -69,11 +69,12 @@ func initRoute(app *gin.Engine) {
 	// 权限管理
 	GroupAuth := v1.Group("/auth")
 	SetRoute("POST", "/login", AuthAPI.Login, GroupAuth, "基础(登录)", true)
+	SetRoute("POST", "/register", AuthAPI.Register, GroupAuth, "基础(注册)", true)
 	SetRoute("POST", "/logout", AuthAPI.Logout, GroupAuth, "基础(登出)", true)
 	SetRoute("GET", "/users", AuthAPI.GetUsers, GroupAuth, "权限管理(获取全部用户)", false)
 	SetRoute("DELETE", "/users", AuthAPI.DelUsers, GroupAuth, "权限管理(批量删除用户)", false)
-	SetRoute("GET", "/user/:id", AuthAPI.GetUser, GroupAuth, "权限管理(获取用户)", false)
-	SetRoute("GET", "/user", AuthAPI.GetUser, GroupAuth, "权限管理(获取用户)", false)
+	SetRoute("GET", "/user/:id", AuthAPI.GetUser, GroupAuth, "权限管理(获取指定用户信息)", false)
+	SetRoute("GET", "/user", AuthAPI.GetUser, GroupAuth, "权限管理(获取用户信息)", true)
 	SetRoute("POST", "/user", AuthAPI.CreateUser, GroupAuth, "权限管理(创建用户)", false)
 	SetRoute("PUT", "/user", AuthAPI.UpdateUser, GroupAuth, "权限管理(更新用户)", false)
 	SetRoute("DELETE", "/user", AuthAPI.DeleteUser, GroupAuth, "权限管理(删除用户)", false)
@@ -82,7 +83,7 @@ func initRoute(app *gin.Engine) {
 	SetRoute("DELETE", "/role", AuthAPI.DeleteRole, GroupAuth, "权限管理(删除角色)", false)
 	SetRoute("POST", "/policy", AuthAPI.AddPolicy, GroupAuth, "权限管理(获取策略)", false)
 	SetRoute("DELETE", "/policy", AuthAPI.DeletePolicy, GroupAuth, "权限管理(删除策略)", false)
-	SetRoute("POST", "/password", AuthAPI.ChangePassword, GroupAuth, "权限管理(修改密码)", false)
+	SetRoute("POST", "/password", AuthAPI.ChangePassword, GroupAuth, "权限管理(修改密码)", true)
 
 	// 系统状态
 	GroupStatus := v1.Group("/status")
@@ -105,7 +106,7 @@ func initRoute(app *gin.Engine) {
 
 	// 文件操作
 	GroupFiles := v1.Group("/files")
-	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "文件管理(获取文件列表)", true)
+	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "文件管理(获取文件列表)", false)
 	SetRoute("GET", "/read", files.FileRead, GroupFiles, "文件管理(读取文件)", false)
 	SetRoute("GET", "/download", files.Download, GroupFiles, "文件管理(下载文件)", false)
 	SetRoute("POST", "/delete", files.Delete, GroupFiles, "文件管理(删除文件)", false)

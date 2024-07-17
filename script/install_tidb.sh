@@ -12,7 +12,8 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # 下载
-wget https://cdn1.d5v.cc/CDN/File/tidb-server
+wget https://cdn1.d5v.cc/CDN/Project/LoongPanel/applications/tidb-server-loong64
+mv tidb-server-loong64 tidb-server
 
 # 安装
 mkdir /opt/tidb -p

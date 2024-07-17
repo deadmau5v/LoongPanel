@@ -11,8 +11,9 @@ import (
 	"LoongPanel/Panel/Service/Database"
 	"LoongPanel/Panel/Service/PanelLog"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -78,7 +79,7 @@ func Logout(c *gin.Context) {
 func authenticateUser(username, email, password string) (*Database.User, error) {
 	users := Database.UserFind()
 	for _, user := range users {
-		if user.Name == username {
+		if user.Name != "" && user.Name == username {
 			// 通过用户名
 			ok, err := Auth.AuthenticateUser(user.Name, password)
 			if ok && err == nil {
@@ -88,7 +89,7 @@ func authenticateUser(username, email, password string) (*Database.User, error) 
 			} else {
 				return nil, err
 			}
-		} else if user.Mail == email {
+		} else if user.Mail != "" && user.Mail == email {
 			// 通过邮箱
 			ok, err := Auth.AuthenticateUserByEmail(user.Mail, password)
 			if ok && err == nil {
