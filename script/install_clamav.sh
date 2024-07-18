@@ -22,9 +22,10 @@ ldconfig
 
 # 设置clamav默认配置
 config_dir="/root/clamav/build/install/etc"
+mkdir -p /root/clamav/build/install/share
+touch /root/clamav/build/install/share/clamav
 mkdir -p $config_dir
 cat <<'EOF' >$config_dir/freshclam.conf
-# Example
 DatabaseDirectory /var/lib/clamav
 UpdateLogFile /var/log/freshclam.log
 LogFileMaxSize 2M
