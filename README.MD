@@ -1,15 +1,16 @@
+<!--suppress HtmlDeprecatedAttribute -->
 <h1 align="center">
-  <img src="./doc/img/logo.png" alt="Logo" width="200">
+  <img src="./doc/img/logo.png" alt="Logo" style="width:120px">
   <br>LoongPanel<br>
 </h1>
 
 <h4 align="center">一个 LoongArch64 下的运维管理平台</h4>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/Go-1.22-blue">
-    <img src="https://img.shields.io/badge/Gin-1.9.1-blue">
-    <img src="https://img.shields.io/badge/arch-Loong64-red">
-    <img src="https://img.shields.io/badge/os-linux-red">
+    <img alt="info" src="https://img.shields.io/badge/Go-1.22-blue">
+    <img alt="info" src="https://img.shields.io/badge/Gin-1.9.1-blue">
+    <img alt="info" src="https://img.shields.io/badge/arch-Loong64-red">
+    <img alt="info" src="https://img.shields.io/badge/os-linux-red">
 </p>
 
 # 后端
@@ -18,25 +19,25 @@
 
 - [x] ~~性能监控~~
     - [x] ~~文件管理~~
-    - [ ] 集群管理
-    - [ ] 日志管理
-    - [ ] 应用安装
-    - [ ] 告警通知
-    - [ ] 漏洞扫描
+    - [x] ~~集群管理~~
+    - [x] ~~日志管理~~
+    - [x] ~~应用安装~~
+    - [x] ~~告警通知~~
+    - [x] ~~漏洞扫描~~
     - [x] ~~远程终端~~
     - [ ] 进程管理
     - [ ] 垃圾清理
-    - [ ] 系统设置
-    - [ ] 面板设置
+    - [x] ~~系统设置~~
+    - [x] ~~面板设置~~
 
 ## 高级功能
 
 - [ ] SSH 管理
     - [ ] 数据库管理
-    - [ ] Docker 管理
-    - [ ] 定时任务执行
-    - [ ] 运行环境管理
-    - [ ] 多用户权限管理
+    - [x] ~~Docker 管理~~
+    - [x] ~~定时任务执行~~
+    - [x] ~~运行环境管理~~
+    - [x] ~~多用户权限管理~~
 
 ## 构建
 
@@ -56,20 +57,3 @@ https://github.com/deadmau5v/loong_panel_react
 # 运行
 
 需要将前端编译后 dist 目录放到后端目录下
-
-# 效果图
-
-<img align="center" src="doc/img/1.png">
----
-<img align="center" src="doc/img/2.png">
----
-<img align="center" src="doc/img/3.png">
----
-
-# TODO 开发计划
-
-- [ ] 持久化记录
-    - [ ] 开关
-    - [ ] 时长
-    - [ ] 位置
-    - [ ] 清理

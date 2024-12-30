@@ -7,59 +7,187 @@
 package API
 
 import (
+	v1 "LoongPanel/Panel/API/v1"
+	inspection "LoongPanel/Panel/API/v1/Inspection"
+	"LoongPanel/Panel/API/v1/appstore"
 	AuthAPI "LoongPanel/Panel/API/v1/auth"
+	"LoongPanel/Panel/API/v1/clamav"
 	"LoongPanel/Panel/API/v1/clean"
+	"LoongPanel/Panel/API/v1/docker"
 	"LoongPanel/Panel/API/v1/files"
 	"LoongPanel/Panel/API/v1/home"
+	"LoongPanel/Panel/API/v1/log"
+	"LoongPanel/Panel/API/v1/notice"
+	"LoongPanel/Panel/API/v1/settings"
+	"LoongPanel/Panel/API/v1/status"
 	"LoongPanel/Panel/API/v1/terminal"
+	"LoongPanel/Panel/Service/Auth"
+	"LoongPanel/Panel/Service/PanelLog"
 	"LoongPanel/Panel/Service/System"
+	"path"
+
 	"github.com/gin-gonic/gin"
 )
 
+func SetRoute(Method, Path string, HandlerFunc gin.HandlerFunc, group *gin.RouterGroup, comment string, Public bool) {
+	PanelLog.DEBUG("[添加路由]", Method, Path, comment)
+
+	addPolicy := func(role, path, method string) {
+		if _, err := Auth.Authenticator.AddPolicy(role, path, method); err != nil {
+			PanelLog.ERROR("[权限管理]", "添加权限策略失败", err)
+			panic(err)
+		}
+	}
+
+	if group != nil {
+		basePath := group.BasePath() + Path
+		addPolicy("admin", basePath, Method)
+		if Public {
+			addPolicy("user", basePath, Method)
+		}
+		group.Handle(Method, Path, HandlerFunc)
+		v1.AddRouteComment(Method, basePath, comment)
+	} else {
+		addPolicy("admin", Path, Method)
+		addPolicy("user", Path, Method)
+		App.Handle(Method, Path, HandlerFunc)
+		v1.AddRouteComment(Method, Path, comment)
+	}
+}
+
 func initRoute(app *gin.Engine) {
 	// 其他
-	app.Static("/assets", System.WORKDIR+"/dist/assets")
+	app.Static("/assets", path.Join(System.WORKDIR, "dist", "assets"))
+	app.Static("/script/icons", path.Join(System.WORKDIR, "script", "icons"))
 
-	// api v1
 	v1 := app.Group("/api/v1")
 	ws := app.Group("/api/ws")
-	//  home 首页
-	// -- home -> status 状态监控(实时)
-	v1.GET("/status/system_status", home.SystemStatus)
-	v1.GET("/status/system_info", home.SystemInfo)
-	v1.GET("/status/disks", home.Disks)
-	// -- home -> clean 清理垃圾
-	v1.GET("/clean/pkg_auto_clean", clean.PkgAutoClean)
-	// -- home -> power 电源操作
-	v1.GET("/power/shutdown", home.Reboot)
-	v1.GET("/power/reboot", home.Shutdown)
 
-	//  files 文件
-	v1.GET("/files/dir", files.FileDir)
+	// 公共路由
+	SetRoute("GET", "/ping", ping, v1, "基础(检测Cookie是否生效)", true)
 
-	//  terminal 终端
-	v1.GET("/screen/input", terminal.ScreenInput)
-	v1.GET("/screen/create", terminal.ScreenCreate)
-	v1.GET("/screen/close", terminal.ScreenClose)
-	v1.GET("/screen/output", terminal.ScreenOutput)
-	v1.GET("/screen/get_screens", terminal.GetScreens)
-	// -- terminal -> WebSocket
-	ws.GET("/api/ws/screen", terminal.ScreenWs)
+	// 权限管理
+	GroupAuth := v1.Group("/auth")
+	SetRoute("POST", "/login", AuthAPI.Login, GroupAuth, "基础(登录)", true)
+	SetRoute("POST", "/register", AuthAPI.Register, GroupAuth, "基础(注册)", true)
+	SetRoute("POST", "/logout", AuthAPI.Logout, GroupAuth, "基础(登出)", true)
+	SetRoute("GET", "/users", AuthAPI.GetUsers, GroupAuth, "权限管理(获取全部用户)", false)
+	SetRoute("DELETE", "/users", AuthAPI.DelUsers, GroupAuth, "权限管理(批量删除用户)", false)
+	SetRoute("GET", "/user/:id", AuthAPI.GetUser, GroupAuth, "权限管理(获取指定用户信息)", false)
+	SetRoute("GET", "/user", AuthAPI.GetUser, GroupAuth, "权限管理(获取用户信息)", true)
+	SetRoute("POST", "/user", AuthAPI.CreateUser, GroupAuth, "权限管理(创建用户)", false)
+	SetRoute("PUT", "/user", AuthAPI.UpdateUser, GroupAuth, "权限管理(更新用户)", false)
+	SetRoute("DELETE", "/user", AuthAPI.DeleteUser, GroupAuth, "权限管理(删除用户)", false)
+	SetRoute("GET", "/role", AuthAPI.GetRoles, GroupAuth, "权限管理(获取角色)", false)
+	SetRoute("POST", "/role", AuthAPI.CreateRole, GroupAuth, "权限管理(创建角色)", false)
+	SetRoute("DELETE", "/role", AuthAPI.DeleteRole, GroupAuth, "权限管理(删除角色)", false)
+	SetRoute("POST", "/policy", AuthAPI.AddPolicy, GroupAuth, "权限管理(获取策略)", false)
+	SetRoute("DELETE", "/policy", AuthAPI.DeletePolicy, GroupAuth, "权限管理(删除策略)", false)
+	SetRoute("POST", "/password", AuthAPI.ChangePassword, GroupAuth, "权限管理(修改密码)", true)
 
-	// ping
-	v1.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"code": 200,
-			"msg":  "pong",
-		})
-	})
+	// 系统状态
+	GroupStatus := v1.Group("/status")
+	SetRoute("GET", "/system_status", home.SystemStatus, GroupStatus, "系统状态(系统实时状态)", true)
+	SetRoute("GET", "/system_info", home.SystemInfo, GroupStatus, "系统状态(系统信息)", true)
+	SetRoute("GET", "/disks", home.Disks, GroupStatus, "系统状态(磁盘信息)", true)
+	SetRoute("POST", "/config", status.SetStatusConfig, GroupStatus, "系统状态(设置状态保存时间和间隔)", false)
 
-	// 登录
-	app.POST("/api/v1/auth/login", AuthAPI.Login)
+	SetRoute("GET", "/status", status.GetStatus, ws, "系统状态(流式传输获取状态)", false)
 
-	// 静态页面
+	// 清理
+	GroupClean := v1.Group("/clean")
+	SetRoute("GET", "/pkg_auto_clean", clean.PkgAutoClean, GroupClean, "包管理工具(清理过期包)", false)
+	SetRoute("GET", "/temp_dir_remove", clean.TempDirRemove, GroupClean, "包管理工具(清理临时目录)", false)
+
+	// 系统操作
+	GroupPower := v1.Group("/power")
+	SetRoute("POST", "/shutdown", home.Reboot, GroupPower, "系统操作(关机操作)", false)
+	SetRoute("POST", "/reboot", home.Shutdown, GroupPower, "系统操作(重启操作)", false)
+
+	// 文件操作
+	GroupFiles := v1.Group("/files")
+	SetRoute("GET", "/dir", files.FileDir, GroupFiles, "文件管理(获取文件列表)", false)
+	SetRoute("GET", "/read", files.FileRead, GroupFiles, "文件管理(读取文件)", false)
+	SetRoute("GET", "/download", files.Download, GroupFiles, "文件管理(下载文件)", false)
+	SetRoute("POST", "/delete", files.Delete, GroupFiles, "文件管理(删除文件)", false)
+	SetRoute("POST", "/move", files.Move, GroupFiles, "文件管理(移动文件)", false)
+	SetRoute("POST", "/rename", files.Rename, GroupFiles, "文件管理(重命名文件)", false)
+	SetRoute("POST", "/decompress", files.Decompress, GroupFiles, "文件管理(解压文件)", false)
+	SetRoute("POST", "/compress", files.Compress, GroupFiles, "文件管理(压缩文件)", false)
+	SetRoute("POST", "/copy", files.Copy, GroupFiles, "文件管理(复制文件)", false)
+	SetRoute("PUT", "/upload", files.Upload, GroupFiles, "文件管理(上传文件)", false)
+
+	// 日志
+	GroupLog := v1.Group("/log")
+	SetRoute("GET", "/logs", log.GetLogs, GroupLog, "日志(获取可用日志)", false)
+	SetRoute("GET", "/log", log.GetLog, GroupLog, "日志(获取日志)", false)
+	SetRoute("GET", "/options", log.GetLogStruct, GroupLog, "日志(获取日志结构)", false)
+	SetRoute("DELETE", "/log", log.ClearLog, GroupLog, "日志(清理日志)", false)
+
+	// 应用商店
+	GroupAppStore := v1.Group("/appstore")
+	SetRoute("GET", "/apps", appstore.AppList, GroupAppStore, "应用商店(获取应用列表)", true)
+	SetRoute("POST", "/app", appstore.InstallApp, GroupAppStore, "应用商店(安装应用)", false)
+	SetRoute("DELETE", "/app", appstore.UninstallApp, GroupAppStore, "应用商店(卸载应用)", false)
+	SetRoute("POST", "/app/start", appstore.StartApp, GroupAppStore, "应用商店(启动应用)", false)
+	SetRoute("POST", "/app/stop", appstore.StopApp, GroupAppStore, "应用商店(停止应用)", false)
+
+	// Docker
+	GroupDocker := v1.Group("/docker")
+	SetRoute("GET", "/containers", docker.GetContainerList, GroupDocker, "Docker(获取容器列表)", false)
+	SetRoute("GET", "/images", docker.GetImageList, GroupDocker, "Docker(获取镜像列表)", false)
+	SetRoute("DELETE", "/container", docker.DeleteContainer, GroupDocker, "Docker(删除容器)", false)
+	SetRoute("DELETE", "/image", docker.DeleteImage, GroupDocker, "Docker(删除镜像)", false)
+
+	// 病毒扫描
+	GroupClamav := v1.Group("/clamav")
+	SetRoute("GET", "/scan", clamav.ScanFile, GroupClamav, "病毒扫描(扫描文件)", false)
+	SetRoute("GET", "/scan_dir", clamav.ScanDir, GroupClamav, "病毒扫描(扫描目录)", false)
+	SetRoute("GET", "/set_scan_time", clamav.SetScanTime, GroupClamav, "病毒扫描(设置定时扫描)", false)
+
+	SetRoute("GET", "/clamav/scan", clamav.ScanFile, ws, "病毒扫描(快速扫描)", false)
+	SetRoute("GET", "/clamav/scan_dir", clamav.ScanFile, ws, "病毒扫描(快速扫描目录)", false)
+
+	// 网页终端
+	SetRoute("GET", "/screen", terminal.Terminal, ws, "网页终端(使用网页终端)", false)
+
+	// 巡检
+	SetRoute("GET", "/check", inspection.Check, ws, "巡检(一键巡检)", false)
+
+	// 预警通知
+	GroupNotice := v1.Group("/notice")
+	SetRoute("GET", "/notices", notice.GetAllSettings, GroupNotice, "预警通知(获取所有通知设置)", true)
+	SetRoute("POST", "/notice", notice.AddNotice, GroupNotice, "预警通知(添加通知设置)", false)
+	SetRoute("DELETE", "/notice", notice.DeleteNotice, GroupNotice, "预警通知(删除通知设置)", false)
+	SetRoute("PUT", "/notice", notice.UpdateNotice, GroupNotice, "预警通知(更新通知设置)", false)
+
+	// 面板设置
+	GroupSettings := v1.Group("/settings")
+	SetRoute("GET", "/mail", settings.GetMailConfig, GroupSettings, "面板设置(获取邮件设置)", true)
+	SetRoute("POST", "/mail", settings.SetMailConfig, GroupSettings, "面板设置(设置邮件设置)", false)
+	SetRoute("GET", "/clamav", settings.GetClamavConfig, GroupSettings, "面板设置(获取Clamav设置)", true)
+	SetRoute("POST", "/clamav", settings.SetClamavConfig, GroupSettings, "面板设置(设置Clamav设置)", false)
+	SetRoute("GET", "/log", settings.GetPanelLogConfig, GroupSettings, "面板设置(获取面板日志设置)", true)
+	SetRoute("POST", "/log", settings.SetPanelLogConfig, GroupSettings, "面板设置(设置面板日志设置)", false)
+	SetRoute("GET", "/auth", settings.GetAuthConfig, GroupSettings, "面板设置(获取认证设置)", true)
+	SetRoute("POST", "/auth", settings.SetAuthConfig, GroupSettings, "面板设置(设置认证设置)", false)
+
+	// 前端静态文件
 	app.NoRoute(func(c *gin.Context) {
 		c.File(System.WORKDIR + "/dist/index.html")
 	})
 
+	// 信任代理
+	err := app.SetTrustedProxies([]string{"127.0.0.1"})
+	if err != nil {
+		PanelLog.DEBUG("[权限管理] 设置信任代理失败", err)
+		return
+	}
+}
+
+func ping(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"status": 0,
+		"msg":    "pong",
+	})
 }

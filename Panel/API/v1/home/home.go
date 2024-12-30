@@ -13,21 +13,14 @@ import (
 )
 
 func SystemInfo(ctx *gin.Context) {
-	data := map[string]interface{}{
-		"system_arch":          "",
-		"system_public_ip":     "",
-		"system_cpu_name":      "",
-		"system_linux_version": "",
-		"system_run_time":      "",
-	}
 
-	data["system_arch"] = System2.Data.OSArch
-	data["system_public_ip"] = System2.PublicIP
-	data["system_cpu_name"] = System2.Data.CPUName
-	data["system_linux_version"] = System2.Data.LinuxVersion
-	data["system_run_time"] = System2.GetRunTime()
-
-	ctx.JSON(http.StatusOK, data)
+	ctx.JSON(http.StatusOK, gin.H{
+		"system_arch":          System2.Data.OSArch,
+		"system_public_ip":     System2.PublicIP,
+		"system_cpu_name":      System2.Data.CPUName,
+		"system_linux_version": System2.Data.LinuxVersion,
+		"system_run_time":      System2.GetRunTime(),
+	})
 }
 
 func Disks(ctx *gin.Context) {
@@ -92,10 +85,12 @@ func SystemStatus(ctx *gin.Context) {
 
 func Shutdown(ctx *gin.Context) {
 	System2.Shutdown()
+	ctx.Abort()
 	// 没必要返回数据 都关机了 无需返回
 }
 
 func Reboot(ctx *gin.Context) {
 	System2.Reboot()
+	ctx.Abort()
 	// 没必要返回数据 都重启了 无需返回
 }

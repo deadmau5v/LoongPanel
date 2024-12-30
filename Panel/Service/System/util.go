@@ -7,7 +7,7 @@
 package System
 
 import (
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/mem"
@@ -23,12 +23,12 @@ func getLocalIP() ([]string, error) {
 	res := make([]string, 0)
 	ifaces, err := net.Interfaces()
 	if err != nil {
-		Log.ERROR("GetOSData() Error: ", err.Error())
+		PanelLog.ERROR("[系统监控]", "GetOSData() Error: ", err.Error())
 	}
 	for _, iface := range ifaces {
 		adders := iface.Addrs
 		if err != nil {
-			Log.ERROR("GetOSData() Error: ", err.Error())
+			PanelLog.ERROR("[系统监控]", "GetOSData() Error: ", err.Error())
 		}
 		for _, addr := range adders {
 			res = append(res, addr.Addr)
@@ -47,7 +47,7 @@ func getPublicIP() (string, error) {
 func getRAM() (float64, error) {
 	memInfo, err := mem.VirtualMemory()
 	if err != nil {
-		Log.ERROR("GetRAM() Error: ", err.Error())
+		PanelLog.ERROR("[系统监控]", "GetRAM() Error: ", err.Error())
 	}
 	return float64(memInfo.Total), err
 }
@@ -56,7 +56,7 @@ func getRAM() (float64, error) {
 func getSwap() (float64, error) {
 	memInfo, err := mem.SwapMemory()
 	if err != nil {
-		Log.ERROR("GetSwap() Error: ", err.Error())
+		PanelLog.ERROR("[系统监控]", "GetSwap() Error: ", err.Error())
 	}
 	return float64(memInfo.Total), err
 }
@@ -66,16 +66,22 @@ func getDisk() ([]*Disk, error) {
 	res := make([]*Disk, 0)
 	partitions, err := disk.Partitions(true)
 	if err != nil {
-		Log.ERROR("GetDisk() Error: ", err.Error())
+		PanelLog.ERROR("[系统监控]", "GetDisk() Error: ", err.Error())
 	}
 	for _, partition := range partitions {
 		// 筛选不必要的空磁盘
 		usage, err := disk.Usage(partition.Mountpoint)
 		if err != nil {
 			if err.Error() == "operation not permitted" {
+<<<<<<< HEAD
 				Log.WARN("GetDisk() Error: 权限不足警告")
 			} else {
 				Log.ERROR("GetDisk() Error: ", err.Error())
+=======
+				PanelLog.WARN("[系统监控] GetDisk() Error: 权限不足警告")
+			} else {
+				PanelLog.ERROR("[系统监控] GetDisk() Error: ", err.Error())
+>>>>>>> 8a524c1ff2e15f012ed93f4624f62feff287e74b
 			}
 			continue
 		}
@@ -96,7 +102,7 @@ func getDisk() ([]*Disk, error) {
 func getCPUPercent() float64 {
 	percentages, err := cpu.Percent(time.Second, false)
 	if err != nil {
-		Log.ERROR("Error: ", err)
+		PanelLog.ERROR("[系统监控]", "Error: ", err)
 		return 0
 	}
 	return percentages[0]
@@ -118,22 +124,33 @@ func getRAMMHz() (int, error) {
 	} else {
 		out, err := exec.Command("dmidecode", "-t", "memory").Output()
 		if err != nil {
-			Log.ERROR("GetRAMMHz() Error: ", err.Error())
+			// executable file not found in
+			if strings.Contains(err.Error(), "executable file not found in") {
+				PanelLog.WARN("[系统监控] GetRAMMHz() Error: dmidecode 命令不存在")
+			} else {
+				PanelLog.ERROR("[系统监控] GetRAMMHz() Error: ", err.Error())
+			}
 			return 0, err
 		}
 		res := string(out)
 		if strings.Contains(res, "Speed: Unknown") {
+			// 如果频率未知
+			PanelLog.DEBUG("[系统监控] GetRAMMHz() 频率未知")
 			return 0, nil
 		}
-		if !strings.Contains(res, "Permission denied") {
-			Log.WARN("GetRAMMHz() Error: 权限不足警告")
+		if strings.Contains(res, "Permission denied") {
+			// 如果权限不足
+			PanelLog.WARN("[系统监控] GetRAMMHz() Error: 权限不足警告")
+			return 0, err
 		}
-		if !strings.Contains(res, "Speed: ") {
+
+		// 正常情况
+		if strings.Contains(res, "Speed: ") {
 			res = strings.Split(res, "Speed: ")[1]
 			res = strings.Split(res, " ")[0]
 			resInt, err := strconv.Atoi(res)
 			if err != nil {
-				Log.ERROR("GetRAMMHz() Error: ", err.Error())
+				PanelLog.ERROR("[系统监控]", "GetRAMMHz() Error: ", err.Error())
 				return 0, err
 			}
 			return resInt, nil

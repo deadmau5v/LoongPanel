@@ -8,40 +8,41 @@ package API
 
 import (
 	"LoongPanel/Panel/Service/Auth"
-	"LoongPanel/Panel/Service/Log"
+	"LoongPanel/Panel/Service/PanelLog"
+
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 var App *gin.Engine
-var AppName = "LoongPanel"
 
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
 		origin := c.Request.Header.Get("Origin")
 		if origin != "" {
-			c.Header("Access-Control-Allow-Origin", "*")
+			c.Header("Access-Control-Allow-Origin", origin)
 			c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
 			c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 			c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
 			c.Header("Access-Control-Allow-Credentials", "true")
 		}
 		if method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
+			c.AbortWithStatus(204) // 返回204状态码
+			return
 		}
 		c.Next()
 	}
 }
 
 func init() {
+	gin.SetMode(gin.ReleaseMode)
 	App = gin.New()
-	App.Use(Log.GinLogToFile())
-	App.Use(gin.Logger())
-	App.Use(gin.Recovery())
 	App.Use(Cors())
-	App.Use(Auth.AuthUser())
 
-	gin.SetMode(gin.DebugMode)
+	App.Use(gin.Logger())
+	App.Use(PanelLog.GinLogToFile())
+	App.Use(gin.Recovery())
+	App.Use(Auth.UserAuth())
+
 	initRoute(App)
 }

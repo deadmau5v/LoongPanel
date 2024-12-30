@@ -1,125 +1,49 @@
 /*
  * 创建人： deadmau5v
  * 创建时间： 2024-5-7
- * 文件作用：终端相关API 主要实现在 Service/Terminal 包中
+ * 文件作用：提供 terminal 的流式传输
  */
 
 package terminal
 
 import (
-	"LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/Terminal"
+	"LoongPanel/Panel/Service/PanelLog"
+	Terminal2 "LoongPanel/Panel/Service/Terminal"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"net/http"
-	"strconv"
+	"strings"
 )
 
-func getQuery(ctx *gin.Context, key string) string {
-	value := ctx.Query(key)
-	if value == "" {
-		data := map[string]interface{}{
-			"msg":    "无法获取参数: " + key,
-			"status": -1,
-		}
-		ctx.JSON(200, data)
-
-	}
-	return value
+var upgrade = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
-func getIntQuery(ctx *gin.Context, key string) int {
-	value, err := strconv.Atoi(ctx.Query(key))
+func Terminal(c *gin.Context) {
+	PanelLog.INFO("[网页终端]", "terminal WebSocket 连接")
+	w := c.Writer
+	r := c.Request
+	host := c.Query("host")
+	port := c.Query("port")
+	user := c.Query("user")
+	pwd := c.Query("pwd")
+	conn, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
-		data := map[string]interface{}{
-			"msg":    "参数无效 需要Int: " + key,
-			"status": -1,
-		}
-		ctx.JSON(http.StatusInternalServerError, data)
-	}
-	return value
-}
-
-func GetScreens(ctx *gin.Context) {
-	data := make([]map[string]interface{}, 0)
-	for _, v := range Terminal.MainScreenManager.Screens {
-		data1 := map[string]interface{}{}
-		data1["id"] = v.Id
-		data1["name"] = v.Name
-
-		data = append(data, data1)
-	}
-	ctx.JSON(200, data)
-}
-
-func ScreenOutput(ctx *gin.Context) {
-	id := getIntQuery(ctx, "id")
-	idx := getIntQuery(ctx, "idx")
-	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
-	if screen == nil {
-		data := map[string]interface{}{
-			"msg":    "无法查询到ID",
-			"status": -1,
-		}
-		ctx.JSON(200, data)
+		PanelLog.ERROR("[网页终端]", "无法打开websocket连接")
+		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 		return
 	}
+	defer conn.Close()
 
-	data := map[string]interface{}{
-		"msg":    "ok",
-		"status": 0,
-		"data":   screen.GetOutput()[idx:],
-	}
-	ctx.JSON(200, data)
-}
-
-func ScreenClose(ctx *gin.Context) {
-	id := getIntQuery(ctx, "id")
-	Terminal.MainScreenManager.Close(id)
-	ctx.JSON(200, "ok")
-}
-
-func ScreenCreate(ctx *gin.Context) {
-	Log.INFO("screenCreate")
-	idStr := ctx.Query("id")
-	var id int
-	if idStr == "" {
-		id = Terminal.GetNextId() // 时间戳
-	} else {
-		_id, err := strconv.Atoi(idStr)
-		if err != nil {
-			data := map[string]interface{}{
-				"msg":    "无法获取参数: id",
-				"status": -1,
-			}
-			ctx.JSON(200, data)
-			return
-		}
-		id = _id
-	}
-
-	name := strconv.Itoa(id)
-	err := Terminal.MainScreenManager.Create(name, uint32(id))
-	data := map[string]interface{}{}
+	err = Terminal2.Shell(conn, host, port, user, pwd)
 	if err != nil {
-		data["status"] = -1
-		data["msg"] = err.Error()
-		ctx.JSON(200, data)
-		Log.ERROR("创建Screen错误")
-		return
-	}
-	data["status"] = 0
-	data["msg"] = "ok"
-	ctx.JSON(200, data)
-}
+		if strings.Contains(err.Error(), "connection refused") {
+			PanelLog.ERROR("[网页终端]", "连接SSH失败")
+		} else {
+			PanelLog.ERROR("[网页终端]", err.Error())
+		}
 
-func ScreenInput(ctx *gin.Context) {
-	id := getIntQuery(ctx, "id")
-	cmd := getQuery(ctx, "cmd")
-	screen := Terminal.MainScreenManager.GetScreen(uint32(id))
-	screen.Input(cmd)
-	data := map[string]interface{}{
-		"msg":    "ok",
-		"status": 0,
 	}
-	ctx.JSON(200, data)
 }

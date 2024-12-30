@@ -1,5 +1,3 @@
-REM from https://d5v.cc/?p=the-construction-of-golang-1fatm2
-
 @echo off
 SETLOCAL ENABLEDELAYEDEXPANSION
 
@@ -12,8 +10,8 @@ SET APP_NAME=LoongPanel
 SET SOURCE_FILE=main.go
 
 REM 设置目标系统和架构
-SET PLATFORMS=windows
-SET ARCHS=amd64
+SET PLATFORMS=linux
+SET ARCHS=loong64
 
 REM 开始编译
 FOR %%P IN (%PLATFORMS%) DO (
@@ -24,19 +22,19 @@ FOR %%P IN (%PLATFORMS%) DO (
         IF "%%P"=="windows" (
             SET OUTPUT_NAME=!OUTPUT_NAME!.exe
         )
-        echo building: !OUTPUT_NAME!
+        echo 构建中: !OUTPUT_NAME!
         REM 删除旧的二进制文件
         IF EXIST bin\!OUTPUT_NAME! (
             del bin\!OUTPUT_NAME!
         )
         go build -o bin/!OUTPUT_NAME! -ldflags "-s -w -extldflags '-static'" %SOURCE_FILE%
         IF NOT !ERRORLEVEL! == 0 (
-            echo build failed !OUTPUT_NAME!
+            echo 构建失败 !OUTPUT_NAME!
         ) ELSE (
-            echo build success !OUTPUT_NAME!
+            echo 构建成功 !OUTPUT_NAME!
         )
     )
 )
 
-ECHO build finished
+ECHO 构建完成
 ENDLOCAL

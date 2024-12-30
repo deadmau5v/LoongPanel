@@ -8,53 +8,98 @@ package Auth
 
 import (
 	"LoongPanel/Panel/Service/Auth"
-	"LoongPanel/Panel/Service/Log"
-	"LoongPanel/Panel/Service/User"
+	"LoongPanel/Panel/Service/Database"
+	"LoongPanel/Panel/Service/PanelLog"
+	"errors"
+	"time"
+
 	"github.com/gin-gonic/gin"
 )
 
-var filed = map[string]interface{}{
-	"code": 401,
-	"msg":  "用户名或密码错误",
-}
+const (
+	successCode      = 200
+	errorCode        = 400
+	unauthorizedCode = 401
+)
 
 func Login(c *gin.Context) {
-	// 读取请求的Json参数
 	var req struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
+		Email    string `json:"email"`
 	}
 
-	err := c.BindJSON(&req)
-
-	if err != nil {
-		c.JSON(400, gin.H{
-			"code": 400,
-			"msg":  "参数错误",
-		})
+	if err := c.BindJSON(&req); err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
 		return
 	}
 
-	// 验证用户名和密码
-	for _, user := range User.Find() {
-		if user.Name == req.Username && user.Password == req.Password {
-			// 登录成功
-			Log.DEBUG(req.Username + ": 登录成功")
-			c.JSON(200, map[string]interface{}{
-				"code":    200,
-				"msg":     "登录成功",
-				"session": Auth.RandomSESSION(req.Username),
-			})
-			return
+	user, err := authenticateUser(req.Username, req.Email, req.Password)
+	if err != nil || user == nil {
+		if err != nil {
+			PanelLog.DEBUG("[权限管理]", "登录失败: "+err.Error())
 		} else {
-			Log.DEBUG(req.Username+": 登录失败", req.Password, " != ", user.Password)
-			continue
+			PanelLog.DEBUG("[权限管理]", "登录失败: 用户不存在")
 		}
+		c.JSON(unauthorizedCode, gin.H{"status": 401, "msg": "用户名或密码错误"})
+		return
 	}
 
-	// 登录失败
-	Log.DEBUG(req.Username + ": 登录失败")
-	c.JSON(401, filed)
-	return
+	session, err := Auth.CreateSession(user.Name)
+	if err != nil {
+		PanelLog.DEBUG("[权限管理]", "登录失败: "+err.Error())
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "登录失败"})
+		return
+	}
+	PanelLog.DEBUG("[权限管理]", user.Name+": 登录成功")
+	user.LastLoginTime = time.Now().Format("2006-01-01 11:22:33")
+	user.LastLoginIP = c.ClientIP()
+	user.Update()
+	Auth.SetSessionCookie(c, session)
 
+	c.JSON(successCode, gin.H{
+		"status": 0,
+		"msg":    "登录成功",
+	})
+}
+
+func Logout(c *gin.Context) {
+	session, err := c.Cookie(Auth.CookieName)
+	if err != nil {
+		c.JSON(errorCode, gin.H{"status": 1, "msg": "参数错误"})
+		return
+	}
+
+	Auth.DeleteSession(session)
+	PanelLog.DEBUG("[权限管理]", "用户注销成功")
+	Auth.ClearSessionCookie(c)
+	c.JSON(successCode, gin.H{"status": 0, "msg": "注销成功"})
+}
+
+func authenticateUser(username, email, password string) (*Database.User, error) {
+	users := Database.UserFind()
+	for _, user := range users {
+		if user.Name != "" && user.Name == username {
+			// 通过用户名
+			ok, err := Auth.AuthenticateUser(user.Name, password)
+			if ok && err == nil {
+				return &user, nil
+			} else if !ok && err == nil {
+				return nil, errors.New("密码错误")
+			} else {
+				return nil, err
+			}
+		} else if user.Mail != "" && user.Mail == email {
+			// 通过邮箱
+			ok, err := Auth.AuthenticateUserByEmail(user.Mail, password)
+			if ok && err == nil {
+				return &user, nil
+			} else if !ok && err == nil {
+				return nil, errors.New("密码错误")
+			} else {
+				return nil, err
+			}
+		}
+	}
+	return nil, errors.New("用户名或密码错误")
 }
