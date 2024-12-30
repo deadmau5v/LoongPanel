@@ -15,8 +15,7 @@ import (
 	"os/exec"
 )
 
-// downloadDist 下载前端文件
-func downloadDist() {
+func DownloadFrontendFiles() {
 	Log.INFO("开始下载前端文件")
 	// 下载地址：https://cdn1.d5v.cc/CDN/Project/LoongPanel/bin/dist.zip
 	const DistURL = "https://cdn1.d5v.cc/CDN/Project/LoongPanel/bin/dist.zip"
@@ -62,7 +61,7 @@ func downloadDist() {
 
 func main() {
 	if _, err := os.Stat("./dist"); os.IsNotExist(err) {
-		downloadDist()
+		DownloadFrontendFiles()
 	}
 
 	Log.INFO("http://127.0.0.1:8080")

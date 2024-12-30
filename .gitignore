@@ -24,3 +24,12 @@ go.work
 test
 bin
 resource
+*.log
+/.idea
+/dist
+test.sh
+scripts.zip
+LoongPanel-linux-amd64
+LoongPanel-linux-loong64
+LoongPanel-linux-arm64
+log.txt
