@@ -8,14 +8,15 @@ package System
 
 import (
 	"LoongPanel/Panel/Service/PanelLog"
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/mem"
-	"github.com/shirou/gopsutil/net"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/net"
 )
 
 // getLocalIP 获取本地IP 数组
@@ -73,15 +74,9 @@ func getDisk() ([]*Disk, error) {
 		usage, err := disk.Usage(partition.Mountpoint)
 		if err != nil {
 			if err.Error() == "operation not permitted" {
-<<<<<<< HEAD
-				Log.WARN("GetDisk() Error: 权限不足警告")
+				PanelLog.WARN("GetDisk() Error: 权限不足警告")
 			} else {
-				Log.ERROR("GetDisk() Error: ", err.Error())
-=======
-				PanelLog.WARN("[系统监控] GetDisk() Error: 权限不足警告")
-			} else {
-				PanelLog.ERROR("[系统监控] GetDisk() Error: ", err.Error())
->>>>>>> 8a524c1ff2e15f012ed93f4624f62feff287e74b
+				PanelLog.ERROR("GetDisk() Error: ", err.Error())
 			}
 			continue
 		}

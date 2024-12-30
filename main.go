@@ -28,8 +28,8 @@ import (
 
 //region 下载前端文件
 
-// downloadDist 下载前端文件
-func downloadDist() {
+// DownloadFrontendFiles 下载前端文件
+func DownloadFrontendFiles() {
 	PanelLog.INFO("[LoonPanel]", "开始下载前端文件")
 	const DistURL = "https://cdn1.d5v.cc/CDN/Project/LoongPanel/bin/dist.zip"
 	const DistPath = "./dist.zip"
